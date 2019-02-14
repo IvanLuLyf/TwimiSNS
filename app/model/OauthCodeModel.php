@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * Created by PhpStorm.
+ * User: IvanLu
+ * Date: 2018/1/8
+ * Time: 13:29
+ */
+class OauthCodeModel extends Model
+{
+    public function getCode($appKey, $appId, $uid, $timestamp)
+    {
+        $code = md5($uid . $appKey . $timestamp);
+        $this->add(['uid' => $uid, 'appid' => $appId, 'code' => $code, 'expire' => ($timestamp + 604800)]);
+        return $code;
+    }
+
+    public function checkCode($appId, $appCode)
+    {
+        if ($row = $this->where(['appid= ? and code= ? and expire > ?'], [$appId, $appCode, time()])->fetch()) {
+            $this->where(['appid= ? and code= ?'], [$appId, $appCode])->delete();
+            return $row['uid'];
+        } else {
+            return null;
+        }
+    }
+}

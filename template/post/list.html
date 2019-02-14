@@ -1,0 +1,76 @@
+<html lang="zh-cn">
+<head>
+    <title><?=constant("TP_SITE_NAME")?></title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/common.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <link href="/static/css/article.css" rel="stylesheet">
+</head>
+<body>
+<?php include "template/common/navbar.html"; ?>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+            <?php foreach ($posts as $post): ?>
+            <div class="card neo_card mt-4">
+                <div class="card-body">
+                    <div class="media">
+                        <div class="media-body small">
+                            <h4><a href="/post/view/<?= $post['tid'] ?>"><?= $post['title'] ?></a></h4>
+                            <div>
+                                <img class="rounded-circle"
+                                     src="/user/avatar?username=<?=$post['username']?>"
+                                     width="24px"/>
+								<span class="username">
+									<a href="/user/post/<?=$post['username']?>"
+                                       class="text-muted font-weight-bold"><?= $post['nickname'] ?></a>
+								</span>
+                                <span class="text-grey ml-2"><?= date('Y-m-d H:i:s', $post['timestamp']) ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="markdown-body">
+                        <?=$post['content']?>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach ?>
+        </div>
+        <div class="col-lg-3">
+            <?php if (isset($tp_user)): ?>
+            <div class="card neo_card mt-4">
+                <div class="card-body">
+                    <a href="/post/create" class="btn btn-dark btn-block text-white badge-pill">发贴</a>
+                </div>
+            </div>
+            <div class="card neo_card mt-4">
+                <div class="card-body text-center">
+                    <img src="/user/avatar/<?= $tp_user['uid'] ?>"
+                         class="rounded-circle center-block" width="72px"/>
+                    <h4 class="card-title"><?= $tp_user['nickname'] ?></h4>
+                </div>
+            </div>
+            <?php endif; ?>
+            <?php if(isset($recommend_posts)):?>
+            <div class="card neo_card mt-4">
+                <div class="card-header">
+                    推荐列表
+                </div>
+                <ul class="list-group list-group-flush">
+                    <?php foreach ($recommend_posts as $post): ?>
+                    <li class="list-group-item list-group-item-action"><?=$post['title']?></li>
+                    <?php endforeach ?>
+                </ul>
+            </div>
+            <?php endif;?>
+        </div>
+    </div>
+</div>
+<?php include "template/common/footer.html"; ?>
+</body>
+</html>
