@@ -8,14 +8,16 @@
 
 class PostModel extends Model
 {
-    public function getPostByPage($page = 1, $size = 5)
+    public function getPostByPage($page = 1, $size = 20)
     {
-        return $this->order(['tid desc'])->limit($size, ($page - 1) * $size)->fetchAll();
+        return $this->join(DB_PREFIX . "user", [DB_PREFIX . "post.username=" . DB_PREFIX . "user.username"], "LEFT")
+            ->order(['tid desc'])->limit($size, ($page - 1) * $size)->fetchAll(DB_PREFIX . "post.*," . DB_PREFIX . "user.nickname");
     }
 
     public function getPostById($id)
     {
-        return $this->where("tid=:tid", ['tid' => $id])->fetch();
+        return $this->join(DB_PREFIX . "user", [DB_PREFIX . "post.username=" . DB_PREFIX . "user.username"], "LEFT")
+            ->where("tid=:tid", ['tid' => $id])->fetch(DB_PREFIX . "post.*," . DB_PREFIX . "user.nickname");
     }
 
     public function getPostByUsername($username)
@@ -26,7 +28,7 @@ class PostModel extends Model
     public function sendPost($user, $title, $content)
     {
         if ($user != null && $title != null && $content != null) {
-            $post = ['username' => $user['username'], 'nickname' => $user['nickname'], 'title' => $title, 'content' => $content, 'timestamp' => time()];
+            $post = ['username' => $user['username'], 'title' => $title, 'content' => $content, 'timestamp' => time()];
             return $this->add($post);
         } else {
             return -1;
