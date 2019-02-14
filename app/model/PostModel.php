@@ -14,6 +14,11 @@ class PostModel extends Model
             ->order(['tid desc'])->limit($size, ($page - 1) * $size)->fetchAll(DB_PREFIX . "post.*," . DB_PREFIX . "user.nickname");
     }
 
+    public function getTotal()
+    {
+        return $this->fetch("count(*) num")['num'];
+    }
+
     public function getPostById($id)
     {
         return $this->join(DB_PREFIX . "user", [DB_PREFIX . "post.username=" . DB_PREFIX . "user.username"], "LEFT")

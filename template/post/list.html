@@ -25,7 +25,7 @@
                                 <img class="rounded-circle"
                                      src="/user/avatar?username=<?=$post['username']?>"
                                      width="24px"/>
-								<span class="username">
+                                <span class="username">
 									<a href="/user/post/<?=$post['username']?>"
                                        class="text-muted font-weight-bold"><?= $post['nickname'] ?></a>
 								</span>
@@ -35,11 +35,30 @@
                     </div>
                     <hr>
                     <div class="markdown-body">
-                        <?=$post['content']?>
+                        <?=strip_tags($parser->makeHtml($post['content']))?>
                     </div>
                 </div>
             </div>
             <?php endforeach ?>
+            <nav class="mt-4" aria-label="">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="/post/list/1">首页</a>
+                    </li>
+                    <li class="page-item <?=$page==1?'disabled':''?>">
+                        <a class="page-link" href="/post/list/<?=$page==1?1:($page-1)?>">上一页</a>
+                    </li>
+                    <?php for($i=($page>4?($page-3):1);($i<=$page+5 && $i<=$end_page);$i++):?>
+                    <li class="page-item <?=$page==$i?'active':''?>"><a class="page-link" href="/post/list/<?=$i?>"><?=$i?></a></li>
+                    <?php endfor;?>
+                    <li class="page-item <?=$page==$end_page?'disabled':''?>">
+                        <a class="page-link" href="/post/list/<?=$page==$end_page?$end_page:($page+1)?>">下一页</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="/post/list/<?=$end_page?>">尾页</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
         <div class="col-lg-3">
             <?php if (isset($tp_user)): ?>

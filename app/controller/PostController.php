@@ -51,6 +51,10 @@ class PostController extends Controller
             if ($this->_mode == BunnyPHP::MODE_NORMAL) {
                 $this->assign('tp_user', $tp_user);
                 $this->assign('cur_ctr', 'post');
+                include APP_PATH . 'library/Parser.php';
+                $parser = new HyperDown\Parser;
+                $html_content = $parser->makeHtml($post['content']);
+                $this->assign("html_content", $html_content);
             }
             $this->assign("post", $post)->assign('comments', $comments)
                 ->render('post/view.html');
@@ -63,12 +67,18 @@ class PostController extends Controller
     function ac_list(array $path, UserService $userService)
     {
         $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : isset($path[0]) ? $path[0] : 1;
-        $posts = (new PostModel())->getPostByPage($page);
+        $postModel = (new PostModel());
+        $posts = $postModel->getPostByPage($page);
+        $total = $postModel->getTotal();
+        $endPage = ceil($total / 20);
         if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+            include APP_PATH . 'library/Parser.php';
+            $parser = new HyperDown\Parser;
+            $this->assign('parser', $parser);
             $this->assign('tp_user', $userService->getLoginUser())
-                ->assign('cur_ctr', 'post');
+                ->assign('cur_ctr', 'post')->assign('end_page', $endPage);
         }
-        $this->assign("page", $page)->assign("posts", $posts)
+        $this->assign('total', $total)->assign("page", $page)->assign("posts", $posts)
             ->render('post/list.html');
     }
 
