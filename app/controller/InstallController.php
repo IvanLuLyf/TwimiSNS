@@ -202,21 +202,21 @@ class InstallController extends Controller
                 'buid' => ['text', 'not null'],
                 'token' => ['text', 'not null'],
                 'expire' => ['text']
-            ], ['id']);
+            ], ['uid']);
 
             Database::getInstance()->createTable($db_prefix . 'sina_bind', [
                 'uid' => ['integer', 'not null'],
                 'buid' => ['text', 'not null'],
                 'token' => ['text', 'not null'],
                 'expire' => ['text']
-            ], ['id']);
+            ], ['uid']);
 
             Database::getInstance()->createTable($db_prefix . 'twimi_bind', [
                 'uid' => ['integer', 'not null'],
                 'buid' => ['text', 'not null'],
                 'token' => ['text', 'not null'],
                 'expire' => ['text']
-            ], ['id']);
+            ], ['uid']);
 
             Database::getInstance()->createTable($db_prefix . 'friend', [
                 'id' => ['integer', 'not null'],
