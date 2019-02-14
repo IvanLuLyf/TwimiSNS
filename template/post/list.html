@@ -46,13 +46,20 @@
                         <a class="page-link" href="/post/list/1">首页</a>
                     </li>
                     <li class="page-item <?=$page==1?'disabled':''?>">
-                        <a class="page-link" href="/post/list/<?=$page==1?1:($page-1)?>">上一页</a>
+                        <a aria-label="Previous" class="page-link" href="/post/list/<?=$page==1?1:($page-1)?>">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">上一页</span>
+                        </a>
                     </li>
                     <?php for($i=($page>4?($page-3):1);($i<=$page+5 && $i<=$end_page);$i++):?>
-                    <li class="page-item <?=$page==$i?'active':''?>"><a class="page-link" href="/post/list/<?=$i?>"><?=$i?></a></li>
+                    <li class="page-item <?=$page==$i?'active':''?>"><a class="page-link"
+                                                                        href="/post/list/<?=$i?>"><?=$i?></a></li>
                     <?php endfor;?>
                     <li class="page-item <?=$page==$end_page?'disabled':''?>">
-                        <a class="page-link" href="/post/list/<?=$page==$end_page?$end_page:($page+1)?>">下一页</a>
+                        <a aria-label="Next" class="page-link" href="/post/list/<?=$page==$end_page?$end_page:($page+1)?>">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">下一页</span>
+                        </a>
                     </li>
                     <li class="page-item">
                         <a class="page-link" href="/post/list/<?=$end_page?>">尾页</a>
