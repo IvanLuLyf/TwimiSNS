@@ -116,7 +116,6 @@ class InstallController extends Controller
             Database::getInstance()->createTable($db_prefix . 'post', [
                 'tid' => ['integer', 'not null'],
                 'username' => ['varchar(16)', 'not null'],
-                'nickname' => ['varchar(32)'],
                 'title' => ['text', 'not null'],
                 'content' => ['text', 'not null'],
                 'timestamp' => ['text'],
