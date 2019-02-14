@@ -74,7 +74,7 @@ class OauthController extends Controller
                 $_SESSION[$type . '_bind_uid'] = $bind['uid'];
                 $_SESSION[$type . '_token'] = $bind['token'];
                 $_SESSION[$type . '_expire'] = $bind['expire'];
-                $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type, 'name' => '微博'])
+                $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])
                     ->render('oauth/connect.html');
             }
         }
@@ -108,12 +108,12 @@ class OauthController extends Controller
             if (isset($_SESSION['referer'])) {
                 $referer = $_SESSION['referer'];
                 unset($_SESSION['referer']);
-                view::redirect($referer);
+                $this->redirect($referer);
             } else {
-                view::redirect('index', 'index');
+                $this->redirect('index', 'index');
             }
         } else {
-            $this->assign('oauth', ['type' => $type, 'name' => '微博'])
+            $this->assign('oauth', ['type' => $type])
                 ->render('oauth/connect.html');
         }
     }
