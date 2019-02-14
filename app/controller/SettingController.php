@@ -23,7 +23,9 @@ class SettingController extends Controller
     public function ac_gravatar()
     {
         $tp_user = BunnyPHP::app()->get('tp_user');
-        (new AvatarModel())->upload($tp_user['id'], 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($tp_user['email']))));
+        if (!empty($tp_user['uid'])) {
+            (new AvatarModel())->upload($tp_user['uid'], 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($tp_user['email']))));
+        }
         $this->assign('tp_user', $tp_user);
         $this->redirect('setting', 'index');
     }
