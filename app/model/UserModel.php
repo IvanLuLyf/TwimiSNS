@@ -15,10 +15,15 @@ class UserModel extends Model
 
     public function refresh($uid)
     {
+        $user = $this->where("uid = :u", ['u' => $uid])->fetch();
         $timestamp = time();
-        $token = md5($uid . md5($timestamp) . $timestamp);
-        $updates = ['token' => $token, 'expire' => $timestamp + 604800];
-        $this->where(["uid = :uid"], ['uid' => $uid])->update($updates);
+        if ($user['expire'] == null || $timestamp > intval($user['expire'])) {
+            $token = md5($user['uid'] . $user['username'] . $timestamp);
+            $updates = ['token' => $token, 'expire' => $timestamp + 604800];
+            $this->where(["uid = :uid"], ['uid' => $uid])->update($updates);
+        } else {
+            $token = $user['token'];
+        }
         return $token;
     }
 
