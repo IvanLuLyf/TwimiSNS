@@ -6,6 +6,8 @@
  * Time: 16:27
  */
 
+include_once('library/SinaWeibo/saetv2.ex.class.php');
+
 class OauthController extends Controller
 {
     function ac_connect(array $path)
