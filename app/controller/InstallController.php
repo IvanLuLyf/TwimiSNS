@@ -135,6 +135,13 @@ class InstallController extends Controller
                 'image' => ['integer'],
             ], ['tid'], 'tid');
 
+            Database::getInstance()->createTable($db_prefix . 'feed_image', [
+                'id' => ['integer', 'not null'],
+                'tid' => ['integer', 'not null'],
+                'uid' => ['integer', 'not null'],
+                'url' => ['text', 'not null'],
+            ], ['id'], 'id');
+
             Database::getInstance()->createTable($db_prefix . 'notification', [
                 'nid' => ['integer', 'not null'],
                 'aid' => ['integer', 'not null'],
