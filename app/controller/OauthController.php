@@ -113,7 +113,8 @@ class OauthController extends Controller
                 $this->redirect('index', 'index');
             }
         } else {
-            $this->assign('oauth', ['type' => $type, 'nickname' => $_POST['nickname']])
+            $this->assignAll($result);
+            $this->assign('oauth', ['type' => $type, 'nickname' => isset($_POST['nickname']) ? $_POST['nickname'] : ''])
                 ->render('oauth/connect.html');
         }
     }
