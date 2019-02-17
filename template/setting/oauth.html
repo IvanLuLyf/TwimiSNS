@@ -1,0 +1,40 @@
+<html lang="zh-cn">
+<head>
+    <title>账号绑定 - <?=constant("TP_SITE_NAME")?></title>
+    <?php include "template/common/header.html"; ?>
+</head>
+<body>
+<?php include "template/common/navbar.html"; ?>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3">
+            <?php include "template/setting/nav.html"; ?>
+        </div>
+        <div class="col-lg-9">
+            <div class="card neo_card mt-4">
+                <div class="card-body">
+                    <?php if(isset($tp_bind)):?>
+                    <form action="/setting/<?=$oauth['type']?>_avatar">
+                        <input type="hidden" name="avatar" value="<?=$avatar?>">
+                        <div class="form-group">
+                            <div class="col-sm-3 col-form-label">
+                                <img class="rounded-circle"
+                                     src="<?=$avatar?>">
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="submit" value="使用<?=$oauth['name']?>头像" class="btn btn-dark">
+                            </div>
+                        </div>
+                    </form>
+                    <?php else: ?>
+                    <a role="button" class="btn btn-info"
+                       href="/oauth/connect/<?=$oauth['type']?>">使用<?=$oauth['name']?>账号绑定</a>
+                    <?php endif;?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php include "template/common/footer.html"; ?>
+</body>
+</html>

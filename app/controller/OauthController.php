@@ -33,7 +33,7 @@ class OauthController extends Controller
         $this->redirect($url);
     }
 
-    function ac_callback(array $path)
+    function ac_callback(array $path, UserService $userService)
     {
         if (count($path) < 1) $path = [''];
         list($type) = $path;
@@ -70,12 +70,28 @@ class OauthController extends Controller
                     $this->redirect('index', 'index');
                 }
             } else {
-                session_start();
-                $_SESSION[$type . '_bind_uid'] = $bind['uid'];
-                $_SESSION[$type . '_token'] = $bind['token'];
-                $_SESSION[$type . '_expire'] = $bind['expire'];
-                $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])
-                    ->render('oauth/connect.html');
+                if ($user = $userService->getLoginUser()) {
+                    $bind_data = array('uid' => $user['uid'], 'buid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']);
+                    switch ($type) {
+                        case 'tm';
+                            (new TwimiBindModel())->add($bind_data);
+                            break;
+                        case 'qq':
+                            (new QqBindModel())->add($bind_data);
+                            break;
+                        case 'wb':
+                            (new SinaBindModel())->add($bind_data);
+                            break;
+                    }
+                    $this->redirect('setting', $type);
+                } else {
+                    session_start();
+                    $_SESSION[$type . '_bind_uid'] = $bind['uid'];
+                    $_SESSION[$type . '_token'] = $bind['token'];
+                    $_SESSION[$type . '_expire'] = $bind['expire'];
+                    $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])
+                        ->render('oauth/connect.html');
+                }
             }
         }
     }
