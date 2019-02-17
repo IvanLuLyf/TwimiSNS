@@ -16,7 +16,7 @@
                     <form action="/setting/gravatar">
                         <div class="form-group">
                             <div class="col-sm-3 col-form-label">
-                                <img class="rounded-circle" src="https://www.gravatar.com/avatar/<?=md5(strtolower(trim($tp_user['email'])))?>">
+                                <img height="100px" width="100px" class="rounded-circle" src="https://www.gravatar.com/avatar/<?=md5(strtolower(trim($tp_user['email'])))?>">
                             </div>
                             <div class="col-sm-9">
                                 <input type="submit" value="使用Gravatar头像" class="btn btn-dark">
