@@ -20,7 +20,7 @@ class OauthTokenModel extends Model
     public function get($uid, $appKey)
     {
         $timestamp = time();
-        if ($tokenRow = $this->where(["appkey = :appkey and uid = :uid"], [':appkey' => $appKey, ':uid' => $uid])->fetch()) {
+        if ($tokenRow = $this->where(["appkey = :ak and uid = :u"], ['ak' => $appKey, 'u' => $uid])->fetch()) {
             if ($timestamp < intval($tokenRow['expire'])) {
                 $token = $tokenRow['token'];
                 $expire = $tokenRow['expire'];
@@ -28,7 +28,7 @@ class OauthTokenModel extends Model
                 $token_id = $tokenRow['id'];
                 $token = md5($uid + $appKey + $timestamp);
                 $expire = $timestamp + 604800;
-                $this->where(["id = :id"], [':id' => $token_id])->update(['token' => $token, 'expire' => $expire]);
+                $this->where(["id = :id"], ['id' => $token_id])->update(['token' => $token, 'expire' => $expire]);
             }
         } else {
             $token = md5($uid + $appKey + $timestamp);
