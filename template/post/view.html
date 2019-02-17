@@ -4,14 +4,7 @@
     <meta property="og:image" content="/user/avatar?username=<?=$post['username']?>">
     <meta property="og:description" content="<?=$post['title']?>">
     <title><?=$post['title']?> - <?=constant("TP_SITE_NAME")?></title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="<?=$post['title']?> - <?=constant('TP_SITE_NAME')?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/common.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <?php include "template/common/header.html"; ?>
     <link href="/static/css/article.css" rel="stylesheet">
 </head>
 <body>
@@ -54,7 +47,8 @@
                             <div class="row">
                                 <div class="mr-auto"></div>
                                 <div class="col-md-3 col-lg-3">
-                                    <button class="btn btn-dark btn-block badge-pill" type="submit" <?php if (!isset($tp_user)):?>disabled<?php endif;?>>发布</button>
+                                    <button class="btn btn-dark btn-block badge-pill" type="submit"
+                                    <?php if (!isset($tp_user)):?>disabled<?php endif;?>>发布</button>
                                 </div>
                             </div>
                         </div>
