@@ -11,7 +11,11 @@ class FriendModel extends Model
     public function listFriend($uid, $state = 2)
     {
         $friends = $this->where(["uid = ? and state = ?"], [$uid, $state])->fetchAll();
-        array_multisort(array_column($friends, 'notename'), SORT_DESC, $friends);
+        $names = [];
+        foreach ($friends as $friend) {
+            $names[] = iconv("UTF-8", "GB2312//IGNORE", $friend['notename']);
+        }
+        array_multisort($names, SORT_ASC, SORT_LOCALE_STRING, $friends);
         return $friends;
     }
 
