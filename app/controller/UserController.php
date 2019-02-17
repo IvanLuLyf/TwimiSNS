@@ -41,6 +41,11 @@ class UserController extends Controller
                 $this->render('user/login.html');
             }
         } elseif ($this->_mode == BunnyPHP::MODE_API) {
+            if ($result['ret'] == 0) {
+                $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['appkey']);
+                $result['token'] = $appToken['token'];
+                $result['expire'] = $appToken['expire'];
+            }
             $this->assignAll($result);
             $this->render();
         }
@@ -87,6 +92,11 @@ class UserController extends Controller
                     $this->render('user/register.html');
                 }
             } elseif ($this->_mode == BunnyPHP::MODE_API) {
+                if ($result['ret'] == 0) {
+                    $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['appkey']);
+                    $result['token'] = $appToken['token'];
+                    $result['expire'] = $appToken['expire'];
+                }
                 $this->assignAll($result);
                 $this->render();
             }
