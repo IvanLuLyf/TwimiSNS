@@ -56,7 +56,8 @@
                                                                         href="/post/list/<?=$i?>"><?=$i?></a></li>
                     <?php endfor;?>
                     <li class="page-item <?=$page==$end_page?'disabled':''?>">
-                        <a aria-label="Next" class="page-link" href="/post/list/<?=$page==$end_page?$end_page:($page+1)?>">
+                        <a aria-label="Next" class="page-link"
+                           href="/post/list/<?=$page==$end_page?$end_page:($page+1)?>">
                             <span aria-hidden="true">&raquo;</span>
                             <span class="sr-only">下一页</span>
                         </a>
@@ -96,6 +97,9 @@
             <?php endif;?>
         </div>
     </div>
+</div>
+<div class="fab-div d-lg-none d-md-none d-xl-none">
+    <button class="btn btn-success btn-fab" onclick="window.location.href='/post/create'">+</button>
 </div>
 <?php include "template/common/footer.html"; ?>
 </body>
