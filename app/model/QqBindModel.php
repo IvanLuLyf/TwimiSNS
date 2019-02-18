@@ -12,7 +12,7 @@ class QqBindModel extends Model
     {
         if ($bind_row = $this->where(['uid=:uid'], ['uid' => $uid])->fetch()) {
             $bind_uid = $bind_row['buid'];
-            return "http://qzapp.qlogo.cn/qzapp/$key/$bind_uid/100";
+            return "https://qzapp.qlogo.cn/qzapp/$key/$bind_uid/100";
         } else {
             return '/static/images/avatar.jpg';
         }

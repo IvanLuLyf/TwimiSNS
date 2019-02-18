@@ -96,6 +96,36 @@ class OauthController extends Controller
         }
     }
 
+    /**
+     * @filter api
+     */
+    function ac_login()
+    {
+        $type = $_REQUEST['type'];
+        $bind_uid = $_REQUEST['buid'];
+        $bind_token = $_REQUEST['token'];
+        $model = null;
+        switch ($type) {
+            case 'tm';
+                $model = new TwimiBindModel();
+                break;
+            case 'qq':
+                $model = new QqBindModel();
+                break;
+            case 'wb':
+                $model = new SinaBindModel();
+                break;
+        }
+        if ($uid = $model->getUid($bind_uid)) {
+            $model->where(['buid=:b'], ['b' => $bind_uid])->update(['token' => $bind_token]);
+            $result = (new UserModel())->getUserByUid($uid);
+            $appToken = (new OauthTokenModel())->get($uid, $_POST['appkey']);
+            $result['token'] = $appToken['token'];
+            $result['expire'] = $appToken['expire'];
+            $this->assign('ret', 0)->assign('status', 'ok')->assignAll($result)->render();
+        }
+    }
+
     function ac_bind(array $path)
     {
         if (count($path) < 1) $path = [''];

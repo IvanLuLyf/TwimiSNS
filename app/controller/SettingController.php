@@ -80,7 +80,8 @@ class SettingController extends Controller
             $o = Config::load('oauth')->get('wb');
             $c = new SaeTClientV2($o['key'], $o['secret'], $bind['token']);
             $user_message = $c->show_user_by_id($bind['buid']);
-            $this->assign('avatar', $user_message['avatar_large']);
+            $image = str_replace('http:', 'https:', $user_message['avatar_large']);
+            $this->assign('avatar', $image);
         }
         $this->assign('cur_st', 'wb')
             ->assign('oauth', ['type' => 'wb', 'name' => '微博'])
