@@ -52,17 +52,17 @@
 </div>
 <script>
     function selectDB(db) {
-        if (db == 'mysql') {
+        if (db === 'mysql') {
             $('#div_host').show();
             $('#div_port').show();
             $('#div_user').show();
             $('#div_pass').show();
-        } else if (db == 'pgsql') {
+        } else if (db === 'pgsql') {
             $('#div_host').show();
             $('#div_port').show();
             $('#div_user').show();
             $('#div_pass').show();
-        } else if (db = 'sqlite') {
+        } else if (db === 'sqlite') {
             $('#div_host').hide();
             $('#div_port').hide();
             $('#div_user').hide();

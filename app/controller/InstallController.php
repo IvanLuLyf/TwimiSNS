@@ -129,9 +129,9 @@ class InstallController extends Controller
                 'source' => ['text'],
                 'content' => ['text', 'not null'],
                 'timestamp' => ['text'],
-                'share_num' => ['integer'],
-                'comment_num' => ['integer'],
-                'like_num' => ['integer'],
+                'share_num' => ['integer', 'default 0'],
+                'comment_num' => ['integer', 'default 0'],
+                'like_num' => ['integer', 'default 0'],
                 'image' => ['integer'],
             ], ['tid'], 'tid');
 
