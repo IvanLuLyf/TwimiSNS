@@ -60,9 +60,9 @@
                         </p>
                     </div>
                     <div class="oauth-bar text-center">
-                        <a href="/oauth/connect/qq"><img alt="QQ" class="oauth-icon" src="/static/img/qq.png"></a>
-                        <a href="/oauth/connect/wb"><img alt="微博" class="oauth-icon" src="/static/img/wb.png"></a>
-                        <a href="/oauth/connect/tm"><img alt="Twimi" class="oauth-icon" src="/static/img/tm.png"></a>
+                        <a href="/oauth/connect/qq?referer=/post/view/<?=$post['tid']?>"><img alt="QQ" class="oauth-icon" src="/static/img/qq.png"></a>
+                        <a href="/oauth/connect/wb?referer=/post/view/<?=$post['tid']?>"><img alt="微博" class="oauth-icon" src="/static/img/wb.png"></a>
+                        <a href="/oauth/connect/tm?referer=/post/view/<?=$post['tid']?>"><img alt="Twimi" class="oauth-icon" src="/static/img/tm.png"></a>
                     </div>
                     <?php endif;?>
                     <?php foreach ($comments as $comment) : ?>
