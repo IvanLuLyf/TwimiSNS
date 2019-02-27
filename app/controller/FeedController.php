@@ -35,8 +35,7 @@ class FeedController extends Controller
                         ) {
                             $t = time() % 1000;
                             $filename = "feed/$feedId-$i-$t.jpg";
-                            $this->storage()->upload($filename, $_FILES["images"]["tmp_name"][$i]);
-                            $url = $this->storage()->geturl($filename);
+                            $url = $this->storage()->upload($filename, $_FILES["images"]["tmp_name"][$i]);
                             $feedImageModel->upload($tp_user['uid'], $feedId, $url);
                         }
                     }
@@ -118,7 +117,6 @@ class FeedController extends Controller
 
     /**
      * @filter auth canFeed
-     * @param array $path
      */
     function ac_like()
     {
