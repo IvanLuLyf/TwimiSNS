@@ -8,6 +8,16 @@
  */
 class LikeModel extends Model
 {
+    protected $_column = [
+        'id' => ['integer', 'not null'],
+        'uid' => ['integer', 'not null'],
+        'tid' => ['integer', 'not null'],
+        'aid' => ['integer', 'not null'],
+        'state' => ['integer', 'not null'],
+    ];
+    protected $_pk = ['id'];
+    protected $_ai = 'id';
+
     public function isLike($uid, $aid, $tid)
     {
         return $this->where(["uid = ? and tid = ? and aid = ?"], [$uid, $tid, $aid])->fetch() ? 1 : 0;

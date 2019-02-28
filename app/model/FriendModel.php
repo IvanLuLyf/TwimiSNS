@@ -8,6 +8,17 @@
  */
 class FriendModel extends Model
 {
+    protected $_column = [
+        'id' => ['integer', 'not null'],
+        'uid' => ['integer', 'not null'],
+        'fuid' => ['integer', 'not null'],
+        'username' => ['text', 'not null'],
+        'notename' => ['text', 'not null'],
+        'state' => ['integer']
+    ];
+    protected $_pk = ['id'];
+    protected $_ai = 'id';
+
     public function listFriend($uid, $state = 2)
     {
         $friends = $this->where(["uid = ? and state = ?"], [$uid, $state])->fetchAll();

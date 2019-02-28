@@ -8,6 +8,16 @@
 
 class PostModel extends Model
 {
+    protected $_column = [
+        'tid' => ['integer', 'not null'],
+        'username' => ['varchar(16)', 'not null'],
+        'title' => ['text', 'not null'],
+        'content' => ['text', 'not null'],
+        'timestamp' => ['text'],
+    ];
+    protected $_pk = ['tid'];
+    protected $_ai = 'tid';
+
     public function getPostByPage($page = 1, $size = 20)
     {
         return $this->join(DB_PREFIX . "user", [DB_PREFIX . "post.username=" . DB_PREFIX . "user.username"], "LEFT")

@@ -103,143 +103,23 @@ class InstallController extends Controller
             $nickname = (isset($_POST['nickname']) && $_POST['nickname'] != '') ? $_POST['nickname'] : $username;
             $site_name = $_POST['site_name'];
             $db_prefix = $db_info['prefix'];
-            Database::getInstance()->createTable($db_prefix . 'user', [
-                'uid' => ['integer', 'not null'],
-                'username' => ['varchar(16)', 'not null'],
-                'password' => ['varchar(32)', 'not null'],
-                'nickname' => ['varchar(32)'],
-                'email' => ['text', 'not null'],
-                'token' => ['text', 'not null'],
-                'expire' => ['text']
-            ], ['uid'], 'uid');
 
-            Database::getInstance()->createTable($db_prefix . 'post', [
-                'tid' => ['integer', 'not null'],
-                'username' => ['varchar(16)', 'not null'],
-                'title' => ['text', 'not null'],
-                'content' => ['text', 'not null'],
-                'timestamp' => ['text'],
-            ], ['tid'], 'tid');
-
-            Database::getInstance()->createTable($db_prefix . 'feed', [
-                'tid' => ['integer', 'not null'],
-                'uid' => ['integer', 'not null'],
-                'username' => ['varchar(16)', 'not null'],
-                'nickname' => ['varchar(32)'],
-                'source' => ['text'],
-                'content' => ['text', 'not null'],
-                'timestamp' => ['text'],
-                'share_num' => ['integer', 'default 0'],
-                'comment_num' => ['integer', 'default 0'],
-                'like_num' => ['integer', 'default 0'],
-                'image' => ['integer'],
-            ], ['tid'], 'tid');
-
-            Database::getInstance()->createTable($db_prefix . 'feed_image', [
-                'id' => ['integer', 'not null'],
-                'tid' => ['integer', 'not null'],
-                'uid' => ['integer', 'not null'],
-                'url' => ['text', 'not null'],
-            ], ['id'], 'id');
-
-            Database::getInstance()->createTable($db_prefix . 'notification', [
-                'nid' => ['integer', 'not null'],
-                'aid' => ['integer', 'not null'],
-                'uid' => ['integer', 'not null'],
-                'tid' => ['integer', 'not null'],
-                'from_uid' => ['integer', 'not null'],
-                'is_read' => ['integer', 'not null'],
-                'action' => ['text'],
-                'message' => ['text'],
-                'timestamp' => ['text'],
-            ], ['nid'], 'nid');
-
-            Database::getInstance()->createTable($db_prefix . 'comment', [
-                'cid' => ['integer', 'not null'],
-                'tid' => ['integer', 'not null'],
-                'aid' => ['integer', 'not null'],
-                'username' => ['varchar(16)', 'not null'],
-                'nickname' => ['varchar(32)'],
-                'content' => ['text', 'not null'],
-                'timestamp' => ['text'],
-            ], ['cid'], 'cid');
-
-            Database::getInstance()->createTable($db_prefix . 'user_info', [
-                'uid' => ['integer', 'not null'],
-                'signature' => ['text'],
-                'cover' => ['text'],
-                'background' => ['text'],
-            ], ['uid']);
-
-            Database::getInstance()->createTable($db_prefix . 'avatar', [
-                'uid' => ['integer', 'not null'],
-                'url' => ['text', 'not null'],
-            ], ['uid']);
-
-            Database::getInstance()->createTable($db_prefix . 'api', [
-                'id' => ['integer', 'not null'],
-                'uid' => ['integer', 'not null'],
-                'appname' => ['text', 'not null'],
-                'appkey' => ['text', 'not null'],
-                'appsecret' => ['text', 'not null'],
-                'appurl' => ['text', 'not null'],
-                'type' => ['integer'],
-                'auth' => ['integer'],
-            ], ['id'], 'id');
-
-            Database::getInstance()->createTable($db_prefix . 'oauth_token', [
-                'id' => ['integer', 'not null'],
-                'uid' => ['integer', 'not null'],
-                'appkey' => ['text', 'not null'],
-                'token' => ['text', 'not null'],
-                'expire' => ['text']
-            ], ['id'], 'id');
-
-            Database::getInstance()->createTable($db_prefix . 'oauth_code', [
-                'id' => ['integer', 'not null'],
-                'uid' => ['integer', 'not null'],
-                'appid' => ['integer', 'not null'],
-                'code' => ['text', 'not null'],
-                'expire' => ['text']
-            ], ['id'], 'id');
-
-            Database::getInstance()->createTable($db_prefix . 'qq_bind', [
-                'uid' => ['integer', 'not null'],
-                'buid' => ['text', 'not null'],
-                'token' => ['text', 'not null'],
-                'expire' => ['text']
-            ], ['uid']);
-
-            Database::getInstance()->createTable($db_prefix . 'sina_bind', [
-                'uid' => ['integer', 'not null'],
-                'buid' => ['text', 'not null'],
-                'token' => ['text', 'not null'],
-                'expire' => ['text']
-            ], ['uid']);
-
-            Database::getInstance()->createTable($db_prefix . 'twimi_bind', [
-                'uid' => ['integer', 'not null'],
-                'buid' => ['text', 'not null'],
-                'token' => ['text', 'not null'],
-                'expire' => ['text']
-            ], ['uid']);
-
-            Database::getInstance()->createTable($db_prefix . 'friend', [
-                'id' => ['integer', 'not null'],
-                'uid' => ['integer', 'not null'],
-                'fuid' => ['integer', 'not null'],
-                'username' => ['text', 'not null'],
-                'notename' => ['text', 'not null'],
-                'state' => ['integer']
-            ], ['id'], 'id');
-
-            Database::getInstance()->createTable($db_prefix . 'like', [
-                'id' => ['integer', 'not null'],
-                'uid' => ['integer', 'not null'],
-                'tid' => ['integer', 'not null'],
-                'aid' => ['integer', 'not null'],
-                'state' => ['integer', 'not null'],
-            ], ['id'], 'id');
+            UserModel::create();
+            PostModel::create();
+            FeedModel::create();
+            FeedImageModel::create();
+            NotificationModel::create();
+            CommentModel::create();
+            UserInfoModel::create();
+            AvatarModel::create();
+            ApiModel::create();
+            OauthTokenModel::create();
+            OauthCodeModel::create();
+            QqBindModel::create();
+            SinaBindModel::create();
+            TwimiBindModel::create();
+            FriendModel::create();
+            LikeModel::create();
 
             Database::getInstance()->insert(['username' => $username, 'password' => $password, 'email' => $email, 'nickname' => $nickname, 'token' => ''], $db_prefix . 'user');
             $config_file = fopen(APP_PATH . "config/config.php", "w") or die("Unable to open file!");

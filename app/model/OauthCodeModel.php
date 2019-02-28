@@ -8,6 +8,16 @@
  */
 class OauthCodeModel extends Model
 {
+    protected $_column = [
+        'id' => ['integer', 'not null'],
+        'uid' => ['integer', 'not null'],
+        'appid' => ['integer', 'not null'],
+        'code' => ['text', 'not null'],
+        'expire' => ['text']
+    ];
+    protected $_pk = ['id'];
+    protected $_ai = 'id';
+
     public function getCode($appKey, $appId, $uid, $timestamp)
     {
         $code = md5($uid . $appKey . $timestamp);

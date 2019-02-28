@@ -8,6 +8,22 @@
  */
 class FeedModel extends Model
 {
+    protected $_column = [
+        'tid' => ['integer', 'not null'],
+        'uid' => ['integer', 'not null'],
+        'username' => ['varchar(16)', 'not null'],
+        'nickname' => ['varchar(32)'],
+        'source' => ['text'],
+        'content' => ['text', 'not null'],
+        'timestamp' => ['text'],
+        'share_num' => ['integer', 'default 0'],
+        'comment_num' => ['integer', 'default 0'],
+        'like_num' => ['integer', 'default 0'],
+        'image' => ['integer'],
+    ];
+    protected $_pk = ['tid'];
+    protected $_ai = 'tid';
+
     public function listFeed($uid, $page = 1)
     {
         return $this->join(DB_PREFIX . 'friend',

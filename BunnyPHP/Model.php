@@ -34,7 +34,9 @@ class Model
         $dashed = strtolower(preg_replace('/([A-Z])/', '_$1', lcfirst($name)));
         $table = DB_PREFIX . strtolower($dashed);
         $vars = get_class_vars(get_called_class());
-        Database::getInstance()->createTable($table, $vars['_column'], $vars['_pk'], $vars['_ai']);
+        $pk = isset($vars['_pk']) ? $vars['_pk'] : [];
+        $ai = isset($vars['_ai']) ? $vars['_ai'] : '';
+        Database::getInstance()->createTable($table, $vars['_column'], $pk, $ai);
     }
 
     private function reset()

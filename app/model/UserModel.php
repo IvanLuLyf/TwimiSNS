@@ -8,6 +8,18 @@
 
 class UserModel extends Model
 {
+    protected $_column = [
+        'uid' => ['integer', 'not null'],
+        'username' => ['varchar(16)', 'not null'],
+        'password' => ['varchar(32)', 'not null'],
+        'nickname' => ['varchar(32)'],
+        'email' => ['text', 'not null'],
+        'token' => ['text', 'not null'],
+        'expire' => ['text']
+    ];
+    protected $_pk = ['uid'];
+    protected $_ai = 'uid';
+
     public function getUsers($page = 1)
     {
         return $this->limit(10, ($page - 1) * 10)->fetchAll();
@@ -25,6 +37,11 @@ class UserModel extends Model
             $token = $user['token'];
         }
         return $token;
+    }
+
+    public function reset($uid, $password)
+    {
+        return $this->where("uid = :u", ['u' => $uid])->update(['password' => md5($password)]);
     }
 
     public function login(string $username, string $password)

@@ -8,6 +8,20 @@
  */
 class NotificationModel extends Model
 {
+    protected $_column = [
+        'nid' => ['integer', 'not null'],
+        'aid' => ['integer', 'not null'],
+        'uid' => ['integer', 'not null'],
+        'tid' => ['integer', 'not null'],
+        'from_uid' => ['integer', 'not null'],
+        'is_read' => ['integer', 'not null'],
+        'action' => ['text'],
+        'message' => ['text'],
+        'timestamp' => ['text'],
+    ];
+    protected $_pk = ['nid'];
+    protected $_ai = 'nid';
+
     public function getUnreadCnt($uid)
     {
         return $this->where(["uid = ? and is_read=0"], [$uid])->fetch("count(*) as noticnt");

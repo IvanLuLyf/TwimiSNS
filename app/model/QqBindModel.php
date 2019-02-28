@@ -8,6 +8,14 @@
 
 class QqBindModel extends Model
 {
+    protected $_column = [
+        'uid' => ['integer', 'not null'],
+        'buid' => ['text', 'not null'],
+        'token' => ['text', 'not null'],
+        'expire' => ['text']
+    ];
+    protected $_pk = ['uid'];
+
     public function getAvatar($key, $uid)
     {
         if ($bind_row = $this->where(['uid=:uid'], ['uid' => $uid])->fetch()) {

@@ -8,6 +8,18 @@
 
 class CommentModel extends Model
 {
+    protected $_column = [
+        'cid' => ['integer', 'not null'],
+        'tid' => ['integer', 'not null'],
+        'aid' => ['integer', 'not null'],
+        'username' => ['varchar(16)', 'not null'],
+        'nickname' => ['varchar(32)'],
+        'content' => ['text', 'not null'],
+        'timestamp' => ['text'],
+    ];
+    protected $_pk = ['cid'];
+    protected $_ai = 'cid';
+
     public function listComment($tid, $aid, $page = 1)
     {
         return $this->where('tid = :t and aid = :a', ['t' => $tid, 'a' => $aid])->limit(20, ($page - 1) * 20)->fetchAll();
