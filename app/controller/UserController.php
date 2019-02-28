@@ -16,14 +16,11 @@ class UserController extends Controller
             $_SESSION['referer'] = $referer;
             $this->assign('referer', $referer);
         }
+        $oauth = [];
         if (Config::check("oauth")) {
-            $sites = Config::load('oauth')->all();
-            $oauth = [];
-            foreach ($sites as $name => $site) {
-                $oauth[] = $name;
-            }
-            $this->assign('oauth', $oauth);
+            $oauth = Config::load('oauth')->get('enabled', []);
         }
+        $this->assign('oauth', $oauth);
         $this->render("user/login.html");
     }
 
@@ -46,6 +43,11 @@ class UserController extends Controller
                 }
             } else {
                 $this->assignAll($result);
+                $oauth = [];
+                if (Config::check("oauth")) {
+                    $oauth = Config::load('oauth')->get('enabled', []);
+                }
+                $this->assign('oauth', $oauth);
                 $this->render('user/login.html');
             }
         } elseif ($this->_mode == BunnyPHP::MODE_API) {

@@ -71,7 +71,7 @@ class SettingController extends Controller
             (new AvatarModel())->upload($tp_user['uid'], $_REQUEST['avatar']);
         }
         $this->assign('tp_user', $tp_user);
-        $this->redirect('setting', $type);
+        $this->redirect('setting', 'oauth', ['type' => $type]);
     }
 
     private function bind_model($type)
