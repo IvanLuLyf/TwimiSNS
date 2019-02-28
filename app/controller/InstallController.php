@@ -102,6 +102,7 @@ class InstallController extends Controller
             $email = $_POST['email'];
             $nickname = (isset($_POST['nickname']) && $_POST['nickname'] != '') ? $_POST['nickname'] : $username;
             $site_name = $_POST['site_name'];
+            $site_url = $_POST['site_url'];
             $db_prefix = $db_info['prefix'];
 
             UserModel::create();
@@ -126,6 +127,7 @@ class InstallController extends Controller
             $config = Config::make([
                 'db' => $db_info,
                 'site_name' => $site_name,
+                'site_url' => $site_url,
                 'controller' => 'Index',
                 'action' => 'index',
                 'allow_reg' => isset($_POST['allow_reg']),
