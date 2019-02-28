@@ -55,6 +55,11 @@ class PostController extends Controller
                 $parser = new HyperDown\Parser;
                 $html_content = $parser->makeHtml($post['content']);
                 $this->assign("html_content", $html_content);
+                $oauth = [];
+                if (Config::check("oauth")) {
+                    $oauth = Config::load('oauth')->get('enabled', []);
+                }
+                $this->assign('oauth', $oauth);
             }
             $this->assign("post", $post)->assign('comments', $comments)
                 ->render('post/view.html');
