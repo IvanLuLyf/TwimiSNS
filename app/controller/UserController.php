@@ -118,6 +118,65 @@ class UserController extends Controller
         }
     }
 
+    public function ac_forgot_get()
+    {
+        $this->render('user/forgot.html');
+    }
+
+    /**
+     * @filter api
+     */
+    public function ac_forgot_post()
+    {
+        if (isset($_POST['email'])) {
+            if ($user = (new UserModel())->where('username = :u or email = :u', ['u' => $_POST['email']])->fetch()) {
+                $service = new EmailService();
+                $code = (new PassCodeModel())->getCode($user['uid']);
+                $service->sendMail('email/forgot.html', ['nickname' => $user['nickname'], 'site' => TP_SITE_NAME, 'url' => TP_SITE_URL, 'code' => $code], $user['email'], '找回密码');
+                $this->assign('ret', 0)->assign('status', 'ok')->assign('tp_error_msg', "邮件已发送")
+                    ->render('common/error.html');
+            } else {
+                $this->assignAll(['ret' => 1002, 'status' => "user not exists", 'tp_error_msg' => "用户名不存在"]);
+                $this->render('user/forgot.html');
+            }
+        } else {
+            $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空");
+            $this->render('user/forgot.html');
+        }
+    }
+
+    public function ac_reset_get()
+    {
+        if (isset($_REQUEST['code'])) {
+            $this->assign('code', $_REQUEST['code']);
+            $this->render('user/reset.html');
+        } else {
+            $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空")
+                ->render('common/error.html');
+        }
+    }
+
+    /**
+     * @filter api
+     */
+    public function ac_reset_post()
+    {
+        if (isset($_POST['code'])) {
+            $uid = (new PassCodeModel())->checkCode($_POST['code']);
+            if ($uid != null) {
+                (new UserModel())->reset($uid, $_POST['password']);
+                $this->assign('ret', 0)->assign('status', 'ok')->assign('tp_error_msg', "密码修改完成")
+                    ->render('common/error.html');
+            } else {
+                $this->assign('ret', 1008)->assign('status', 'expired')->assign('tp_error_msg', "验证码已过期")
+                    ->render('common/error.html');
+            }
+        } else {
+            $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空")
+                ->render('common/error.html');
+        }
+    }
+
     public function ac_logout()
     {
         session_start();

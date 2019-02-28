@@ -56,7 +56,6 @@ class Template
             $content = file_get_contents(APP_PATH . "template/{$template}");
             $pattern = '/\{\{\s*([\w]+)\s*\}\}/';
             if (preg_match_all($pattern, $content, $match)) {
-                print_r($match);
                 $ps = [];
                 $rs = [];
                 for ($i = 0; $i < count($match[0]); $i++) {
