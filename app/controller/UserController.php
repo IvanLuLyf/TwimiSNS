@@ -88,6 +88,8 @@ class UserController extends Controller
             $result = (new UserModel())->register($_POST['username'], $_POST['password'], $_POST['email'], $_POST['nickname']);
             if ($this->_mode == BunnyPHP::MODE_NORMAL) {
                 if ($result['ret'] == 0) {
+                    $service = new EmailService();
+                    $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
                     session_start();
                     $_SESSION['token'] = $result['token'];
                     if (isset($_SESSION['referer'])) {
@@ -103,6 +105,8 @@ class UserController extends Controller
                 }
             } elseif ($this->_mode == BunnyPHP::MODE_API) {
                 if ($result['ret'] == 0) {
+                    $service = new EmailService();
+                    $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
                     $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['appkey']);
                     $result['token'] = $appToken['token'];
                     $result['expire'] = $appToken['expire'];
