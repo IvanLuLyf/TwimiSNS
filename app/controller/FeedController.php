@@ -29,10 +29,9 @@ class FeedController extends Controller
                 $feedId = (new FeedModel())->sendFeed($tp_user, $_POST['content'], $tp_api['name'], $imageCount);
                 $feedImageModel = new FeedImageModel();
                 if ($imageCount > 0) {
+                    $image_type = ['image/bmp', 'image/gif', 'image/jpeg', 'image/pjpeg', 'image/png', 'application/x-bmp', 'application/x-jpg', 'application/x-png'];
                     for ($i = 0; $i < $imageCount; $i++) {
-                        if ((($_FILES["images"]["type"][$i] == "image/gif") || ($_FILES["images"]["type"][$i] == "image/jpeg") || ($_FILES["images"]["type"][$i] == "image/pjpeg"))
-                            && ($_FILES["images"]["size"][$i] < 2000000)
-                        ) {
+                        if (in_array($_FILES["images"]["type"][$i], $image_type) && ($_FILES["images"]["size"][$i] < 2000000)) {
                             $t = time() % 1000;
                             $filename = "feed/$feedId-$i-$t.jpg";
                             $url = $this->storage()->upload($filename, $_FILES["images"]["tmp_name"][$i]);
