@@ -9,10 +9,7 @@
                 <a class="nav-link <?=(isset($cur_ctr)&&$cur_ctr=='post')?'active':''?>" href="/post/index">帖子</a>
             </li>
             <li class="nav-item">
-                <form class="form-inline ml-md-4 mt-2 mt-md-0 mb-0" action="/post/search">
-                    <input name="word" class="form-control mr-sm-2" type="text" placeholder="搜索" aria-label="搜索">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">搜索</button>
-                </form>
+                <a class="nav-link <?=(isset($cur_ctr)&&$cur_ctr=='search')?'active':''?>" href="/post/search">搜索</a>
             </li>
         </ul>
         <ul class="navbar-nav">
