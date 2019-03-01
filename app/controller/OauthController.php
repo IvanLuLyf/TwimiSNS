@@ -26,9 +26,9 @@ class OauthController extends Controller
                 $oauth = Config::load('oauth')->get('gh');
                 $url = 'https://github.com/login/oauth/authorize?client_id=' . $oauth['key'] . '&redirect_uri=' . urlencode($oauth['callback']) . '&scope=user,public_repo';
                 break;
-            case 'tm':
-                $oauth = Config::load('oauth')->get('tm');
-                $url = 'http://tp.twimi.cn/index.php?mod=tauth&appkey=' . $oauth['key'] . '&url=' . urlencode($oauth['callback']);
+            default:
+                $oauth = Config::load('oauth')->get($type);
+                $url = $oauth['url'] . '/oauth/authorize?client_id=' . $oauth['key'] . '&redirect_uri=' . urlencode($oauth['callback']);
                 break;
         }
         if (isset($_REQUEST['referer'])) {
@@ -43,8 +43,8 @@ class OauthController extends Controller
         if (count($path) < 1) $path = [''];
         list($type) = $path;
         $uid = null;
+        $bind_model = new BindModel();
         if (isset($_GET['code'])) {
-            $bind_model = new BindModel();
             $bind = (new OauthService($this))->oauth($type);
             if ($uid = $bind_model->getUid($bind['uid'], $type)) {
                 $userToken = (new UserModel())->refresh($uid);
@@ -121,6 +121,15 @@ class OauthController extends Controller
             $this->assignAll($result);
             $this->assign('oauth', ['type' => $type, 'nickname' => isset($_POST['nickname']) ? $_POST['nickname'] : ''])
                 ->render('oauth/connect.html');
+        }
+    }
+
+    function ac_authorize_get()
+    {
+        if (isset($_REQUEST['client_id']) && $app = (new ApiModel())->check($_REQUEST['client_id'])) {
+
+        } else {
+
         }
     }
 }
