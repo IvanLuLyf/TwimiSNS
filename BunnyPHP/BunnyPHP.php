@@ -99,7 +99,7 @@ class BunnyPHP
                 if (preg_match_all($pattern, $docComment, $matches, PREG_PATTERN_ORDER)) {
                     foreach ($matches[1] as $decorate) {
                         if (strpos($decorate, '@filter') === 0) {
-                            $filters = explode(' ', $decorate);
+                            $filters = explode(' ', trim($decorate));
                             array_filter($filters);
                             array_shift($filters);
                             $filter = trim(ucfirst(array_shift($filters))) . 'Filter';

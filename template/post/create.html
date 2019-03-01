@@ -13,6 +13,7 @@
             <div class="card neo_card mt-4">
                 <div class="card-body">
                     <form class="form-horizontal" role="form" action="/post/create" method="post">
+                        <input type="hidden" name="csrf_token" value="<?=$csrf_token?>"/>
                         <div class="form-group">
                             <label for="title">标题</label>
                             <input id="title" name="title" type="text" placeholder="标题" class="form-control" required/>

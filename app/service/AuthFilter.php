@@ -11,7 +11,7 @@ class AuthFilter extends Filter
     public function doFilter($fa = [])
     {
         if ($this->_mode == BunnyPHP::MODE_NORMAL) {
-            session_start();
+            if (!session_id()) session_start();
             if (isset($_SESSION['token']) && $_SESSION['token'] != "") {
                 $user = (new UserModel)->check($_SESSION["token"]);
                 if ($user != null) {

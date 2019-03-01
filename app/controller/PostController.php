@@ -15,15 +15,18 @@ class PostController extends Controller
     }
 
     /**
+     * @filter csrf
      * @filter auth
      */
     public function ac_create_get()
     {
+        $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
         $this->assign('tp_user', BunnyPHP::app()->get('tp_user'));
         $this->render('post/create.html');
     }
 
     /**
+     * @filter csrf check
      * @filter auth canFeed
      */
     public function ac_create_post()

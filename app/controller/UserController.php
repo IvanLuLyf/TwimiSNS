@@ -8,6 +8,9 @@
 
 class UserController extends Controller
 {
+    /**
+     * @filter csrf
+     */
     public function ac_login_get()
     {
         if (isset($_REQUEST['referer'])) {
@@ -20,11 +23,13 @@ class UserController extends Controller
         if (Config::check("oauth")) {
             $oauth = Config::load('oauth')->get('enabled', []);
         }
+        $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
         $this->assign('oauth', $oauth);
         $this->render("user/login.html");
     }
 
     /**
+     * @filter csrf check
      * @filter api
      */
     public function ac_login_post()
@@ -48,6 +53,7 @@ class UserController extends Controller
                     $oauth = Config::load('oauth')->get('enabled', []);
                 }
                 $this->assign('oauth', $oauth);
+                $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
                 $this->render('user/login.html');
             }
         } elseif ($this->_mode == BunnyPHP::MODE_API) {
@@ -61,6 +67,9 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * @filter csrf
+     */
     public function ac_register_get()
     {
         if (Config::load('config')->get('allow_reg')) {
@@ -70,6 +79,7 @@ class UserController extends Controller
                 $_SESSION['referer'] = $referer;
                 $this->assign('referer', $referer);
             }
+            $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
             $this->render("user/register.html");
         } else {
             $this->assign('ret', 1007);
@@ -80,6 +90,7 @@ class UserController extends Controller
     }
 
     /**
+     * @filter csrf check
      * @filter api
      */
     public function ac_register_post()
@@ -101,6 +112,7 @@ class UserController extends Controller
                     }
                 } else {
                     $this->assignAll($result);
+                    $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
                     $this->render('user/register.html');
                 }
             } elseif ($this->_mode == BunnyPHP::MODE_API) {
@@ -122,12 +134,17 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * @filter csrf
+     */
     public function ac_forgot_get()
     {
+        $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
         $this->render('user/forgot.html');
     }
 
     /**
+     * @filter csrf check
      * @filter api
      */
     public function ac_forgot_post()
@@ -149,10 +166,14 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * @filter csrf
+     */
     public function ac_reset_get()
     {
         if (isset($_REQUEST['code'])) {
             $this->assign('code', $_REQUEST['code']);
+            $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
             $this->render('user/reset.html');
         } else {
             $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空")
@@ -161,6 +182,7 @@ class UserController extends Controller
     }
 
     /**
+     * @filter csrf check
      * @filter api
      */
     public function ac_reset_post()

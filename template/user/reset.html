@@ -19,6 +19,7 @@
                     <?php endif; ?>
                     <form class="form-horizontal" role="form" action="/user/reset"
                           method="post">
+                        <input type="hidden" name="csrf_token" value="<?=$csrf_token?>"/>
                         <input type="hidden" name="code" value="<?=$code?>"/>
                         <div class="form-group">
                             <label for="password">密码</label>

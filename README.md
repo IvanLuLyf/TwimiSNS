@@ -18,6 +18,7 @@ Powered By BunnyPHP
 |2001    |invalid appkey|
 |2002    |permission denied|
 |2003    |invalid token|
+|2004    |invalid crsf token|
 |3001    |invalid tid|
 |3002    |already liked|
 |4001    |no friend|

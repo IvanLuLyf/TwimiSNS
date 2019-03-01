@@ -19,6 +19,7 @@
                     <?php endif; ?>
                     <form class="form-horizontal" role="form" action="/user/forgot"
                           method="post">
+                        <input type="hidden" name="csrf_token" value="<?=$csrf_token?>"/>
                         <div class="form-group">
                             <label for="email">用户名/邮箱</label>
                             <input type="text" class="form-control" id="email" name="email"

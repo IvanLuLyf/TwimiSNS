@@ -27,14 +27,15 @@
             <?php if(isset($referer)):?>
             <input type="hidden" id="referer" name="referer" value="<?=$referer?>">
             <?php endif;?>
+            <input type="hidden" name="csrf_token" value="<?=$csrf_token?>"/>
             <input type="submit" class="btn btn-success btn-block" value="登陆">
             <div class="oauth-bar">
                 <?php foreach ($oauth as $o): ?>
                 <a href="/oauth/connect/<?=$o?>"><img alt="<?=$o?>" class="oauth-icon" src="/static/img/<?=$o?>.png"></a>
                 <?php endforeach ?>
             </div>
-            <div class="float-right"><a href="/user/register?referer=<?=isset($referer)?urlencode($referer):''?>">注册</a> | <a
-                    href="/user/forgot">忘记密码</a></div>
+            <div class="float-right"><a href="/user/register?referer=<?=isset($referer)?urlencode($referer):''?>">注册</a>
+                | <a href="/user/forgot">忘记密码</a></div>
         </form>
     </div>
 </div>
