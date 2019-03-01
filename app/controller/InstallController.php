@@ -116,9 +116,7 @@ class InstallController extends Controller
             ApiModel::create();
             OauthTokenModel::create();
             OauthCodeModel::create();
-            QqBindModel::create();
-            SinaBindModel::create();
-            TwimiBindModel::create();
+            BindModel::create();
             FriendModel::create();
             LikeModel::create();
 

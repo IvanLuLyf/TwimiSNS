@@ -45,11 +45,11 @@ class SettingController extends Controller
         list($type) = $path;
         $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : $type;
         $tp_user = BunnyPHP::app()->get('tp_user');
-        $bind = $this->bind_model($type)->where(['uid = :u'], ['u' => $tp_user['uid']])->fetch();
+        $bind = (new BindModel())->where(['uid=:u and type=:t'], ['u' => $tp_user['uid'], 't' => $type])->fetch();
         $names = ['wb' => '微博', 'qq' => 'QQ', 'tm' => 'Twimi', 'gh' => 'Github'];
         if ($bind != null) {
             $this->assign('tp_bind', $bind);
-            $image = (new OauthService($this))->avatar($type, $bind['buid'], $bind['token']);
+            $image = (new OauthService($this))->avatar($type, $bind['bind'], $bind['token']);
             $this->assign('avatar', $image);
         }
         $this->assign('cur_st', $type)
@@ -72,18 +72,5 @@ class SettingController extends Controller
         }
         $this->assign('tp_user', $tp_user);
         $this->redirect('setting', 'oauth', ['type' => $type]);
-    }
-
-    private function bind_model($type)
-    {
-        switch ($type) {
-            case 'tm';
-                return new TwimiBindModel();
-            case 'qq':
-                return new QqBindModel();
-            case 'wb':
-                return new SinaBindModel();
-        }
-        return null;
     }
 }

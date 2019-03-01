@@ -14,12 +14,14 @@
             <div class="card neo_card mt-4">
                 <div class="card-body row">
                     <div class="col-lg-6">
-                    <form action="/user/avatar" method="post" enctype="multipart/form-data">
-                        <div class="form-group">
+                        <form action="/user/avatar" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="avatar">当前头像</label>
+                                <img height="100px" width="100px" style="display: block;" class="rounded-circle" src="/user/avatar/<?=$tp_user['uid']?>">
+                            </div>
                             <div class="form-group">
                                 <label for="avatar">头像</label>
-                                <input type="file" class="form-control" id="avatar" name="avatar"
-                                       placeholder="头像" required/>
+                                <input type="file" class="form-control" id="avatar" name="avatar" placeholder="头像" required/>
                             </div>
                             <div class="form-group">
                                 <div class="row">
@@ -29,20 +31,20 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
                     </div>
                     <div class="col-lg-6">
-                    <form action="/setting/gravatar">
-                        <div class="form-group">
-                            <div class="col-sm-3 col-form-label">
-                                <img height="100px" width="100px" class="rounded-circle" src="https://www.gravatar.com/avatar/<?=md5(strtolower(trim($tp_user['email'])))?>">
+                        <form action="/setting/gravatar">
+                            <div class="form-group">
+                                <div class="col-sm-3 col-form-label">
+                                    <img height="100px" width="100px" class="rounded-circle"
+                                         src="https://www.gravatar.com/avatar/<?=md5(strtolower(trim($tp_user['email'])))?>">
+                                </div>
+                                <div class="col-sm-9">
+                                    <input type="submit" value="使用Gravatar头像" class="btn btn-dark">
+                                </div>
                             </div>
-                            <div class="col-sm-9">
-                                <input type="submit" value="使用Gravatar头像" class="btn btn-dark">
-                            </div>
-                        </div>
-                    </form>
+                        </form>
                     </div>
                 </div>
             </div>

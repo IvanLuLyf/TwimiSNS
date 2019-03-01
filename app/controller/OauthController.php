@@ -28,7 +28,7 @@ class OauthController extends Controller
                 break;
         }
         if (isset($_REQUEST['referer'])) {
-            session_start();
+            if (!session_id()) session_start();
             $_SESSION['referer'] = $_REQUEST['referer'];
         }
         $this->redirect($url);
@@ -40,13 +40,13 @@ class OauthController extends Controller
         list($type) = $path;
         $uid = null;
         if (isset($_GET['code'])) {
-            $bind_model = $this->bind_model($type);
+            $bind_model = new BindModel();
             $bind = (new OauthService($this))->oauth($type);
-            if ($uid = $bind_model->getUid($bind['uid'])) {
+            if ($uid = $bind_model->getUid($bind['uid'], $type)) {
                 $userToken = (new UserModel())->refresh($uid);
-                session_start();
+                if (!session_id()) session_start();
                 $_SESSION['token'] = $userToken;
-                $bind_model->where(['buid = :buid'], ['buid' => $bind['uid']])->update(['token' => $bind['token'], 'expire' => $bind['expire']]);
+                $bind_model->where(['bind=:b and type=:t'], ['b' => $bind['uid'], 't' => $type])->update(['token' => $bind['token'], 'expire' => $bind['expire']]);
                 if (isset($_SESSION['referer'])) {
                     $referer = $_SESSION['referer'];
                     unset($_SESSION['referer']);
@@ -56,14 +56,15 @@ class OauthController extends Controller
                 }
             } else {
                 if ($user = $userService->getLoginUser()) {
-                    $bind_data = ['uid' => $user['uid'], 'buid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
+                    $bind_data = ['uid' => $user['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
                     $bind_model->add($bind_data);
                     $this->redirect('setting', 'oauth', ['type' => $type]);
                 } else {
-                    session_start();
-                    $_SESSION[$type . '_bind_uid'] = $bind['uid'];
-                    $_SESSION[$type . '_token'] = $bind['token'];
-                    $_SESSION[$type . '_expire'] = $bind['expire'];
+                    if (!session_id()) session_start();
+                    $_SESSION['oauth_user'] = ['type' => $type, 'uid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire'], 'nickname' => $bind['nickname'],];
+                    if (Config::load('config')->get('allow_reg')) {
+                        $this->assign('allow_reg', true);
+                    }
                     $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])
                         ->render('oauth/connect.html');
                 }
@@ -77,11 +78,11 @@ class OauthController extends Controller
     function ac_login()
     {
         $type = $_REQUEST['type'];
-        $bind_uid = $_REQUEST['buid'];
+        $bind_uid = $_REQUEST['bind'];
         $bind_token = $_REQUEST['token'];
-        $model = $this->bind_model($type);
-        if ($uid = $model->getUid($bind_uid)) {
-            $model->where(['buid=:b'], ['b' => $bind_uid])->update(['token' => $bind_token]);
+        $model = new BindModel();
+        if ($uid = $model->getUid($bind_uid, $type)) {
+            $model->where(['bind=:b and type=:t'], ['b' => $bind_uid, 't' => $type])->update(['token' => $bind_token]);
             $result = (new UserModel())->getUserByUid($uid);
             $appToken = (new OauthTokenModel())->get($uid, $_POST['appkey']);
             $result['token'] = $appToken['token'];
@@ -95,16 +96,16 @@ class OauthController extends Controller
         if (count($path) < 1) $path = [''];
         list($type) = $path;
         $bind_type = $_REQUEST['type'];
-        if ($bind_type == 'reg') {
+        if ($bind_type == 'reg' && Config::load('config')->get('allow_reg')) {
             $result = (new UserModel())->register($_POST['username'], $_POST['password'], $_POST['email'], $_POST['nickname']);
         } else {
             $result = (new UserModel())->login($_POST['username'], $_POST['password']);
         }
         if ($result['ret'] == 0) {
-            session_start();
-            $_SESSION['access_token'] = $result['token'];
-            $bind_data = ['uid' => $result['uid'], 'buid' => $_SESSION[$type . '_bind_uid'], 'token' => $_SESSION[$type . '_token'], 'expire' => $_SESSION[$type . '_expire']];
-            $this->bind_model($type)->add($bind_data);
+            if (!session_id()) session_start();
+            $bind = $_SESSION['oauth_user'];
+            $bind_data = ['uid' => $result['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
+            (new BindModel())->add($bind_data);
             if (isset($_SESSION['referer'])) {
                 $referer = $_SESSION['referer'];
                 unset($_SESSION['referer']);
@@ -117,18 +118,5 @@ class OauthController extends Controller
             $this->assign('oauth', ['type' => $type, 'nickname' => isset($_POST['nickname']) ? $_POST['nickname'] : ''])
                 ->render('oauth/connect.html');
         }
-    }
-
-    private function bind_model($type)
-    {
-        switch ($type) {
-            case 'tm';
-                return new TwimiBindModel();
-            case 'qq':
-                return new QqBindModel();
-            case 'wb':
-                return new SinaBindModel();
-        }
-        return null;
     }
 }
