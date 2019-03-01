@@ -22,6 +22,10 @@ class OauthController extends Controller
                 $oauth = Config::load('oauth')->get('wb');
                 $url = 'https://api.weibo.com/oauth2/authorize?client_id=' . $oauth['key'] . '&redirect_uri=' . urlencode($oauth['callback']) . '&response_type=code';
                 break;
+            case 'gh':
+                $oauth = Config::load('oauth')->get('gh');
+                $url = 'https://github.com/login/oauth/authorize?client_id=' . $oauth['key'] . '&redirect_uri=' . urlencode($oauth['callback']) . '&scope=user,public_repo';
+                break;
             case 'tm':
                 $oauth = Config::load('oauth')->get('tm');
                 $url = 'http://tp.twimi.cn/index.php?mod=tauth&appkey=' . $oauth['key'] . '&url=' . urlencode($oauth['callback']);
