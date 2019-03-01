@@ -24,8 +24,8 @@ class AuthFilter extends Filter
                 $this->redirect('user', 'login', ['referer' => $_SERVER['REQUEST_URI']]);
             }
         } elseif ($this->_mode == BunnyPHP::MODE_API) {
-            if (isset($_POST['appkey']) && isset($_POST['token'])) {
-                $appKey = $_POST['appkey'];
+            if (isset($_POST['client_id']) && isset($_POST['token'])) {
+                $appKey = $_POST['client_id'];
                 $appToken = $_POST['token'];
                 if ($apiInfo = (new ApiModel())->check($appKey)) {
                     if ($apiInfo['type'] == 1 || $fa[0] == '' || $apiInfo[$fa[0]] == true) {
@@ -42,7 +42,7 @@ class AuthFilter extends Filter
                         $this->error(['ret' => 2002, 'status' => 'permission denied']);
                     }
                 } else {
-                    $this->error(['ret' => 2001, 'status' => 'invalid appkey']);
+                    $this->error(['ret' => 2001, 'status' => 'invalid client id']);
                 }
             } else {
                 $this->error(['ret' => 1004, 'status' => 'empty arguments']);

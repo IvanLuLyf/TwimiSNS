@@ -10,7 +10,7 @@ class UserService extends Service
 {
     public function getLoginUser()
     {
-        session_start();
+        if (!session_id()) session_start();
         if (isset($_SESSION['token']) && $_SESSION['token'] != "") {
             return (new UserModel)->check($_SESSION["token"]);
         }

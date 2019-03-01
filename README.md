@@ -15,10 +15,11 @@ Powered By BunnyPHP
 |1006    |database error|
 |1007    |register not allowed|
 |1009    |already exist|
-|2001    |invalid appkey|
+|2001    |invalid client id|
 |2002    |permission denied|
 |2003    |invalid token|
 |2004    |invalid crsf token|
+|2005    |invalid oauth code|
 |3001    |invalid tid|
 |3002    |already liked|
 |4001    |no friend|

@@ -11,10 +11,10 @@ class ApiModel extends Model
     protected $_column = [
         'id' => ['integer', 'not null'],
         'uid' => ['integer', 'not null'],
-        'appname' => ['text', 'not null'],
-        'appkey' => ['text', 'not null'],
-        'appsecret' => ['text', 'not null'],
-        'appurl' => ['text', 'not null'],
+        'name' => ['text', 'not null'],
+        'client_id' => ['text', 'not null'],
+        'client_secret' => ['text', 'not null'],
+        'url' => ['text', 'not null'],
         'type' => ['integer'],
         'auth' => ['integer'],
     ];
@@ -23,11 +23,12 @@ class ApiModel extends Model
 
     public function check($appKey)
     {
-        if ($row = $this->where(["appkey = ?"], [$appKey])->fetch()) {
+        if ($row = $this->where(["client_id = ?"], [$appKey])->fetch()) {
             return [
                 'id' => $row['id'],
-                'name' => $row['appname'],
+                'name' => $row['name'],
                 'type' => $row['type'],
+                'url' => $row['url'],
                 'canGetInfo' => (intval($row['auth']) & 1) && true,
                 'canFeed' => (intval($row['auth']) & 2) && true,
                 'canGetFriend' => (intval($row['auth']) & 4) && true,
@@ -41,11 +42,12 @@ class ApiModel extends Model
 
     public function validate($appKey, $appSecret)
     {
-        if ($row = $this->where(["appkey = ? and appsecret = ?"], [$appKey, $appSecret])->fetch()) {
+        if ($row = $this->where(["client_id = ? and client_secret = ?"], [$appKey, $appSecret])->fetch()) {
             return [
                 'id' => $row['id'],
-                'name' => $row['appname'],
+                'name' => $row['name'],
                 'type' => $row['type'],
+                'url' => $row['url'],
                 'canGetInfo' => (intval($row['auth']) & 1) && true,
                 'canFeed' => (intval($row['auth']) & 2) && true,
                 'canGetFriend' => (intval($row['auth']) & 4) && true,
@@ -59,7 +61,7 @@ class ApiModel extends Model
 
     public function getAuthorByAppKey($appKey)
     {
-        if ($row = $this->where(["appkey = ?"], [$appKey])->fetch()) {
+        if ($row = $this->where(["client_id = ?"], [$appKey])->fetch()) {
             return $row['uid'];
         } else {
             return null;

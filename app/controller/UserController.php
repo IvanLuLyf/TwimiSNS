@@ -252,4 +252,17 @@ class UserController extends Controller
             $this->render('setting/avatar.html');
         }
     }
+
+    /**
+     * @filter auth canGetInfo
+     */
+    public function ac_info()
+    {
+        if ($this->_mode == BunnyPHP::MODE_API) {
+            $tp_user = BunnyPHP::app()->get('tp_user');
+            $this->assign('ret', 0)->assign('status', 'ok');
+            $this->assignAll($tp_user);
+        }
+        $this->render('user/info.html');
+    }
 }

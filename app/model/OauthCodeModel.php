@@ -34,4 +34,9 @@ class OauthCodeModel extends Model
             return null;
         }
     }
+
+    public function deleteCode($appId, $appCode)
+    {
+        return $this->where(['appid= ? and code= ?'], [$appId, $appCode])->delete();
+    }
 }

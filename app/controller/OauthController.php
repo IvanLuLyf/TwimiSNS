@@ -10,7 +10,6 @@ class OauthController extends Controller
 {
     function ac_connect(array $path)
     {
-        $url = '/index';
         if (count($path) < 1) $path = [''];
         list($type) = $path;
         switch ($type) {
@@ -124,12 +123,98 @@ class OauthController extends Controller
         }
     }
 
-    function ac_authorize_get()
+    /**
+     * @filter csrf
+     * @param UserService $userService
+     */
+    function ac_authorize_get(UserService $userService)
     {
         if (isset($_REQUEST['client_id']) && $app = (new ApiModel())->check($_REQUEST['client_id'])) {
-
+            if (isset($_REQUEST['redirect_uri']) && strstr($_REQUEST['redirect_uri'], $app['url']) != false) {
+                $tp_user = $userService->getLoginUser();
+                $this->assign('tp_user', $tp_user)
+                    ->assign('client_id', $_REQUEST['client_id'])
+                    ->assign('app_url', $app['url'])
+                    ->assign('client_name', $app['name'])
+                    ->assign('redirect_uri', $_REQUEST['redirect_uri'])
+                    ->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));;
+                $this->render('oauth/login.html');
+            } else {
+                $this->assign('tp_error_msg', '非法的应用网址')
+                    ->assign('tp_hide', true);
+                $this->render('oauth/login.html');
+            }
         } else {
+            $this->assign('tp_error_msg', '非法的Client ID')
+                ->assign('tp_hide', true);
+            $this->render('oauth/login.html');
+        }
+    }
 
+    /**
+     * @filter csrf check
+     * @param UserService $userService
+     */
+    function ac_authorize_post(UserService $userService)
+    {
+        if (isset($_REQUEST['client_id']) && $app = (new ApiModel())->check($_REQUEST['client_id'])) {
+            if (isset($_REQUEST['redirect_uri']) && strstr($_REQUEST['redirect_uri'], $app['url']) != false) {
+                if (($user = $userService->getLoginUser()) != null) {
+                    $url = $_REQUEST['redirect_uri'];
+                    $code = (new OauthCodeModel())->getCode($_REQUEST['client_id'], $app['id'], $user['uid'], time());
+                    if (strpos($url, "?"))
+                        $this->redirect("$url&code=$code");
+                    else
+                        $this->redirect("$url?code=$code");
+                } else {
+                    if (isset($_POST['username'])) {
+                        $result = (new UserModel())->login($_POST['username'], $_POST['password']);
+                        if ($result['ret'] == 0) {
+                            if (!session_id()) session_start();
+                            $_SESSION['token'] = $result['token'];
+                            $url = $_REQUEST['redirect_uri'];
+                            $code = (new OauthCodeModel())->getCode($_REQUEST['client_id'], $app['id'], $user['uid'], time());
+                            if (strpos($url, "?"))
+                                $this->redirect("$url&code=$code");
+                            else
+                                $this->redirect("$url?code=$code");
+                        } else {
+                            $this->assignAll($result);
+                            $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
+                            $this->render('oauth/login.html');
+                        }
+                    }
+                }
+            } else {
+                $this->assign('tp_error_msg', '非法的应用网址')
+                    ->assign('tp_hide', true);
+                $this->render('oauth/login.html');
+            }
+        } else {
+            $this->assign('tp_error_msg', '非法的Client ID')
+                ->assign('tp_hide', true);
+            $this->render('oauth/login.html');
+        }
+    }
+
+    public function ac_token_post()
+    {
+        if (isset($_REQUEST['client_id']) && isset($_REQUEST['client_secret']) && $app = (new ApiModel())->validate($_REQUEST['client_id'], $_REQUEST['client_secret'])) {
+            $app_key = $_REQUEST['client_id'];
+            $app_id = $app['id'];
+            $oauthCodeModel = new OauthCodeModel();
+            if (isset($_REQUEST['code']) && $uid = $oauthCodeModel->checkCode($app_id, $_REQUEST['code'])) {
+                $token_row = (new OauthTokenModel())->get($uid, $app_key);
+                $this->assign('ret', 0)->assign('status', 'ok')->assignAll($token_row);
+                $oauthCodeModel->deleteCode($app_id, $_REQUEST['code']);
+                $this->render('common/error.html');
+            } else {
+                $this->assign('ret', 2005)->assign('status', 'invalid oauth code');
+                $this->render('common/error.html');
+            }
+        } else {
+            $this->assign('ret', 2001)->assign('status', 'invalid client id');
+            $this->render('common/error.html');
         }
     }
 }

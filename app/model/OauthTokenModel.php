@@ -11,7 +11,7 @@ class OauthTokenModel extends Model
     protected $_column = [
         'id' => ['integer', 'not null'],
         'uid' => ['integer', 'not null'],
-        'appkey' => ['text', 'not null'],
+        'client_id' => ['text', 'not null'],
         'token' => ['text', 'not null'],
         'expire' => ['text']
     ];
@@ -20,7 +20,7 @@ class OauthTokenModel extends Model
 
     public function check($appKey, $appToken)
     {
-        if ($row = $this->where(["appkey = ? and token = ? and expire > ?"], [$appKey, $appToken, time()])->fetch()) {
+        if ($row = $this->where(["client_id = ? and token = ? and expire > ?"], [$appKey, $appToken, time()])->fetch()) {
             return $row['uid'];
         } else {
             return 0;
@@ -30,7 +30,7 @@ class OauthTokenModel extends Model
     public function get($uid, $appKey)
     {
         $timestamp = time();
-        if ($tokenRow = $this->where(["appkey = :ak and uid = :u"], ['ak' => $appKey, 'u' => $uid])->fetch()) {
+        if ($tokenRow = $this->where(["client_id = :ak and uid = :u"], ['ak' => $appKey, 'u' => $uid])->fetch()) {
             if ($timestamp < intval($tokenRow['expire'])) {
                 $token = $tokenRow['token'];
                 $expire = $tokenRow['expire'];
@@ -43,7 +43,7 @@ class OauthTokenModel extends Model
         } else {
             $token = md5($uid + $appKey + $timestamp);
             $expire = $timestamp + 604800;
-            $this->add(['uid' => $uid, 'appkey' => $appKey, 'token' => $token, 'expire' => $expire]);
+            $this->add(['uid' => $uid, 'client_id' => $appKey, 'token' => $token, 'expire' => $expire]);
         }
         $response = ['token' => $token, 'expire' => $expire];
         return $response;
