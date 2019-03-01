@@ -29,6 +29,15 @@ class PostModel extends Model
         return $this->fetch("count(*) num")['num'];
     }
 
+    public function search($word, $page = 1, $size = 20)
+    {
+        $posts = $this->join(DB_PREFIX . "user", [DB_PREFIX . "post.username=" . DB_PREFIX . "user.username"], "LEFT")
+            ->where('title like :w or content like :w', ['w' => "%$word%"])->order(['tid desc'])->limit($size, ($page - 1) * $size)
+            ->fetchAll(DB_PREFIX . "post.*," . DB_PREFIX . "user.nickname");
+        $total = $this->where('title like :w or content like :w', ['w' => "%$word%"])->fetch("count(*) num")['num'];
+        return ['posts' => $posts, 'total' => $total];
+    }
+
     public function getPostById($id)
     {
         return $this->join(DB_PREFIX . "user", [DB_PREFIX . "post.username=" . DB_PREFIX . "user.username"], "LEFT")

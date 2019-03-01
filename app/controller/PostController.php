@@ -112,4 +112,28 @@ class PostController extends Controller
             $this->render('common/error.html');
         }
     }
+
+
+    function ac_search(array $path, UserService $userService)
+    {
+        if (isset($_REQUEST['word']) && $_REQUEST['word'] != '') {
+            $word = $_REQUEST['word'];
+            $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : 1;
+            $result = (new PostModel())->search($word, $page);
+            $endPage = ceil($result['total'] / 20);
+            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+                $this->assign('tp_user', $userService->getLoginUser())
+                    ->assign('cur_ctr', 'post')->assign('end_page', $endPage);
+            }
+            $this->assign('word', $word);
+            $this->assign("page", $page)->assign('total', $result['total'])->assign("posts", $result['posts'])
+                ->render('post/search.html');
+        } else {
+            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+                $this->assign('word', '');
+                $this->assign('total', 0)->assign("posts", []);
+                $this->assign('tp_user', $userService->getLoginUser())->render('post/search.html');
+            }
+        }
+    }
 }
