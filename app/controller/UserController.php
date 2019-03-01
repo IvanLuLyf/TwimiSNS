@@ -14,7 +14,7 @@ class UserController extends Controller
     public function ac_login_get()
     {
         if (isset($_REQUEST['referer'])) {
-            session_start();
+            if (!session_id()) session_start();
             $referer = $_REQUEST['referer'];
             $_SESSION['referer'] = $referer;
             $this->assign('referer', $referer);
@@ -37,7 +37,7 @@ class UserController extends Controller
         $result = (new UserModel())->login($_POST['username'], $_POST['password']);
         if ($this->_mode == BunnyPHP::MODE_NORMAL) {
             if ($result['ret'] == 0) {
-                session_start();
+                if (!session_id()) session_start();
                 $_SESSION['token'] = $result['token'];
                 if (isset($_SESSION['referer'])) {
                     $referer = $_SESSION['referer'];
@@ -74,7 +74,7 @@ class UserController extends Controller
     {
         if (Config::load('config')->get('allow_reg')) {
             if (isset($_REQUEST['referer'])) {
-                session_start();
+                if (!session_id()) session_start();
                 $referer = $_REQUEST['referer'];
                 $_SESSION['referer'] = $referer;
                 $this->assign('referer', $referer);
@@ -101,7 +101,7 @@ class UserController extends Controller
                 if ($result['ret'] == 0) {
                     $service = new EmailService();
                     $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
-                    session_start();
+                    if (!session_id()) session_start();
                     $_SESSION['token'] = $result['token'];
                     if (isset($_SESSION['referer'])) {
                         $referer = $_SESSION['referer'];
@@ -205,7 +205,7 @@ class UserController extends Controller
 
     public function ac_logout()
     {
-        session_start();
+        if (!session_id()) session_start();
         unset($_SESSION['token']);
         $this->redirect('user', 'login');
     }
@@ -226,4 +226,30 @@ class UserController extends Controller
         $this->redirect($imgUrl);
     }
 
+    /**
+     * @filter api
+     * @filter auth
+     */
+    public function ac_avatar_post()
+    {
+        $tp_user = BunnyPHP::app()->get('tp_user');
+        $this->assign('tp_user', $tp_user);
+        if (isset($_FILES['avatar'])) {
+            $image_type = ['image/bmp', 'image/gif', 'image/jpeg', 'image/pjpeg', 'image/png', 'application/x-bmp', 'application/x-jpg', 'application/x-png'];
+            if (in_array($_FILES["avatar"]["type"], $image_type) && ($_FILES["avatar"]["size"] < 2000000)) {
+                $t = time() % 1000;
+                $url = $this->storage()->upload("avatar/" . $tp_user['uid'] . '_' . $t . ".jpg", $_FILES["avatar"]["tmp_name"]);
+                (new AvatarModel())->upload($tp_user['uid'], $url);
+                $response = array('ret' => 0, 'status' => 'ok', 'url' => $url);
+            } else {
+                $response = array('ret' => 1007, 'status' => 'wrong file');
+            }
+            $this->assignAll($response);
+        }
+        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+            $this->redirect('setting', 'avatar');
+        } else {
+            $this->render('setting/avatar.html');
+        }
+    }
 }
