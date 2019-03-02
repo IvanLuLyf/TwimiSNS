@@ -58,7 +58,7 @@ class UserController extends Controller
             }
         } elseif ($this->_mode == BunnyPHP::MODE_API) {
             if ($result['ret'] == 0) {
-                $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['appkey']);
+                $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id']);
                 $result['token'] = $appToken['token'];
                 $result['expire'] = $appToken['expire'];
             }
@@ -119,7 +119,7 @@ class UserController extends Controller
                 if ($result['ret'] == 0) {
                     $service = new EmailService();
                     $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
-                    $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['appkey']);
+                    $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id']);
                     $result['token'] = $appToken['token'];
                     $result['expire'] = $appToken['expire'];
                 }
