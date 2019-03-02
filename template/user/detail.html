@@ -1,0 +1,46 @@
+<html lang="zh-cn">
+<head>
+    <title><?=constant("TP_SITE_NAME")?></title>
+    <?php include "template/common/header.html"; ?>
+    <link href="/static/css/article.css" rel="stylesheet">
+    <?php if(isset($user_info['background'])):?>
+    <style>
+        body {
+            background: url(<?=$user_info[ 'background' ]?>) no-repeat fixed center;
+        }
+    </style>
+    <?php endif;?>
+</head>
+<body>
+<?php include "template/common/navbar.html"; ?>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="card neo_card mt-4">
+                <div class="card-body text-center">
+                    <img src="/user/avatar/<?=$user['uid']?>"
+                         class="rounded-circle center-block" width="72px"/>
+                    <h4 class="card-title"><?= $user['nickname'] ?></h4>
+                    <p class="card-text"><?=htmlspecialchars($user_info['signature'])?></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <?php if(isset($recommend_blogs)):?>
+            <div class="card neo_card mt-4">
+                <div class="card-header">
+                    推荐列表
+                </div>
+                <ul class="list-group list-group-flush">
+                    <?php foreach ($recommend_blogs as $blog): ?>
+                    <li class="list-group-item list-group-item-action"><?=$blog['title']?></li>
+                    <?php endforeach ?>
+                </ul>
+            </div>
+            <?php endif;?>
+        </div>
+    </div>
+</div>
+<?php include "template/common/footer.html"; ?>
+</body>
+</html>

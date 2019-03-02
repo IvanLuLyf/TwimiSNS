@@ -23,3 +23,6 @@ Powered By BunnyPHP
 |3001    |invalid tid|
 |3002    |already liked|
 |4001    |no friend|
+|5001    |invalid password|
+|5002    |already pay|
+|5003    |no enough coin|

@@ -265,4 +265,23 @@ class UserController extends Controller
         }
         $this->render('user/info.html');
     }
+
+    public function ac_detail(array $path, UserService $userService)
+    {
+        if (count($path) == 0) $path = [''];
+        $username = isset($_GET['username']) ? $_GET['username'] : $path[0];
+        $tp_user = $userService->getLoginUser();
+        if ($username == '') {
+            if ($tp_user == null) {
+                $this->redirect('user', 'login', ['referer' => View::get_url('user', 'detail')]);
+                return;
+            }
+            $username = $tp_user['username'];
+        }
+        $user = (new UserModel())->where(["username = :username"], ['username' => $username])->fetch(['uid', 'username', 'nickname']);
+        $user_info = (new UserInfoModel())->get($user['uid']);
+        $this->assign('user', $user);
+        $this->assign('user_info', $user_info);
+        $this->render('user/detail.html');
+    }
 }

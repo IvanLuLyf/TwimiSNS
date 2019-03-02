@@ -16,4 +16,8 @@ class UserInfoModel extends Model
     ];
     protected $_pk = ['uid'];
 
+    public function get($uid)
+    {
+        return $this->where(['uid = :uid'], ['uid' => $uid])->fetch();
+    }
 }
