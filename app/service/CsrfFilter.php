@@ -10,7 +10,7 @@ class CsrfFilter extends Filter
 {
     public function doFilter($fa = [])
     {
-        if ($this->_mode == BunnyPHP::MODE_NORMAL || $this->_mode == BunnyPHP::MODE_API) {
+        if ($this->_mode == BunnyPHP::MODE_NORMAL || $this->_mode == BunnyPHP::MODE_AJAX) {
             if (!session_id()) session_start();
             if (in_array('check', $fa)) {
                 if (isset($_POST['csrf_token']) && $_POST['csrf_token'] != '' && $_POST['csrf_token'] == $_SESSION['csrf_token']) {
