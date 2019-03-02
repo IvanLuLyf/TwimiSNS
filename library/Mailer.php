@@ -33,7 +33,7 @@ class Mailer
         $nickname = ($nickname == '') ? $from : $nickname;
         $body = preg_replace("/(^|(\r\n))(\.)/", "\1.\3", $body);
         $header = "MIME-Version:1.0\r\n";
-        if ($mailType == "HTML") $header .= "Content-Type:text/html\r\n";
+        if ($mailType == "HTML") $header .= "Content-Type:text/html;charset=utf-8\r\n";
         $header .= "To: {$to} \r\n";
         if ($cc != "") $header .= "Cc: {$cc}\r\n";
         $header .= "From: {$nickname}<{$from}>\r\n";
