@@ -107,8 +107,9 @@ class PayController extends Controller
     /**
      * @filter auth canPay
      * @filter csrf check
+     * @param EmailService $service
      */
-    public function ac_start_post()
+    public function ac_start_post(EmailService $service)
     {
         if (isset($_POST['pass'])) {
             $tp_user = BunnyPHP::app()->get('tp_user');
@@ -120,6 +121,7 @@ class PayController extends Controller
                 $this->assign('tp_user', $tp_user);
             }
             $this->assign('credit', $credit->start($tp_user['uid']));
+            $service->sendMail('email/pay_start.html', ['nickname' => $tp_user['nickname'], 'site' => TP_SITE_NAME], $tp_user['email'], '您已开通' . TP_SITE_NAME . "支付服务");
             $this->render('pay/start.html');
         } else {
             $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空")
