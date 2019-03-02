@@ -133,9 +133,9 @@ class Model
         return Database::getInstance()->insert($data, $this->_table);
     }
 
-    public function update($data = [])
+    public function update($data = [], $what = null)
     {
-        $result = Database::getInstance()->update($data, $this->_table, $this->_filter, $this->_param);
+        $result = Database::getInstance()->update($data, $this->_table, $this->_filter, $this->_param, $what);
         $this->reset();
         return $result;
     }
