@@ -87,7 +87,7 @@ class OauthController extends Controller
         if ($uid = $model->getUid($bind_uid, $type)) {
             $model->where(['bind=:b and type=:t'], ['b' => $bind_uid, 't' => $type])->update(['token' => $bind_token]);
             $result = (new UserModel())->getUserByUid($uid);
-            $appToken = (new OauthTokenModel())->get($uid, $_POST['appkey']);
+            $appToken = (new OauthTokenModel())->get($uid, $_POST['client_id']);
             $result['token'] = $appToken['token'];
             $result['expire'] = $appToken['expire'];
             $this->assign('ret', 0)->assign('status', 'ok')->assignAll($result)->render();
@@ -167,13 +167,13 @@ class OauthController extends Controller
                     else
                         $this->redirect("$url?code=$code");
                 } else {
-                    if (isset($_POST['username'])) {
+                    if (isset($_POST['username']) && isset($_POST['password'])) {
                         $result = (new UserModel())->login($_POST['username'], $_POST['password']);
                         if ($result['ret'] == 0) {
                             if (!session_id()) session_start();
                             $_SESSION['token'] = $result['token'];
                             $url = $_REQUEST['redirect_uri'];
-                            $code = (new OauthCodeModel())->getCode($_REQUEST['client_id'], $app['id'], $user['uid'], time());
+                            $code = (new OauthCodeModel())->getCode($_REQUEST['client_id'], $app['id'], $result['uid'], time());
                             if (strpos($url, "?"))
                                 $this->redirect("$url&code=$code");
                             else
