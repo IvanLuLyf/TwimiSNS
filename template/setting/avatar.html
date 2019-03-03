@@ -83,7 +83,12 @@
             avatar_crop.show();
             $("#btn_confirm").show();
             $('#btn_sel').hide();
-            cropper = avatar_crop.croppie({url: evt.target.result});
+            cropper = avatar_crop.croppie({
+                url: evt.target.result, viewport: {
+                    width: 200,
+                    height: 200
+                }
+            });
         };
         reader.readAsDataURL(document.getElementById("avatar").files[0]);
     });
