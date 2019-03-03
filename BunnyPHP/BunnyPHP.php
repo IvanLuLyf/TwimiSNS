@@ -55,6 +55,9 @@ class BunnyPHP
             if (strtolower($url_array[0]) == "api") {
                 array_shift($url_array);
                 $this->mode = BunnyPHP::MODE_API;
+            } elseif (strtolower($url_array[0]) == "ajax") {
+                array_shift($url_array);
+                $this->mode = BunnyPHP::MODE_AJAX;
             }
             $controllerName = ucfirst($url_array[0]);
             array_shift($url_array);
