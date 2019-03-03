@@ -12,14 +12,11 @@
             <div class="card neo_card mt-4">
                 <div class="card-body">
                     搜索
-                    <form class="mt-2 mb-2" action="/post/search">
-                        <div class="form-row">
-                            <div class="col-8">
-                                <input name="word" class="form-control" type="text" placeholder="搜索" aria-label="搜索"
-                                       value="<?=$word?>">
-                            </div>
-                            <div class="col-4">
-                                <input type="submit" class="btn btn-outline-success btn-block" value="搜索">
+                    <form class="mt-2 mb-2 row" action="/post/search">
+                        <div class="input-group mb-3 col-lg-6">
+                            <input name="word" class="form-control" type="text" placeholder="搜索" aria-label="搜索" value="<?=$word?>">
+                            <div class="input-group-append">
+                                <input type="submit" class="btn btn-outline-secondary" value="搜索">
                             </div>
                         </div>
                     </form>

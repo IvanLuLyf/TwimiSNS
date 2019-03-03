@@ -79,7 +79,6 @@
         let reader = new FileReader();
         let avatar_crop = $('#avatar_crop');
         reader.onload = function (evt) {
-            $("#img_avatar").attr("src", evt.target.result);
             avatar_crop.show();
             $("#btn_confirm").show();
             $('#btn_sel').hide();
