@@ -227,6 +227,7 @@ class UserController extends Controller
     }
 
     /**
+     * @filter ajax
      * @filter api
      * @filter auth
      */
