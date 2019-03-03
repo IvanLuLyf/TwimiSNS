@@ -47,6 +47,23 @@ class AuthFilter extends Filter
             } else {
                 $this->error(['ret' => 1004, 'status' => 'empty arguments']);
             }
+        } elseif ($this->_mode == BunnyPHP::MODE_AJAX) {
+            if (BunnyPHP::app()->get("tp_ajax") === true) {
+                if (!session_id()) session_start();
+                if (isset($_SESSION['token']) && $_SESSION['token'] != "") {
+                    $user = (new UserModel)->check($_SESSION["token"]);
+                    if ($user != null) {
+                        BunnyPHP::app()->set('tp_user', $user);
+                        return self::NEXT;
+                    } else {
+                        $this->redirect('user', 'login', ['referer' => $_SERVER['REQUEST_URI']]);
+                    }
+                } else {
+                    $this->redirect('user', 'login', ['referer' => $_SERVER['REQUEST_URI']]);
+                }
+            } else {
+                $this->error(['ret' => -1, 'status' => 'not permission']);
+            }
         } else {
             $this->error(['ret' => -1, 'status' => 'not permission']);
         }
