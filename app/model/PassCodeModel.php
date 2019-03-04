@@ -20,7 +20,7 @@ class PassCodeModel extends Model
         if ($row = $this->where('uid=:u and expire>:t', ['u' => $uid, 't' => time()])->fetch()) {
             return $row['code'];
         } else {
-            $code = md5("BunnyPHP" . time() . "Hello");
+            $code = md5("BunnyPHP" . time() . rand(1, 1000));
             $this->add(['uid' => $uid, 'code' => $code, 'expire' => time() + 1800]);
             return $code;
         }

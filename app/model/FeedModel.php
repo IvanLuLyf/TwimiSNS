@@ -26,16 +26,14 @@ class FeedModel extends Model
 
     public function listFeed($uid, $page = 1)
     {
-        return $this->join(DB_PREFIX . 'friend',
-            [DB_PREFIX . "feed.username=" . DB_PREFIX . "friend.username AND " . DB_PREFIX . "friend.uid=$uid AND " . DB_PREFIX . "friend.state=2"],
-            "LEFT")
-            ->join(DB_PREFIX . 'like',
-                [DB_PREFIX . "feed.tid=" . DB_PREFIX . "like.tid and " . DB_PREFIX . "like.aid = 3 and " . DB_PREFIX . "like.uid=$uid"],
-                "LEFT")
-            ->where([DB_PREFIX . "friend.uid = :u OR " . DB_PREFIX . "feed.uid= :u"], ['u' => $uid])
+        $tb = $this->_table;
+        $ft = FriendModel::name();
+        return $this->join(FriendModel::class, ['username', 'uid' => $uid, 'state' => 2], ['notename'])
+            ->join(LikeModel::class, ['tid', 'aid' => 3, 'uid' => $uid], [["state", "(%s is not null) as islike"]])
+            ->where(["{$ft}.uid = :u or {$tb}.uid= :u"], ['u' => $uid])
             ->order(["tid desc"])
             ->limit(20, ($page - 1) * 20)
-            ->fetchAll(DB_PREFIX . "feed.*," . DB_PREFIX . "friend.notename,(" . DB_PREFIX . "like.state is not null) as islike");
+            ->fetchAll();
     }
 
     public function sendFeed($user, $content, $source, $image = 0)
@@ -62,9 +60,7 @@ class FeedModel extends Model
 
     public function likeFeed($tid)
     {
-        $row = $this->where(["tid = :tid"], [':tid' => $tid])->fetch();
-        $updates = array('like_num' => intval($row['like_num']) + 1);
-        $this->where(["tid = :tid"], [':tid' => $tid])->update($updates);
+        $this->where(["tid = :tid"], [':tid' => $tid])->update([], 'like_num=like_num+1');
         $row = $this->where(["tid = :tid"], [':tid' => $tid])->fetch();
         return intval($row['like_num']);
     }

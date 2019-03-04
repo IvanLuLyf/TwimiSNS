@@ -21,9 +21,9 @@ class ApiModel extends Model
     protected $_pk = ['id'];
     protected $_ai = 'id';
 
-    public function check($appKey)
+    public function check($clientId)
     {
-        if ($row = $this->where(["client_id = ?"], [$appKey])->fetch()) {
+        if ($row = $this->where(["client_id = ?"], [$clientId])->fetch()) {
             return [
                 'id' => $row['id'],
                 'name' => $row['name'],
@@ -40,9 +40,9 @@ class ApiModel extends Model
         }
     }
 
-    public function validate($appKey, $appSecret)
+    public function validate($clientId, $clientSecret)
     {
-        if ($row = $this->where(["client_id = ? and client_secret = ?"], [$appKey, $appSecret])->fetch()) {
+        if ($row = $this->where(["client_id = ? and client_secret = ?"], [$clientId, $clientSecret])->fetch()) {
             return [
                 'id' => $row['id'],
                 'name' => $row['name'],
@@ -59,9 +59,9 @@ class ApiModel extends Model
         }
     }
 
-    public function getAuthorByAppKey($appKey)
+    public function getAuthorByClientId($clientId)
     {
-        if ($row = $this->where(["client_id = ?"], [$appKey])->fetch()) {
+        if ($row = $this->where(["client_id = ?"], [$clientId])->fetch()) {
             return $row['uid'];
         } else {
             return null;

@@ -18,9 +18,9 @@ class OauthCodeModel extends Model
     protected $_pk = ['id'];
     protected $_ai = 'id';
 
-    public function getCode($appKey, $appId, $uid, $timestamp)
+    public function getCode($clientId, $appId, $uid, $timestamp)
     {
-        $code = md5($uid . $appKey . $timestamp);
+        $code = md5($uid . $clientId . $timestamp);
         $this->add(['uid' => $uid, 'appid' => $appId, 'code' => $code, 'expire' => ($timestamp + 604800)]);
         return $code;
     }

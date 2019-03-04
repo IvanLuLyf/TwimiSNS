@@ -13,6 +13,7 @@ class PostModel extends Model
         'username' => ['varchar(16)', 'not null'],
         'title' => ['text', 'not null'],
         'content' => ['text', 'not null'],
+        'extra' => ['text'],
         'timestamp' => ['text'],
     ];
     protected $_pk = ['tid'];
@@ -20,8 +21,8 @@ class PostModel extends Model
 
     public function getPostByPage($page = 1, $size = 20)
     {
-        return $this->join(DB_PREFIX . "user", [DB_PREFIX . "post.username=" . DB_PREFIX . "user.username"], "LEFT")
-            ->order(['tid desc'])->limit($size, ($page - 1) * $size)->fetchAll(DB_PREFIX . "post.*," . DB_PREFIX . "user.nickname");
+        return $this->join(UserModel::class, ['username'], ['nickname'])
+            ->order(['tid desc'])->limit($size, ($page - 1) * $size)->fetchAll();
     }
 
     public function getTotal()
@@ -31,17 +32,17 @@ class PostModel extends Model
 
     public function search($word, $page = 1, $size = 20)
     {
-        $posts = $this->join(DB_PREFIX . "user", [DB_PREFIX . "post.username=" . DB_PREFIX . "user.username"], "LEFT")
+        $posts = $this->join(UserModel::class, ['username'], ['nickname'])
             ->where('title like :w or content like :w', ['w' => "%$word%"])->order(['tid desc'])->limit($size, ($page - 1) * $size)
-            ->fetchAll(DB_PREFIX . "post.*," . DB_PREFIX . "user.nickname");
+            ->fetchAll();
         $total = $this->where('title like :w or content like :w', ['w' => "%$word%"])->fetch("count(*) num")['num'];
         return ['posts' => $posts, 'total' => $total];
     }
 
     public function getPostById($id)
     {
-        return $this->join(DB_PREFIX . "user", [DB_PREFIX . "post.username=" . DB_PREFIX . "user.username"], "LEFT")
-            ->where("tid=:tid", ['tid' => $id])->fetch(DB_PREFIX . "post.*," . DB_PREFIX . "user.nickname");
+        return $this->join(UserModel::class, ['username'], ['nickname'])
+            ->where("tid=:tid", ['tid' => $id])->fetch();
     }
 
     public function getPostByUsername($username)

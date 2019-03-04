@@ -33,7 +33,7 @@ class FriendModel extends Model
     public function noteFriend($uid, $username, $notename)
     {
         if ($friend = $this->where(["uid = ? and username = ? and state = 2"], [$uid, $username])->fetch()) {
-            $updates = array('notename' => $notename);
+            $updates = ['notename' => $notename];
             if ($this->where(["uid = :uid and username = :username"], [':uid' => $uid, ':username' => $username])->update($updates)) {
                 $response = ['ret' => 0, 'status' => 'ok'];
             } else {

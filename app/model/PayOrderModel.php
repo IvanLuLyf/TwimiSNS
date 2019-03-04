@@ -20,11 +20,11 @@ class PayOrderModel extends Model
     protected $_pk = ['id'];
     protected $_ai = 'id';
 
-    public function ticket($app_id, $intro, $price)
+    public function ticket($appId, $intro, $price)
     {
         $timestamp = time();
-        $payTicket = sha1($intro . $app_id . $timestamp . rand(1, 100));
-        $this->add(['intro' => $intro, 'app' => $app_id, 'ticket' => $payTicket, 'price' => $price, 'timestamp' => $timestamp]);
+        $payTicket = sha1($intro . $appId . $timestamp . rand(1, 100));
+        $this->add(['intro' => $intro, 'app' => $appId, 'ticket' => $payTicket, 'price' => $price, 'timestamp' => $timestamp]);
         return $payTicket;
     }
 
