@@ -105,21 +105,16 @@ class InstallController extends Controller
             $site_url = $_POST['site_url'];
             $db_prefix = $db_info['prefix'];
 
-            UserModel::create();
-            PostModel::create();
-            FeedModel::create();
-            FeedImageModel::create();
-            NotificationModel::create();
-            CommentModel::create();
-            UserInfoModel::create();
-            AvatarModel::create();
-            ApiModel::create();
-            OauthTokenModel::create();
-            OauthCodeModel::create();
-            BindModel::create();
-            FriendModel::create();
-            LikeModel::create();
-
+            $models = scandir(APP_PATH . "app/model");
+            /**
+             * @var $modelClass Model
+             */
+            foreach ($models as $model) {
+                if (substr($model, -9) == "Model.php") {
+                    $modelClass = substr($model, 0, -4);
+                    $modelClass::create();
+                }
+            }
             Database::getInstance()->insert(['username' => $username, 'password' => $password, 'email' => $email, 'nickname' => $nickname, 'token' => ''], $db_prefix . 'user');
             $config_file = fopen(APP_PATH . "config/config.php", "w") or die("Unable to open file!");
             $config = Config::make([
