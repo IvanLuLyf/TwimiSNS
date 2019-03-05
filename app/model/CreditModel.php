@@ -21,9 +21,9 @@ class CreditModel extends Model
         if ($from_credit != null && $to_credit != null) {
             $balance = doubleval($from_credit['credit']);
             if ($balance >= $credit && $from_uid != $to_uid) {
-                $this->where(['uid=:u'], ['u' => $from_uid])->update(['c' => $credit], 'credit=credit-:c');
-                $this->where(['uid=:u'], ['u' => $to_uid])->update(['c' => $credit], 'credit=credit+:c');
-                return true;
+                $flag = $this->where(['uid=:u'], ['u' => $from_uid])->update(['c' => $credit], 'credit=credit-:c');
+                $flag &= $this->where(['uid=:u'], ['u' => $to_uid])->update(['c' => $credit], 'credit=credit+:c');
+                return $flag;
             } else if ($from_uid == $to_uid) {
                 return true;
             } else {

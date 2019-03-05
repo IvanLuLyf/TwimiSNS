@@ -28,9 +28,15 @@
                         </div>
                     </div>
                     <hr>
+                    <?php if($show_state==0):?>
                     <div class="markdown-body">
                         <?=$html_content?>
                     </div>
+                    <?php elseif($show_state==1):?>
+                    <p>该帖子需要付费阅读,请支付<?=$coin?>硬币之后阅读<a role="button" class="btn btn-dark" href="/post/buy/<?=$post['tid']?>">购买</a></p>
+                    <?php elseif($show_state==2):?>
+                    <p>该帖子需要登录才可继续阅读,请登陆后继续阅读</p>
+                    <?php endif;?>
                 </div>
             </div>
             <div class="card neo_card mt-3">
@@ -61,7 +67,9 @@
                     </div>
                     <div class="oauth-bar text-center">
                         <?php foreach ($oauth as $o): ?>
-                        <a href="/oauth/connect/<?=$o[0]?>?referer=/post/view/<?=$post['tid']?>"><img alt="<?=$o[1]?>" class="oauth-icon" src="/static/img/<?=$o[0]?>.png"></a>
+                        <a href="/oauth/connect/<?=$o[0]?>?referer=/post/view/<?=$post['tid']?>"><img alt="<?=$o[1]?>"
+                                                                                                      class="oauth-icon"
+                                                                                                      src="/static/img/<?=$o[0]?>.png"></a>
                         <?php endforeach ?>
                     </div>
                     <?php endif;?>

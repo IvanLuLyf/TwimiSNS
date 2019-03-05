@@ -27,3 +27,4 @@ Powered By BunnyPHP
 |5001    |invalid password|
 |5002    |already pay|
 |5003    |no enough coin|
+|5004    |no need to pay|

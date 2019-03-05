@@ -39,7 +39,7 @@ class PayController extends Controller
             $this->assign('ret', 5001);
             $this->assign('status', 'invalid password');
         }
-        $this->render('pay/pay.html');
+        $this->render('pay/buy.html');
     }
 
     /**
