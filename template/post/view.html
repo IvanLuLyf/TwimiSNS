@@ -61,7 +61,7 @@
                     </div>
                     <div class="oauth-bar text-center">
                         <?php foreach ($oauth as $o): ?>
-                        <a href="/oauth/connect/<?=$o?>?referer=/post/view/<?=$post['tid']?>"><img alt="<?=$o?>" class="oauth-icon" src="/static/img/<?=$o?>.png"></a>
+                        <a href="/oauth/connect/<?=$o[0]?>?referer=/post/view/<?=$post['tid']?>"><img alt="<?=$o[1]?>" class="oauth-icon" src="/static/img/<?=$o[0]?>.png"></a>
                         <?php endforeach ?>
                     </div>
                     <?php endif;?>
