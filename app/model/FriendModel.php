@@ -30,11 +30,27 @@ class FriendModel extends Model
         return $friends;
     }
 
+    public function getNoteName($uid, $friend_uid)
+    {
+        if ($friend = $this->where(["uid = ? and fuid = ?"], [$uid, $friend_uid])->fetch(['notename'])) {
+            return $friend['notename'];
+        }
+        return null;
+    }
+
+    public function getNoteNameByUsername($uid, $friend_username)
+    {
+        if ($friend = $this->where(["uid = ? and username = ?"], [$uid, $friend_username])->fetch(['notename'])) {
+            return $friend['notename'];
+        }
+        return null;
+    }
+
     public function noteFriend($uid, $username, $notename)
     {
         if ($friend = $this->where(["uid = ? and username = ? and state = 2"], [$uid, $username])->fetch()) {
             $updates = ['notename' => $notename];
-            if ($this->where(["uid = :uid and username = :username"], [':uid' => $uid, ':username' => $username])->update($updates)) {
+            if ($this->where(["uid = :u and username = :un"], ['u' => $uid, 'un' => $username])->update($updates)) {
                 $response = ['ret' => 0, 'status' => 'ok'];
             } else {
                 $response = ['ret' => 1006, 'status' => "database error"];
@@ -48,7 +64,7 @@ class FriendModel extends Model
     public function addFriend($uid, $fuid, $username, $fusername, $nickname, $fnickname)
     {
         if ($username != $fusername) {
-            if ($this->where(["uid = :uid and username = :username"], [':uid' => $uid, ':username' => $fusername])->fetch()) {
+            if ($this->where(["uid = :u and username = :un"], ['u' => $uid, 'un' => $fusername])->fetch()) {
                 $response = ['ret' => 1009, 'status' => "already exist"];
             } else {
                 $this->add(['uid' => $uid, 'fuid' => $fuid, 'username' => $fusername, 'notename' => $fnickname, 'state' => 0]);
@@ -63,10 +79,10 @@ class FriendModel extends Model
 
     public function acceptFriend($uid, $fuid, $username, $fusername)
     {
-        if ($row = $this->where(["uid = :uid and username = :username and state = 1"], [':uid' => $uid, ':username' => $fusername])->fetch()) {
+        if ($row = $this->where(["uid = :u and username = :un and state = 1"], ['u' => $uid, 'un' => $fusername])->fetch()) {
             $updates = ['state' => 2];
-            $this->where(["uid = :uid and username= :username"], [':uid' => $uid, ':username' => $fusername])->update($updates);
-            $this->where(["uid = :uid and username= :username"], [':uid' => $fuid, ':username' => $username])->update($updates);
+            $this->where(["uid = :u and username= :un"], ['u' => $uid, 'un' => $fusername])->update($updates);
+            $this->where(["uid = :u and username= :un"], ['u' => $fuid, 'un' => $username])->update($updates);
             $response = ['ret' => 0, 'status' => "ok"];
         } else {
             $response = ['ret' => 1005, 'status' => "invalid username"];

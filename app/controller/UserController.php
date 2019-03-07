@@ -260,9 +260,36 @@ class UserController extends Controller
     public function ac_info()
     {
         if ($this->_mode == BunnyPHP::MODE_API) {
-            $tp_user = BunnyPHP::app()->get('tp_user');
-            $this->assign('ret', 0)->assign('status', 'ok');
-            $this->assignAll($tp_user);
+            $username = isset($_REQUEST['username']) ? $_REQUEST['username'] : '';
+            $id_code = isset($_REQUEST['id_code']) ? $_REQUEST['id_code'] : '';
+            if ($username == '' && $id_code == '') {
+                $tp_user = BunnyPHP::app()->get('tp_user');
+                $this->assign('ret', 0)->assign('status', 'ok');
+                $this->assignAll($tp_user);
+            } else if ($id_code != '') {
+                /*
+                $uid = (new IdCodeModel())->getUidByIdCode($id_code);
+                if ($uid != 0) {
+                    $response = (new UserModel())->getUserByUid($uid);
+                    $this->assign('ret', 0);
+                    $this->assign('status', 'ok');
+                    $this->assignAll($response);
+                } else {
+                    $this->assign('ret', 1008);
+                    $this->assign('status', 'invalid idcode');
+                }
+                */
+            } else {
+                $row = (new UserModel())->getUserByUsername($username);
+                if ($row['uid'] != null) {
+                    $this->assign('ret', 0);
+                    $this->assign('status', 'ok');
+                    $this->assignAll($row);
+                } else {
+                    $this->assign('ret', 1005);
+                    $this->assign('status', 'invalid username');
+                }
+            }
         }
         $this->render('user/info.html');
     }

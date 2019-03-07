@@ -14,7 +14,7 @@ class NotificationModel extends Model
         'uid' => ['integer', 'not null'],
         'tid' => ['integer', 'not null'],
         'from_uid' => ['integer', 'not null'],
-        'is_read' => ['integer', 'not null'],
+        'is_read' => ['integer', 'not null', 'default 0'],
         'action' => ['text'],
         'message' => ['text'],
         'timestamp' => ['text'],
@@ -24,17 +24,19 @@ class NotificationModel extends Model
 
     public function getUnreadCnt($uid)
     {
-        return $this->where(["uid = ? and is_read=0"], [$uid])->fetch("count(*) as noticnt");
+        $note_count = $this->where(["uid = ? and is_read=0"], [$uid])->fetch("count(*) as note_count")['note_count'];
+        $note_uid = $this->where(["uid = ? and is_read=0"], [$uid])->order("timestamp desc")->fetch("from_uid")['from_uid'];
+        return [$note_count, $note_uid];
     }
 
     public function getNotice($uid)
     {
         $tb = $this->_table;
         $notices = $this->join(FriendModel::class, [['fuid', 'from_uid'], 'uid' => $uid, 'state' => 2], ['notename'])
-            ->where(["{$tb}.uid=? AND {$tb}.uid!={$tb}.from_uid AND {$tb}.is_read=0"], [$uid])
+            ->where(["{$tb}.uid=:u AND {$tb}.uid!={$tb}.from_uid AND {$tb}.is_read=0"], ['u' => $uid])
             ->order(["nid desc"])
             ->fetchAll();
-        $this->where(["uid = :uid and is_read=0"], [':uid' => $uid])->update(['is_read' => 1]);
+        $this->where(["uid = :u and is_read=0"], ['u' => $uid])->update(['is_read' => 1]);
         return $notices;
     }
 

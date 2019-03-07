@@ -60,8 +60,8 @@ class FeedModel extends Model
 
     public function likeFeed($tid)
     {
-        $this->where(["tid = :tid"], [':tid' => $tid])->update([], 'like_num=like_num+1');
-        $row = $this->where(["tid = :tid"], [':tid' => $tid])->fetch();
+        $this->where(["tid = :t"], ['t' => $tid])->update([], 'like_num=like_num+1');
+        $row = $this->where(["tid = :t"], ['t' => $tid])->fetch();
         return intval($row['like_num']);
     }
 }

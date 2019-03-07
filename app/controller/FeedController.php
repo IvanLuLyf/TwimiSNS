@@ -70,14 +70,20 @@ class FeedController extends Controller
                 }
                 $this->assign('tid', $tid);
                 $this->assign('user', $tp_user);
-                $this->assign('noticnt', (new NotificationModel())->getUnreadCnt($tp_user['uid'])['noticnt']);
+                $note_info = (new NotificationModel())->getUnreadCnt($tp_user['uid']);
+                $this->assign('note_count', $note_info[0]);
+                $this->assign('note_uid', $note_info[1]);
+                $user_info = (new UserInfoModel())->get($tp_user['uid']);
+                $this->assign('user_info', $user_info);
                 $this->assign('feeds', $feeds);
             } else {
                 $feed = (new FeedModel())->getFeed($tid);
+                $noteName = (new FriendModel())->getNoteNameByUsername($tp_user['uid'], $feed['username']);
+                $feed['notename'] = $noteName;
                 if ($feed['image'] != null && $feed['image'] > 0) {
                     $feed['images'] = (new FeedImageModel())->getFeedImageByTid($feed['tid']);
                 }
-                $comments = (new CommentModel())->listComment(3, $tid, $page);
+                $comments = (new CommentModel())->listComment($tid, 3, $page, $tp_user['uid']);
                 $this->assign('feed', $feed);
                 $this->assign('comments', $comments);
             }

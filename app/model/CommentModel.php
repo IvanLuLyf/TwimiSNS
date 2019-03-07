@@ -20,9 +20,16 @@ class CommentModel extends Model
     protected $_pk = ['cid'];
     protected $_ai = 'cid';
 
-    public function listComment($tid, $aid, $page = 1)
+    public function listComment($tid, $aid, $page = 1, $uid = 0)
     {
-        return $this->where('tid = :t and aid = :a', ['t' => $tid, 'a' => $aid])->limit(20, ($page - 1) * 20)->fetchAll();
+        if ($uid == 0) {
+            return $this->where('tid = :t and aid = :a', ['t' => $tid, 'a' => $aid])->limit(20, ($page - 1) * 20)->fetchAll();
+        } else {
+            return $this
+                ->join(FriendModel::class, ['username', 'uid' => $uid, 'state' => 2], ['notename'])
+                ->where('tid = :t and aid = :a', ['t' => $tid, 'a' => $aid])->limit(20, ($page - 1) * 20)
+                ->fetchAll();
+        }
     }
 
     public function sendComment($tid, $aid, $user, $content)
