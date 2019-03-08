@@ -18,6 +18,6 @@ class UserInfoModel extends Model
 
     public function get($uid)
     {
-        return $this->where(['uid = :uid'], ['uid' => $uid])->fetch();
+        return $this->where(['uid = :uid'], ['uid' => intval($uid)])->fetch();
     }
 }

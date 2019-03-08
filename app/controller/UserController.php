@@ -304,6 +304,19 @@ class UserController extends Controller
         $this->render('user/info.html');
     }
 
+    /**
+     * @filter auth canGetInfo
+     */
+    public function ac_code()
+    {
+        $tp_user = BunnyPHP::app()->get('tp_user');
+        $code = (new IdCodeModel())->getIdCode($tp_user['uid']);
+        $this->assign('ret', 0);
+        $this->assign('status', 'ok');
+        $this->assign('code', $code);
+        $this->render();
+    }
+
     public function ac_detail(array $path, UserService $userService)
     {
         if (count($path) == 0) $path = [''];

@@ -69,7 +69,6 @@ class FeedController extends Controller
                     }
                 }
                 $this->assign('tid', $tid);
-                $this->assign('user', $tp_user);
                 $note_info = (new NotificationModel())->getUnreadCnt($tp_user['uid']);
                 $this->assign('note_count', $note_info[0]);
                 $this->assign('note_uid', $note_info[1]);
@@ -86,6 +85,34 @@ class FeedController extends Controller
                 $comments = (new CommentModel())->listComment($tid, 3, $page, $tp_user['uid']);
                 $this->assign('feed', $feed);
                 $this->assign('comments', $comments);
+            }
+        }
+        $this->render();
+    }
+
+    /**
+     * @filter auth canFeed
+     * @param array $path
+     */
+    public function ac_list(array $path)
+    {
+        $username = isset($_REQUEST['username']) ? $_REQUEST['username'] : (isset($path[0]) ? $path[0] : 0);
+        $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : (isset($path[1]) ? $path[1] : 1);
+        $user = (new UserModel())->getUserByUsername($username);
+        if ($this->_mode == BunnyPHP::MODE_API) {
+            if ($user['uid'] != null) {
+                $this->assign('ret', 0)->assign('status', 'ok')->assign('page', $page);
+                $feeds = (new FeedModel())->userFeed($username, $page);
+                foreach ($feeds as &$feed) {
+                    if ($feed['image'] != null && $feed['image'] > 0) {
+                        $feed['images'] = (new FeedImageModel())->getFeedImageByTid($feed['tid']);
+                    }
+                }
+                $user_info = (new UserInfoModel())->get($user['uid']);
+                $this->assign('user_info', $user_info);
+                $this->assign('feeds', $feeds);
+            } else {
+                $this->assignAll(['ret' => 1002, 'status' => "user not exists"]);
             }
         }
         $this->render();

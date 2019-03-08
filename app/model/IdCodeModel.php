@@ -27,7 +27,7 @@ class IdCodeModel extends Model
 
     public function getIdByCode($code)
     {
-        if ($row = $this->where('code=:c', ['c' => $code])) {
+        if ($row = $this->where('code=:c', ['c' => $code])->fetch()) {
             return $row['uid'];
         } else {
             return 0;

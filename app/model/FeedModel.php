@@ -36,6 +36,11 @@ class FeedModel extends Model
             ->fetchAll();
     }
 
+    public function userFeed($username, $page = 1)
+    {
+        return $this->where('username=:u', ['u' => $username])->order(["tid desc"])->limit(20, ($page - 1) * 20)->fetchAll();
+    }
+
     public function sendFeed($user, $content, $source, $image = 0)
     {
         if ($user != null && $source != null && $content != null) {
