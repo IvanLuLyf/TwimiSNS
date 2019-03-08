@@ -279,8 +279,7 @@ class UserController extends Controller
                 $this->assign('ret', 0)->assign('status', 'ok');
                 $this->assignAll($tp_user);
             } else if ($id_code != '') {
-                /*
-                $uid = (new IdCodeModel())->getUidByIdCode($id_code);
+                $uid = (new IdCodeModel())->getIdByCode($id_code);
                 if ($uid != 0) {
                     $response = (new UserModel())->getUserByUid($uid);
                     $this->assign('ret', 0);
@@ -288,9 +287,8 @@ class UserController extends Controller
                     $this->assignAll($response);
                 } else {
                     $this->assign('ret', 1008);
-                    $this->assign('status', 'invalid idcode');
+                    $this->assign('status', 'invalid id code');
                 }
-                */
             } else {
                 $row = (new UserModel())->getUserByUsername($username);
                 if ($row['uid'] != null) {

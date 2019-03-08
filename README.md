@@ -14,6 +14,7 @@ Powered By BunnyPHP
 |1005    |invalid username|
 |1006    |database error|
 |1007    |register not allowed|
+|1008    |invalid id code|
 |1009    |already exist|
 |1010    |oauth is not enabled|
 |2001    |invalid client id|
