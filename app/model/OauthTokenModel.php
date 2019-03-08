@@ -27,9 +27,14 @@ class OauthTokenModel extends Model
         }
     }
 
-    public function get($uid, $clientId)
+    public function get($uid, $clientId, $appType)
     {
         $timestamp = time();
+        if (intval($appType) == 1) {
+            $seconds = 1296000;
+        } else {
+            $seconds = 172800;
+        }
         if ($tokenRow = $this->where(["client_id = :ak and uid = :u"], ['ak' => $clientId, 'u' => $uid])->fetch()) {
             if ($timestamp < intval($tokenRow['expire'])) {
                 $token = $tokenRow['token'];
@@ -37,15 +42,19 @@ class OauthTokenModel extends Model
             } else {
                 $token_id = $tokenRow['id'];
                 $token = md5($uid + $clientId + $timestamp);
-                $expire = $timestamp + 604800;
+                $expire = $timestamp + $seconds;
                 $this->where(["id = :id"], ['id' => $token_id])->update(['token' => $token, 'expire' => $expire]);
             }
+            $rowId = $tokenRow['id'];
         } else {
             $token = md5($uid + $clientId + $timestamp);
-            $expire = $timestamp + 604800;
-            $this->add(['uid' => $uid, 'client_id' => $clientId, 'token' => $token, 'expire' => $expire]);
+            $expire = $timestamp + $seconds;
+            $rowId = $this->add(['uid' => $uid, 'client_id' => $clientId, 'token' => $token, 'expire' => $expire]);
         }
         $response = ['token' => $token, 'expire' => $expire];
+        if (intval($appType) == 1) {
+            $response['refresh_token'] = md5(md5($rowId) . $token . md5($clientId));
+        }
         return $response;
     }
 }

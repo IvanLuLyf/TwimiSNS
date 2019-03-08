@@ -19,12 +19,14 @@ class UserController extends Controller
             $_SESSION['referer'] = $referer;
             $this->assign('referer', $referer);
         }
-        $oauth = [];
-        if (Config::check("oauth")) {
-            $oauth = Config::load('oauth')->get('enabled', []);
+        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+            $oauth = [];
+            if (Config::check("oauth")) {
+                $oauth = Config::load('oauth')->get('enabled', []);
+            }
+            $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
+            $this->assign('oauth', $oauth);
         }
-        $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
-        $this->assign('oauth', $oauth);
         $this->render("user/login.html");
     }
 
@@ -58,9 +60,13 @@ class UserController extends Controller
             }
         } elseif ($this->_mode == BunnyPHP::MODE_API) {
             if ($result['ret'] == 0) {
-                $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id']);
+                $app = BunnyPHP::app()->get('tp_api');
+                $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id'], $app['type']);
                 $result['token'] = $appToken['token'];
                 $result['expire'] = $appToken['expire'];
+                if (isset($appToken['refresh_token'])) {
+                    $result['refresh_token'] = $appToken['refresh_token'];
+                }
             }
             $this->assignAll($result);
             $this->render();
@@ -79,7 +85,9 @@ class UserController extends Controller
                 $_SESSION['referer'] = $referer;
                 $this->assign('referer', $referer);
             }
-            $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
+            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+                $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
+            }
             $this->render("user/register.html");
         } else {
             $this->assign('ret', 1007);
@@ -119,9 +127,13 @@ class UserController extends Controller
                 if ($result['ret'] == 0) {
                     $service = new EmailService();
                     $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
-                    $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id']);
+                    $app = BunnyPHP::app()->get('tp_api');
+                    $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id'], $app['type']);
                     $result['token'] = $appToken['token'];
                     $result['expire'] = $appToken['expire'];
+                    if (isset($appToken['refresh_token'])) {
+                        $result['refresh_token'] = $appToken['refresh_token'];
+                    }
                 }
                 $this->assignAll($result);
                 $this->render();

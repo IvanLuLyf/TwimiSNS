@@ -87,10 +87,13 @@ class OauthController extends Controller
         if ($uid = $model->getUid($bind_uid, $type)) {
             $model->where(['bind=:b and type=:t'], ['b' => $bind_uid, 't' => $type])->update(['token' => $bind_token]);
             $result = (new UserModel())->getUserByUid($uid);
-            $appToken = (new OauthTokenModel())->get($uid, $_POST['client_id']);
+            $appToken = (new OauthTokenModel())->get($uid, $_POST['client_id'], 1);
             $result['token'] = $appToken['token'];
             $result['expire'] = $appToken['expire'];
+            $result['refresh_token'] = $appToken['refresh_token'];
             $this->assign('ret', 0)->assign('status', 'ok')->assignAll($result)->render();
+        } else {
+            $this->assignAll(['ret' => 1002, 'status' => "user not exists"])->render();
         }
     }
 
@@ -130,7 +133,7 @@ class OauthController extends Controller
     function ac_authorize_get(UserService $userService)
     {
         if (isset($_REQUEST['client_id']) && $app = (new ApiModel())->check($_REQUEST['client_id'])) {
-            if (isset($_REQUEST['redirect_uri']) && strstr($_REQUEST['redirect_uri'], $app['url']) != false) {
+            if (isset($_REQUEST['redirect_uri']) && strpos($_REQUEST['redirect_uri'], $app['redirect_uri']) === 0) {
                 $tp_user = $userService->getLoginUser();
                 $this->assign('tp_user', $tp_user)
                     ->assign('client_id', $_REQUEST['client_id'])
@@ -158,7 +161,7 @@ class OauthController extends Controller
     function ac_authorize_post(UserService $userService)
     {
         if (isset($_REQUEST['client_id']) && $app = (new ApiModel())->check($_REQUEST['client_id'])) {
-            if (isset($_REQUEST['redirect_uri']) && strstr($_REQUEST['redirect_uri'], $app['url']) != false) {
+            if (isset($_REQUEST['redirect_uri']) && strpos($_REQUEST['redirect_uri'], $app['redirect_uri']) === 0) {
                 if (($user = $userService->getLoginUser()) != null) {
                     $url = $_REQUEST['redirect_uri'];
                     $code = (new OauthCodeModel())->getCode($_REQUEST['client_id'], $app['id'], $user['uid'], time());
@@ -204,7 +207,7 @@ class OauthController extends Controller
             $app_id = $app['id'];
             $oauthCodeModel = new OauthCodeModel();
             if (isset($_REQUEST['code']) && $uid = $oauthCodeModel->checkCode($app_id, $_REQUEST['code'])) {
-                $token_row = (new OauthTokenModel())->get($uid, $app_key);
+                $token_row = (new OauthTokenModel())->get($uid, $app_key, $app['type']);
                 $this->assign('ret', 0)->assign('status', 'ok')->assignAll($token_row);
                 $oauthCodeModel->deleteCode($app_id, $_REQUEST['code']);
                 $this->render('common/error.html');
