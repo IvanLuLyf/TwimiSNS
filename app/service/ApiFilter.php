@@ -29,7 +29,9 @@ class ApiFilter extends Filter
             }
             return self::STOP;
         } else if ($this->_mode == BunnyPHP::MODE_AJAX) {
-            return self::STOP;
+            if (BunnyPHP::app()->get("tp_ajax") !== true) {
+                return self::STOP;
+            }
         }
         return self::NEXT;
     }
