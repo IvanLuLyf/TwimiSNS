@@ -13,7 +13,7 @@ class UserController extends Controller
      */
     public function ac_login_get()
     {
-        if (isset($_REQUEST['referer'])) {
+        if (empty($_REQUEST['referer']) === false) {
             if (!session_id()) session_start();
             $referer = $_REQUEST['referer'];
             $_SESSION['referer'] = $referer;
@@ -41,7 +41,7 @@ class UserController extends Controller
             if ($result['ret'] == 0) {
                 if (!session_id()) session_start();
                 $_SESSION['token'] = $result['token'];
-                if (isset($_SESSION['referer'])) {
+                if (empty($_SESSION['referer']) === false) {
                     $referer = $_SESSION['referer'];
                     unset($_SESSION['referer']);
                     $this->redirect($referer);
@@ -79,7 +79,7 @@ class UserController extends Controller
     public function ac_register_get()
     {
         if (Config::load('config')->get('allow_reg')) {
-            if (isset($_REQUEST['referer'])) {
+            if (empty($_REQUEST['referer']) === false) {
                 if (!session_id()) session_start();
                 $referer = $_REQUEST['referer'];
                 $_SESSION['referer'] = $referer;
@@ -111,7 +111,7 @@ class UserController extends Controller
                     $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
                     if (!session_id()) session_start();
                     $_SESSION['token'] = $result['token'];
-                    if (isset($_SESSION['referer'])) {
+                    if (empty($_SESSION['referer']) === false) {
                         $referer = $_SESSION['referer'];
                         unset($_SESSION['referer']);
                         $this->redirect($referer);
@@ -319,8 +319,10 @@ class UserController extends Controller
 
     public function ac_detail(array $path, UserService $userService)
     {
-        if (count($path) == 0) $path = [''];
+        if (count($path) == 0) $path = ['', ''];
         $username = isset($_GET['username']) ? $_GET['username'] : $path[0];
+        $tab = isset($_GET['tab']) ? $_GET['tab'] : (isset($path[1]) ? $path[1] : 'post');
+
         $tp_user = $userService->getLoginUser();
         if ($username == '') {
             if ($tp_user == null) {
@@ -331,6 +333,14 @@ class UserController extends Controller
         }
         $user = (new UserModel())->where(["username = :username"], ['username' => $username])->fetch(['uid', 'username', 'nickname']);
         $user_info = (new UserInfoModel())->get($user['uid']);
+
+        switch ($tab) {
+            case 'post':
+                $posts = (new PostModel())->getPostByUsername($username);
+                $this->assign('posts', $posts);
+                break;
+        }
+        $this->assign('tab', $tab);
         $this->assign('user', $user);
         $this->assign('user_info', $user_info);
         $this->render('user/detail.html');

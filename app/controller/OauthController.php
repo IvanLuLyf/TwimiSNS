@@ -30,7 +30,7 @@ class OauthController extends Controller
                 $url = $oauth['url'] . '/oauth/authorize?client_id=' . $oauth['key'] . '&redirect_uri=' . urlencode($oauth['callback']);
                 break;
         }
-        if (isset($_REQUEST['referer'])) {
+        if (empty($_REQUEST['referer']) === false) {
             if (!session_id()) session_start();
             $_SESSION['referer'] = $_REQUEST['referer'];
         }
@@ -50,7 +50,7 @@ class OauthController extends Controller
                 if (!session_id()) session_start();
                 $_SESSION['token'] = $userToken;
                 $bind_model->where(['bind=:b and type=:t'], ['b' => $bind['uid'], 't' => $type])->update(['token' => $bind['token'], 'expire' => $bind['expire']]);
-                if (isset($_SESSION['referer'])) {
+                if (empty($_SESSION['referer']) === false) {
                     $referer = $_SESSION['referer'];
                     unset($_SESSION['referer']);
                     $this->redirect($referer);

@@ -3,10 +3,10 @@
     <title><?=constant("TP_SITE_NAME")?></title>
     <?php include "template/common/header.html"; ?>
     <link href="/static/css/article.css" rel="stylesheet">
-    <?php if(isset($user_info['background'])):?>
+    <?php if(!empty($user_info['background'])):?>
     <style>
         body {
-            background: url(<?=$user_info[ 'background' ]?>) no-repeat fixed center;
+            background: url(<?=$user_info[ 'background' ]?>) no-repeat fixed center 0;
         }
     </style>
     <?php endif;?>
@@ -24,6 +24,31 @@
                     <p class="card-text"><?=htmlspecialchars($user_info['signature'])?></p>
                 </div>
             </div>
+            <?php if(!empty($tab)&&$tab=='post'):?>
+            <div class="card neo_card mt-4">
+                <div class="card-body">
+                    <?php foreach($posts as $post):?>
+                    <div class="media">
+                        <div class="media-body small">
+                            <h5><a class="link-dark" href="/post/view/<?=$post['tid']?>"><?=$post['title']?></a>
+                            </h5>
+                            <div>
+                                <img class="rounded-circle"
+                                     src="/user/avatar?username=<?=$post['username']?>"
+                                     width="24px"/>
+                                <span class="username">
+									<a href="/user/detail/<?=$post['username']?>"
+                                       class="text-muted font-weight-bold"><?=$user['nickname']?></a>
+								</span>
+                                <span class="text-grey ml-2"><?=date('Y-m-d H:i:s',$post['timestamp'])?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <?php endforeach;?>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
         <div class="col-lg-3">
             <?php if(isset($recommend_blogs)):?>
