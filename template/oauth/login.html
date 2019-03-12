@@ -35,8 +35,11 @@
             <div class="float-right"><a href="/user/register?referer=<?=isset($referer)?urlencode($referer):''?>">注册</a>
                 | <a href="/user/forgot">忘记密码</a></div>
             <?php else:?>
-            <p class="text-center"><img class="rounded-circle" height="100px"
-                                        src="/user/avatar?username=<?=$tp_user['username']?>"/></p>
+            <p class="text-center">
+                <img class="rounded-circle" height="80px" src="/user/avatar?username=<?=$tp_user['username']?>"/>
+                <img src="/static/img/arrow.png" height="60px">
+                <img class="rounded-circle" height="80px" src="<?=$client_icon?>"/>
+            </p>
             <h5 class="login-heading">当前用户:<?=$tp_user["nickname"];?></h5>
             <input type="hidden" name="csrf_token" value="<?=$csrf_token?>"/>
             <input type="submit" class="btn btn-success btn-block" value="授权">

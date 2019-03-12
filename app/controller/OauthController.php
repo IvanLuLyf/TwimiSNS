@@ -139,6 +139,7 @@ class OauthController extends Controller
                     ->assign('client_id', $_REQUEST['client_id'])
                     ->assign('app_url', $app['url'])
                     ->assign('client_name', $app['name'])
+                    ->assign('client_icon', $app['icon'])
                     ->assign('redirect_uri', $_REQUEST['redirect_uri'])
                     ->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));;
                 $this->render('oauth/login.html');
@@ -218,6 +219,41 @@ class OauthController extends Controller
         } else {
             $this->assign('ret', 2001)->assign('status', 'invalid client id');
             $this->render('common/error.html');
+        }
+    }
+
+    /**
+     * @filter auth
+     */
+    public function ac_info()
+    {
+        if (isset($_REQUEST['app_id']) && ($app = (new ApiModel())->check($_REQUEST['app_id']))) {
+            $this->assign('ret', 0);
+            $this->assign('status', 'ok');
+            $this->assign('name', $app['name']);
+            $this->assign('icon', $app['icon']);
+            $this->render();
+        } else {
+            $this->assignAll(['ret' => 2001, 'status' => 'invalid client id'])->render();
+        }
+    }
+
+    /**
+     * @filter auth
+     */
+    public function ac_code()
+    {
+        if (isset($_REQUEST['app_id']) && ($app = (new ApiModel())->check($_REQUEST['app_id']))) {
+            $user = BunnyPHP::app()->get('tp_user');
+            $timestamp = time();
+            $code = (new OauthCodeModel())->getCode($_REQUEST['app_id'], $app['id'], $user['uid'], $timestamp);
+            $this->assign('ret', 0);
+            $this->assign('status', 'ok');
+            $this->assign('code', $code);
+            $this->assign('expire', $timestamp + 604800);
+            $this->render();
+        } else {
+            $this->assignAll(['ret' => 2001, 'status' => 'invalid client id'])->render();
         }
     }
 }

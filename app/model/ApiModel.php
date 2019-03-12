@@ -16,6 +16,7 @@ class ApiModel extends Model
         'client_secret' => ['text', 'not null'],
         'redirect_uri' => ['text', 'not null'],
         'url' => ['text', 'not null'],
+        'icon' => ['text', 'not null'],
         'type' => ['integer'],
         'auth' => ['integer'],
     ];
@@ -30,6 +31,7 @@ class ApiModel extends Model
                 'name' => $row['name'],
                 'type' => $row['type'],
                 'url' => $row['url'],
+                'icon' => $row['icon'],
                 'redirect_uri' => $row['redirect_uri'],
                 'canGetInfo' => (intval($row['auth']) & 1) && true,
                 'canFeed' => (intval($row['auth']) & 2) && true,
@@ -50,6 +52,7 @@ class ApiModel extends Model
                 'name' => $row['name'],
                 'type' => $row['type'],
                 'url' => $row['url'],
+                'icon' => $row['icon'],
                 'redirect_uri' => $row['redirect_uri'],
                 'canGetInfo' => (intval($row['auth']) & 1) && true,
                 'canFeed' => (intval($row['auth']) & 2) && true,
