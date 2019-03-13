@@ -222,6 +222,28 @@ class OauthController extends Controller
         }
     }
 
+    public function ac_refresh_post()
+    {
+        if (isset($_REQUEST['client_id']) && $app = (new ApiModel())->check($_REQUEST['client_id'])) {
+            $app_key = $_REQUEST['client_id'];
+            if (isset($_REQUEST['token']) && isset($_REQUEST['refresh_token'])) {
+                $token_row = (new OauthTokenModel())->refresh($_REQUEST['token'], $app_key, $_REQUEST['refresh_token']);
+                if ($token_row != null) {
+                    $this->assign('ret', 0)->assign('status', 'ok')->assignAll($token_row);
+                } else {
+                    $this->assign('ret', 2006)->assign('status', 'invalid refresh token');
+                }
+                $this->render('common/error.html');
+            } else {
+                $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空");
+                $this->render('common/error.html');
+            }
+        } else {
+            $this->assign('ret', 2001)->assign('status', 'invalid client id');
+            $this->render('common/error.html');
+        }
+    }
+
     /**
      * @filter auth
      */

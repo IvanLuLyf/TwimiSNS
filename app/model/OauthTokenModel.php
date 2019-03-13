@@ -57,4 +57,19 @@ class OauthTokenModel extends Model
         }
         return $response;
     }
+
+    public function refresh($accessToken, $clientId, $refreshToken)
+    {
+        $tokenRow = $this->where(["client_id = ? and token = ?"], [$clientId, $accessToken])->fetch();
+        $token_id = $tokenRow['id'];
+        if (md5(md5($token_id) . $accessToken . md5($clientId)) == $refreshToken) {
+            $timestamp = time();
+            $token = md5($tokenRow['uid'] + $clientId + $timestamp);
+            $expire = $timestamp + 1296000;
+            $this->where(["id = :id"], ['id' => $token_id])->update(['token' => $token, 'expire' => $expire]);
+            return ['token' => $token, 'expire' => $expire, 'refresh_token' => md5(md5($token_id) . $token . md5($clientId))];
+        } else {
+            return null;
+        }
+    }
 }

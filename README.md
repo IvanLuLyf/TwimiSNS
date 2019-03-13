@@ -22,6 +22,7 @@ Powered By BunnyPHP
 |2003    |invalid token|
 |2004    |invalid crsf token|
 |2005    |invalid oauth code|
+|2006    |invalid refresh token|
 |3001    |invalid tid|
 |3002    |already liked|
 |4001    |no friend|
