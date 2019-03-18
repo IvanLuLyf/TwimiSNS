@@ -30,7 +30,7 @@ class OauthTokenModel extends Model
     public function get($uid, $clientId, $appType)
     {
         $timestamp = time();
-        if (intval($appType) == 1) {
+        if (intval($appType) == 1 || intval($appType) == 2) {
             $seconds = 1296000;
         } else {
             $seconds = 172800;
