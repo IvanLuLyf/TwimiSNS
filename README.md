@@ -25,6 +25,7 @@ Powered By BunnyPHP
 |2006    |invalid refresh token|
 |3001    |invalid tid|
 |3002    |already liked|
+|3003    |invalid action|
 |4001    |no friend|
 |5001    |invalid password|
 |5002    |already pay|

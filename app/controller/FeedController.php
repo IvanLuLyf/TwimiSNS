@@ -175,4 +175,39 @@ class FeedController extends Controller
         }
         $this->render();
     }
+
+    /**
+     * @filter auth canFeed
+     */
+    function ac_delete()
+    {
+        $tid = isset($_REQUEST['tid']) ? $_REQUEST['tid'] : 0;
+        if ($this->_mode == BunnyPHP::MODE_API) {
+            $feedModel = new FeedModel();
+            if ($feed = $feedModel->getFeed($tid)) {
+                $tp_user = BunnyPHP::app()->get('tp_user');
+                if ($feed['username'] == $tp_user['username']) {
+                    $images = (new FeedImageModel())->getFeedImageByTid($tid);
+                    if ($images != null) {
+                        foreach ($images as $image) {
+                            $this->storage()->remove($image['url']);
+                        }
+                    }
+                    (new FeedImageModel())->where('tid=:t', ['t' => $tid])->delete();
+                    (new CommentModel())->where('aid=3 and tid=:t', ['t' => $tid])->delete();
+                    (new LikeModel())->where('aid=3 and tid=:t', ['t' => $tid])->delete();
+                    $feedModel->where('tid=:t', ['t' => $tid])->delete();
+                    $this->assign('ret', 0);
+                    $this->assign('status', 'ok');
+                } else {
+                    $this->assign('ret', 3003);
+                    $this->assign('status', 'invalid action');
+                }
+            } else {
+                $this->assign('ret', 3001);
+                $this->assign('status', 'invalid tid');
+            }
+        }
+        $this->render();
+    }
 }
