@@ -50,11 +50,78 @@ class PayController extends Controller
         $tp_api = BunnyPHP::app()->get('tp_api');
         $intro = $_POST['intro'];
         $price = $_POST['price'];
-        $payTicket = (new PayOrderModel())->ticket($tp_api['id'], $intro, $price);
-        $this->assign('ret', 0);
-        $this->assign('status', 'ok');
-        $this->assign('ticket', $payTicket);
+        if ($price >= 0) {
+            $payTicket = (new PayOrderModel())->ticket($tp_api['id'], $intro, $price);
+            $this->assign('ret', 0);
+            $this->assign('status', 'ok');
+            $this->assign('ticket', $payTicket);
+        } else {
+            $this->assign('ret', 5006);
+            $this->assign('status', 'invalid price');
+        }
         $this->render('pay/request.html');
+    }
+
+    /**
+     * @filter auth canPay
+     */
+    public function ac_red_packet()
+    {
+        $tp_user = BunnyPHP::app()->get('tp_user');
+        $tp_api = BunnyPHP::app()->get('tp_api');
+        $num = $_POST['num'];
+        $total = $_POST['total'];
+        $message = $_POST['message'];
+        $signature = $_POST['signature'];
+        $random_str = $_POST['str'];
+        $payPassword = (new PayPassModel())->getPassword($tp_user['uid']);
+        if ($total > 0) {
+            if (md5(md5($num . ':' . $total . $random_str) . md5($payPassword . $random_str)) == $signature) {
+                $creditModel = new CreditModel();
+                if ($creditModel->cut($tp_user['uid'], $total)) {
+                    $rp = (new RedPacketModel())->send($tp_api['id'], $tp_user['uid'], $total, $num, $message);
+                    $this->assign('ret', 0);
+                    $this->assign('status', 'ok');
+                    $this->assign('red_packet', $rp);
+                } else {
+                    $this->assign('ret', 5003);
+                    $this->assign('status', 'no enough coin');
+                }
+            } else {
+                $this->assign('ret', 5001);
+                $this->assign('status', 'invalid password');
+            }
+        } else {
+            $this->assign('ret', 5006);
+            $this->assign('status', 'invalid price');
+        }
+        $this->render('pay/red_packet.html');
+    }
+
+    /**
+     * @filter auth canPay
+     */
+    public function ac_pick()
+    {
+        $tp_user = BunnyPHP::app()->get('tp_user');
+        $tp_api = BunnyPHP::app()->get('tp_api');
+        $packetId = $_POST['packet'];
+        $money = (new RedPacketModel())->pick($packetId, $tp_api['id']);
+        if ($money > 0) {
+            $creditModel = new CreditModel();
+            if ($creditModel->cut($tp_user['uid'], -$money)) {
+                $this->assign('ret', 0);
+                $this->assign('status', 'ok');
+                $this->assign("money", $money);
+            } else {
+                $this->assign('ret', 5003);
+                $this->assign('status', 'no enough coin');
+            }
+        } else {
+            $this->assign('ret', 5005);
+            $this->assign('status', 'empty red packet');
+        }
+        $this->render('pay/pick.html');
     }
 
     /**

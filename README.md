@@ -31,3 +31,5 @@ Powered By BunnyPHP
 |5002    |already pay|
 |5003    |no enough coin|
 |5004    |no need to pay|
+|5005    |empty red packet|
+|5006    |invalid price|
