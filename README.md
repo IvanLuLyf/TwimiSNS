@@ -1,6 +1,46 @@
 # TwimiSNS
 
-Powered By BunnyPHP
+![MineBlog](static/img/logo.png?raw=true)
+
+TwimiSNS is a SNS Engine Powered By BunnyPHP
+
+![GitHub release](https://img.shields.io/github/release/ivanlulyf/twimisns.svg?color=brightgreen)
+![GitHub](https://img.shields.io/github/license/ivanlulyf/twimisns.svg?color=blue)
+
+## Requirement
+
+* PHP >= 7.0
+* MySQL or SQLite
+
+
+## Installation
+
+### 1. Clone this repository to your site root.
+
+### 2. Set up your server
+> Apache
+
+Add following content to ```.htacess``` file.
+
+```
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . index.php
+</IfModule>
+```
+
+
+> Nginx
+
+```
+location / {
+    try_files $uri $uri/ /index.php$is_args$args;
+}
+```
+
+### 3. Open http://yourdomain/install
 
 ## Return Code Reference
 
