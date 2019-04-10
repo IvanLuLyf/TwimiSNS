@@ -11,9 +11,9 @@ class CsrfFilter extends Filter
     public function doFilter($fa = [])
     {
         if ($this->_mode == BunnyPHP::MODE_NORMAL || $this->_mode == BunnyPHP::MODE_AJAX) {
-            if (!session_id()) session_start();
+            $csrf_token = BunnyPHP::getRequest()->getSession('csrf_token');
             if (in_array('check', $fa)) {
-                if (isset($_POST['csrf_token']) && $_POST['csrf_token'] != '' && $_POST['csrf_token'] == $_SESSION['csrf_token']) {
+                if ($csrf_token && !empty($_POST['csrf_token']) && $_POST['csrf_token'] == $csrf_token) {
                     unset($_SESSION['csrf_token']);
                 } else {
                     $this->error(['ret' => 2004, 'status' => 'invalid csrf token', 'tp_error_msg' => '非法的请求操作']);
@@ -21,8 +21,8 @@ class CsrfFilter extends Filter
                 }
             }
             $token = md5(time() . rand(1, 1000));
-            $_SESSION['csrf_token'] = $token;
-            BunnyPHP::app()->set('csrf_token', $token);
+            BunnyPHP::getRequest()->setSession('csrf_token', $token);
+            $this->assign('csrf_token', $token);
             return self::NEXT;
         } else {
             return self::NEXT;
