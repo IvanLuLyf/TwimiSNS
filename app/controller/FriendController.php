@@ -17,9 +17,7 @@ class FriendController extends Controller
         $tp_user = BunnyPHP::app()->get('tp_user');
         $friends = (new FriendModel())->listFriend($tp_user['uid'], $state);
         if ($this->_mode == BunnyPHP::MODE_API) {
-            $this->assign('ret', 0);
-            $this->assign('status', 'ok');
-            $this->assign('friends', $friends);
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'friends' => $friends]);
         }
         $this->render();
     }
@@ -33,12 +31,11 @@ class FriendController extends Controller
             $tp_user = BunnyPHP::app()->get('tp_user');
             if ($this->_mode == BunnyPHP::MODE_API) {
                 $result = (new FriendModel())->noteFriend($tp_user['uid'], $_POST['username'], $_POST['notename']);
-                $this->assignAll($result);
+                $this->assignAll($result)->render();
             }
         } else {
-            $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空");
+            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
         }
-        $this->render();
     }
 
     /**
@@ -52,12 +49,11 @@ class FriendController extends Controller
                 $user = (new UserModel())->getUserByUid($tp_user['uid']);
                 $f_user = (new UserModel())->getUserByUsername($_POST['username']);
                 $result = (new FriendModel())->addFriend($user['uid'], $f_user['uid'], $user['username'], $f_user['username'], $user['nickname'], $f_user['nickname']);
-                $this->assignAll($result);
+                $this->assignAll($result)->render();
             }
         } else {
-            $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空");
+            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
         }
-        $this->render();
     }
 
     /**
@@ -71,11 +67,10 @@ class FriendController extends Controller
                 $user = (new UserModel())->getUserByUid($tp_user['uid']);
                 $f_user = (new UserModel())->getUserByUsername($_POST['username']);
                 $result = (new FriendModel())->acceptFriend($user['uid'], $f_user['uid'], $user['username'], $f_user['username']);
-                $this->assignAll($result);
+                $this->assignAll($result)->render();
             }
         } else {
-            $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空");
+            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
         }
-        $this->render();
     }
 }
