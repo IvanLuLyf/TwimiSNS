@@ -20,8 +20,6 @@ class PostController extends Controller
      */
     public function ac_create_get()
     {
-        $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
-        $this->assign('tp_user', BunnyPHP::app()->get('tp_user'));
         $this->render('post/create.html');
     }
 
@@ -36,11 +34,10 @@ class PostController extends Controller
             if ($this->_mode == BunnyPHP::MODE_NORMAL) {
                 $this->redirect('post', 'view', ['tid' => $tid]);
             } elseif ($this->_mode == BunnyPHP::MODE_API) {
-                $this->assign('ret', 0)->assign('status', 'ok')->assign('tid', $tid)->render();
+                $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid])->render();
             }
         } else {
-            $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空")
-                ->render('common/error.html');
+            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
         }
     }
 
@@ -80,8 +77,7 @@ class PostController extends Controller
             $this->assign("post", $post)->assign('comments', $comments)
                 ->render('post/view.html');
         } else {
-            $this->assign('ret', 3001)->assign('status', 'invalid tid')->assign('tp_error_msg', "帖子不存在")
-                ->render('common/error.html');
+            $this->assignAll(['ret' => 3001, 'status' => 'invalid tid', 'tp_error_msg' => '帖子不存在'])->error();
         }
     }
 
@@ -116,29 +112,25 @@ class PostController extends Controller
     }
 
     /**
-     * @param array $path
      * @filter auth canFeed
+     * @param $tid integer path(0,0)
      */
-    function ac_comment(array $path)
+    function ac_comment($tid)
     {
-        $tid = isset($_REQUEST['tid']) ? $_REQUEST['tid'] : (isset($path[0]) ? $path[0] : 0);
         $post = (new PostModel())->getPostById($tid);
         if ($post != null) {
             (new CommentModel())->sendComment($tid, 1, BunnyPHP::app()->get('tp_user'), $_POST['content']);
             if ($this->_mode == BunnyPHP::MODE_NORMAL) {
                 $this->redirect('post', 'view', ['tid' => $tid]);
             } elseif ($this->_mode == BunnyPHP::MODE_API) {
-                $this->assign('ret', 0)->assign('status', 'ok')->render();
+                $this->assignAll(['ret' => 0, 'status' => 'ok'])->render();
             }
         } else {
-            $this->assign('ret', 3001);
-            $this->assign('status', 'invalid tid');
-            $this->assign('tp_error_msg', "帖子不存在");
-            $this->render('common/error.html');
+            $this->assignAll(['ret' => 3001, 'status' => 'invalid tid', 'tp_error_msg' => '帖子不存在'])->error();
         }
     }
 
-    function ac_search(array $path, UserService $userService)
+    function ac_search(UserService $userService)
     {
         if (isset($_REQUEST['word']) && $_REQUEST['word'] != '') {
             $word = $_REQUEST['word'];
@@ -164,11 +156,10 @@ class PostController extends Controller
     /**
      * @filter csrf
      * @filter auth
-     * @param array $path
+     * @param $tid integer path(0,0)
      */
-    function ac_buy_get(array $path)
+    function ac_buy_get($tid)
     {
-        $tid = isset($_REQUEST['tid']) ? $_REQUEST['tid'] : (isset($path[0]) ? $path[0] : 0);
         $post = (new PostModel())->getPostById($tid);
         $tp_user = BunnyPHP::app()->get('tp_user');
         if ($this->_mode == BunnyPHP::MODE_NORMAL) {
@@ -180,31 +171,21 @@ class PostController extends Controller
                         $this->redirect('pay', 'start');
                         return;
                     }
-                    $this->assign('coin', $extra['price']);
-                    $this->assign('balance', $balance);
-                    $this->assign('tid', $tid);
-                    $this->assign('title', $post['title']);
-                    if ($this->_mode == BunnyPHP::MODE_NORMAL) {
-                        $this->assign('tp_user', $tp_user);
-                        $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
-                    }
-                    $this->render('post/buy.html');
-                    return;
+                    $this->assignAll(['coin' => $extra['price'], 'balance' => $balance, 'tid' => $tid, 'title' => $post['title']])->render('post/buy.html');
                 }
+            } else {
+                $this->assignAll(['ret' => 5004, 'status' => 'no need to pay', 'tp_error_msg' => '帖子不需要支付'])->error();
             }
-            $this->assign('ret', 5004)->assign('status', 'no need to pay')->assign('tp_error_msg', "帖子不需要支付")
-                ->render('common/error.html');
         }
     }
 
     /**
      * @filter csrf check
      * @filter auth canPay
-     * @param array $path
+     * @param $tid integer path(0,0)
      */
-    function ac_buy_post(array $path)
+    function ac_buy_post($tid)
     {
-        $tid = isset($_REQUEST['tid']) ? $_REQUEST['tid'] : (isset($path[0]) ? $path[0] : 0);
         $post = (new PostModel())->getPostById($tid);
         $tp_user = BunnyPHP::app()->get('tp_user');
         if ($post['extra'] != '') {
@@ -213,18 +194,13 @@ class PostController extends Controller
                 $author = (new UserModel())->getUserByUsername($post['username']);
                 if ((new CreditModel())->transfer($tp_user['uid'], $author['uid'], doubleval($extra['price']))) {
                     (new PostPayModel())->pay($tp_user['uid'], $post['tid']);
-                    $this->assign('ret', 0);
-                    $this->assign('status', 'ok');
-                    $this->assign('tid', $tid);
-                    if ($this->_mode == BunnyPHP::MODE_NORMAL) {
-                        $this->assign('tp_user', $tp_user);
-                    }
-                    $this->render('post/buy.html');
+                    $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid])->render('post/buy.html');
                 } else {
-                    $this->assign('ret', 5003)->assign('status', 'no enough coin')->assign('tp_error_msg', "余额不足")
-                        ->render('common/error.html');
+                    $this->assignAll(['ret' => 5003, 'status' => 'no enough coin', 'tp_error_msg' => '余额不足'])->error();
                 }
             }
+        } else {
+            $this->assignAll(['ret' => 5004, 'status' => 'no need to pay', 'tp_error_msg' => '帖子不需要支付'])->error();
         }
     }
 }
