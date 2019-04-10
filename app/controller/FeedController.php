@@ -39,12 +39,9 @@ class FeedController extends Controller
                         }
                     }
                 }
-                $this->assign('ret', 0);
-                $this->assign('status', 'ok');
-                $this->assign('tid', $feedId);
+                $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $feedId]);
             } else {
-                $this->assign('ret', 1004);
-                $this->assign('status', 'empty arguments');
+                $this->assignAll(['ret' => 1004, 'status' => 'empty arguments']);
             }
         }
         $this->render();
@@ -60,7 +57,7 @@ class FeedController extends Controller
         $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : (isset($path[1]) ? $path[1] : 1);
         if ($this->_mode == BunnyPHP::MODE_API) {
             $tp_user = BunnyPHP::app()->get('tp_user');
-            $this->assign('ret', 0)->assign('status', 'ok')->assign('page', $page);
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'page' => $page]);
             if ($tid == 0) {
                 $feeds = (new FeedModel())->listFeed($tp_user['uid'], $page);
                 foreach ($feeds as &$feed) {
@@ -68,13 +65,9 @@ class FeedController extends Controller
                         $feed['images'] = (new FeedImageModel())->getFeedImageByTid($feed['tid']);
                     }
                 }
-                $this->assign('tid', $tid);
                 $note_info = (new NotificationModel())->getUnreadCnt($tp_user['uid']);
-                $this->assign('note_count', $note_info[0]);
-                $this->assign('note_uid', $note_info[1]);
                 $user_info = (new UserInfoModel())->get($tp_user['uid']);
-                $this->assign('user_info', $user_info);
-                $this->assign('feeds', $feeds);
+                $this->assignAll(['tid' => $tid, 'note_count' => $note_info[0], 'note_uid' => $note_info[1], 'user_info' => $user_info, 'feeds' => $feeds]);
             } else {
                 $feed = (new FeedModel())->getFeed($tid);
                 $noteName = (new FriendModel())->getNoteNameByUsername($tp_user['uid'], $feed['username']);
@@ -83,8 +76,7 @@ class FeedController extends Controller
                     $feed['images'] = (new FeedImageModel())->getFeedImageByTid($feed['tid']);
                 }
                 $comments = (new CommentModel())->listComment($tid, 3, $page, $tp_user['uid']);
-                $this->assign('feed', $feed);
-                $this->assign('comments', $comments);
+                $this->assignAll(['feed' => $feed, 'comments' => $comments]);
             }
         }
         $this->render();
@@ -101,7 +93,6 @@ class FeedController extends Controller
         $user = (new UserModel())->getUserByUsername($username);
         if ($this->_mode == BunnyPHP::MODE_API) {
             if ($user['uid'] != null) {
-                $this->assign('ret', 0)->assign('status', 'ok')->assign('page', $page);
                 $feeds = (new FeedModel())->userFeed($username, $page);
                 foreach ($feeds as &$feed) {
                     if ($feed['image'] != null && $feed['image'] > 0) {
@@ -109,8 +100,7 @@ class FeedController extends Controller
                     }
                 }
                 $user_info = (new UserInfoModel())->get($user['uid']);
-                $this->assign('user_info', $user_info);
-                $this->assign('feeds', $feeds);
+                $this->assignAll(['ret' => 0, 'status' => 'ok', 'page' => $page, 'user_info' => $user_info, 'feeds' => $feeds]);
             } else {
                 $this->assignAll(['ret' => 1002, 'status' => "user not exists"]);
             }
@@ -131,17 +121,12 @@ class FeedController extends Controller
                     $tp_user = BunnyPHP::app()->get('tp_user');
                     $comment_id = (new CommentModel())->sendComment($tid, 3, $tp_user, $_POST['content']);
                     (new NotificationModel())->notify(3, $tid, $feed['uid'], $tp_user['uid'], 'comment', $_POST['content']);
-                    $this->assign('ret', 0);
-                    $this->assign('status', 'ok');
-                    $this->assign('tid', $tid);
-                    $this->assign('cid', $comment_id);
+                    $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid, 'cid' => $comment_id]);
                 } else {
-                    $this->assign('ret', 3001);
-                    $this->assign('status', 'invalid tid');
+                    $this->assignAll(['ret' => 3001, 'status' => 'invalid tid']);
                 }
             } else {
-                $this->assign('ret', 1004);
-                $this->assign('status', 'empty arguments');
+                $this->assignAll(['ret' => 1004, 'status' => 'empty arguments']);
             }
         }
         $this->render();
@@ -158,19 +143,15 @@ class FeedController extends Controller
             if ($feed = $feedModel->getFeed($tid)) {
                 $tp_user = BunnyPHP::app()->get('tp_user');
                 if ((new LikeModel())->isLike($tp_user['uid'], 3, $tid) == 1) {
-                    $this->assign('ret', 3002);
-                    $this->assign('status', 'already liked');
+                    $this->assignAll(['ret' => 3002, 'status' => 'already liked']);
                 } else {
                     (new LikeModel())->like($tp_user['uid'], 3, $tid);
                     $like_num = $feedModel->likeFeed($tid);
                     (new NotificationModel())->notify(3, $tid, $feed['uid'], $tp_user['uid'], 'like', '');
-                    $this->assign('ret', 0);
-                    $this->assign('status', 'ok');
-                    $this->assign('like_num', $like_num);
+                    $this->assignAll(['ret' => 0, 'status' => 'ok', 'like_num' => $like_num]);
                 }
             } else {
-                $this->assign('ret', 3001);
-                $this->assign('status', 'invalid tid');
+                $this->assignAll(['ret' => 3001, 'status' => 'invalid tid']);
             }
         }
         $this->render();
@@ -197,15 +178,12 @@ class FeedController extends Controller
                     (new CommentModel())->where('aid=3 and tid=:t', ['t' => $tid])->delete();
                     (new LikeModel())->where('aid=3 and tid=:t', ['t' => $tid])->delete();
                     $feedModel->where('tid=:t', ['t' => $tid])->delete();
-                    $this->assign('ret', 0);
-                    $this->assign('status', 'ok');
+                    $this->assignAll(['ret' => 0, 'status' => 'ok']);
                 } else {
-                    $this->assign('ret', 3003);
-                    $this->assign('status', 'invalid action');
+                    $this->assignAll(['ret' => 3003, 'status' => 'invalid action']);
                 }
             } else {
-                $this->assign('ret', 3001);
-                $this->assign('status', 'invalid tid');
+                $this->assignAll(['ret' => 3001, 'status' => 'invalid tid']);
             }
         }
         $this->render();
