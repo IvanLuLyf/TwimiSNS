@@ -8,7 +8,7 @@
 
 class OauthController extends Controller
 {
-    function ac_connect(array $path)
+    function ac_connect(array $path, $referer)
     {
         if (count($path) < 1) $path = [''];
         list($type) = $path;
@@ -30,9 +30,8 @@ class OauthController extends Controller
                 $url = $oauth['url'] . '/oauth/authorize?client_id=' . $oauth['key'] . '&redirect_uri=' . urlencode($oauth['callback']);
                 break;
         }
-        if (empty($_REQUEST['referer']) === false) {
-            if (!session_id()) session_start();
-            $_SESSION['referer'] = $_REQUEST['referer'];
+        if ($referer) {
+            BunnyPHP::getRequest()->setSession('referer', $referer);
         }
         $this->redirect($url);
     }
@@ -47,12 +46,10 @@ class OauthController extends Controller
             $bind = (new OauthService($this))->oauth($type);
             if ($uid = $bind_model->getUid($bind['uid'], $type)) {
                 $userToken = (new UserModel())->refresh($uid);
-                if (!session_id()) session_start();
-                $_SESSION['token'] = $userToken;
+                BunnyPHP::getRequest()->setSession('token', $userToken);
                 $bind_model->where(['bind=:b and type=:t'], ['b' => $bind['uid'], 't' => $type])->update(['token' => $bind['token'], 'expire' => $bind['expire']]);
-                if (empty($_SESSION['referer']) === false) {
-                    $referer = $_SESSION['referer'];
-                    unset($_SESSION['referer']);
+                $referer = BunnyPHP::getRequest()->delSession('referer');
+                if ($referer) {
                     $this->redirect($referer);
                 } else {
                     $this->redirect('index', 'index');
@@ -63,13 +60,11 @@ class OauthController extends Controller
                     $bind_model->add($bind_data);
                     $this->redirect('setting', 'oauth', ['type' => $type]);
                 } else {
-                    if (!session_id()) session_start();
-                    $_SESSION['oauth_user'] = ['type' => $type, 'uid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire'], 'nickname' => $bind['nickname'],];
+                    BunnyPHP::getRequest()->setSession('oauth_user', ['type' => $type, 'uid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire'], 'nickname' => $bind['nickname'],]);
                     if (Config::load('config')->get('allow_reg')) {
                         $this->assign('allow_reg', true);
                     }
-                    $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])
-                        ->render('oauth/connect.html');
+                    $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])->render('oauth/connect.html');
                 }
             }
         }
@@ -108,13 +103,12 @@ class OauthController extends Controller
             $result = (new UserModel())->login($_POST['username'], $_POST['password']);
         }
         if ($result['ret'] == 0) {
-            if (!session_id()) session_start();
-            $bind = $_SESSION['oauth_user'];
+            BunnyPHP::getRequest()->setSession('access_token', $result['token']);
+            $bind = BunnyPHP::getRequest()->getSession('oauth_user');
             $bind_data = ['uid' => $result['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
             (new BindModel())->add($bind_data);
-            if (isset($_SESSION['referer'])) {
-                $referer = $_SESSION['referer'];
-                unset($_SESSION['referer']);
+            $referer = BunnyPHP::getRequest()->delSession('referer');
+            if ($referer) {
                 $this->redirect($referer);
             } else {
                 $this->redirect('index', 'index');
@@ -140,18 +134,13 @@ class OauthController extends Controller
                     ->assign('app_url', $app['url'])
                     ->assign('client_name', $app['name'])
                     ->assign('client_icon', $app['icon'])
-                    ->assign('redirect_uri', $_REQUEST['redirect_uri'])
-                    ->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));;
+                    ->assign('redirect_uri', $_REQUEST['redirect_uri']);
                 $this->render('oauth/login.html');
             } else {
-                $this->assign('tp_error_msg', '非法的应用网址')
-                    ->assign('tp_hide', true);
-                $this->render('oauth/login.html');
+                $this->assignAll(['tp_error_msg' => '非法的应用网址', 'tp_hide' => true])->render('oauth/login.html');
             }
         } else {
-            $this->assign('tp_error_msg', '非法的Client ID')
-                ->assign('tp_hide', true);
-            $this->render('oauth/login.html');
+            $this->assignAll(['tp_error_msg' => '非法的Client ID', 'tp_hide' => true])->render('oauth/login.html');
         }
     }
 
@@ -174,8 +163,7 @@ class OauthController extends Controller
                     if (isset($_POST['username']) && isset($_POST['password'])) {
                         $result = (new UserModel())->login($_POST['username'], $_POST['password']);
                         if ($result['ret'] == 0) {
-                            if (!session_id()) session_start();
-                            $_SESSION['token'] = $result['token'];
+                            BunnyPHP::getRequest()->setSession('token', $result['token']);
                             $url = $_REQUEST['redirect_uri'];
                             $code = (new OauthCodeModel())->getCode($_REQUEST['client_id'], $app['id'], $result['uid'], time());
                             if (strpos($url, "?"))
@@ -183,21 +171,15 @@ class OauthController extends Controller
                             else
                                 $this->redirect("$url?code=$code");
                         } else {
-                            $this->assignAll($result);
-                            $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
-                            $this->render('oauth/login.html');
+                            $this->assignAll($result)->render('oauth/login.html');
                         }
                     }
                 }
             } else {
-                $this->assign('tp_error_msg', '非法的应用网址')
-                    ->assign('tp_hide', true);
-                $this->render('oauth/login.html');
+                $this->assignAll(['tp_error_msg' => '非法的应用网址', 'tp_hide' => true])->render('oauth/login.html');
             }
         } else {
-            $this->assign('tp_error_msg', '非法的Client ID')
-                ->assign('tp_hide', true);
-            $this->render('oauth/login.html');
+            $this->assignAll(['tp_error_msg' => '非法的Client ID', 'tp_hide' => true])->render('oauth/login.html');
         }
     }
 
@@ -209,16 +191,14 @@ class OauthController extends Controller
             $oauthCodeModel = new OauthCodeModel();
             if (isset($_REQUEST['code']) && $uid = $oauthCodeModel->checkCode($app_id, $_REQUEST['code'])) {
                 $token_row = (new OauthTokenModel())->get($uid, $app_key, $app['type']);
-                $this->assign('ret', 0)->assign('status', 'ok')->assignAll($token_row);
+                $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($token_row);
                 $oauthCodeModel->deleteCode($app_id, $_REQUEST['code']);
                 $this->render('common/error.html');
             } else {
-                $this->assign('ret', 2005)->assign('status', 'invalid oauth code');
-                $this->render('common/error.html');
+                $this->assignAll(['ret' => 2005, 'status' => 'invalid oauth code'])->error();
             }
         } else {
-            $this->assign('ret', 2001)->assign('status', 'invalid client id');
-            $this->render('common/error.html');
+            $this->assignAll(['ret' => 2001, 'status' => 'invalid client id'])->error();
         }
     }
 
@@ -229,18 +209,15 @@ class OauthController extends Controller
             if (isset($_REQUEST['token']) && isset($_REQUEST['refresh_token'])) {
                 $token_row = (new OauthTokenModel())->refresh($_REQUEST['token'], $app_key, $_REQUEST['refresh_token']);
                 if ($token_row != null) {
-                    $this->assign('ret', 0)->assign('status', 'ok')->assignAll($token_row);
+                    $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($token_row)->render();
                 } else {
-                    $this->assign('ret', 2006)->assign('status', 'invalid refresh token');
+                    $this->assignAll(['ret' => 2006, 'status' => 'invalid refresh token'])->error();
                 }
-                $this->render('common/error.html');
             } else {
-                $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空");
-                $this->render('common/error.html');
+                $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => '必要参数为空'])->error();
             }
         } else {
-            $this->assign('ret', 2001)->assign('status', 'invalid client id');
-            $this->render('common/error.html');
+            $this->assignAll(['ret' => 2001, 'status' => 'invalid client id'])->error();
         }
     }
 
@@ -250,11 +227,7 @@ class OauthController extends Controller
     public function ac_info()
     {
         if (isset($_REQUEST['app_id']) && ($app = (new ApiModel())->check($_REQUEST['app_id']))) {
-            $this->assign('ret', 0);
-            $this->assign('status', 'ok');
-            $this->assign('name', $app['name']);
-            $this->assign('icon', $app['icon']);
-            $this->render();
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'name' => $app['name'], 'icon' => $app['icon']])->render();
         } else {
             $this->assignAll(['ret' => 2001, 'status' => 'invalid client id'])->render();
         }
@@ -269,11 +242,7 @@ class OauthController extends Controller
             $user = BunnyPHP::app()->get('tp_user');
             $timestamp = time();
             $code = (new OauthCodeModel())->getCode($_REQUEST['app_id'], $app['id'], $user['uid'], $timestamp);
-            $this->assign('ret', 0);
-            $this->assign('status', 'ok');
-            $this->assign('code', $code);
-            $this->assign('expire', $timestamp + 604800);
-            $this->render();
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'code' => $code, 'expire' => $timestamp + 604800])->render();
         } else {
             $this->assignAll(['ret' => 2001, 'status' => 'invalid client id'])->render();
         }
