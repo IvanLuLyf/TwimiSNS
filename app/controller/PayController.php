@@ -24,20 +24,16 @@ class PayController extends Controller
                 $apiModel = new ApiModel();
                 $creditModel = new CreditModel();
                 if ($creditModel->transfer($tp_user['uid'], $apiModel->getAuthorByAppId($payInfo['app']), $payInfo['price'])) {
-                    $this->assign('ret', 0);
-                    $this->assign('status', 'ok');
+                    $this->assignAll(['ret' => 0, 'status' => 'ok']);
                 } else {
                     $payOrderModel->cancel($payTicket);
-                    $this->assign('ret', 5003);
-                    $this->assign('status', 'no enough coin');
+                    $this->assignAll(['ret' => 5003, 'status' => 'no enough coin']);
                 }
             } else {
-                $this->assign('ret', 5002);
-                $this->assign('status', 'already pay');
+                $this->assignAll(['ret' => 5002, 'status' => 'already pay']);
             }
         } else {
-            $this->assign('ret', 5001);
-            $this->assign('status', 'invalid password');
+            $this->assignAll(['ret' => 5001, 'status' => 'invalid password']);
         }
         $this->render('pay/buy.html');
     }
@@ -52,12 +48,9 @@ class PayController extends Controller
         $price = $_POST['price'];
         if ($price >= 0) {
             $payTicket = (new PayOrderModel())->ticket($tp_api['id'], $intro, $price);
-            $this->assign('ret', 0);
-            $this->assign('status', 'ok');
-            $this->assign('ticket', $payTicket);
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'ticket' => $payTicket]);
         } else {
-            $this->assign('ret', 5006);
-            $this->assign('status', 'invalid price');
+            $this->assignAll(['ret' => 5006, 'status' => 'invalid price']);
         }
         $this->render('pay/request.html');
     }
@@ -80,20 +73,15 @@ class PayController extends Controller
                 $creditModel = new CreditModel();
                 if ($creditModel->cut($tp_user['uid'], $total)) {
                     $rp = (new RedPacketModel())->send($tp_api['id'], $tp_user['uid'], $total, $num, $message);
-                    $this->assign('ret', 0);
-                    $this->assign('status', 'ok');
-                    $this->assign('red_packet', $rp);
+                    $this->assignAll(['ret' => 0, 'status' => 'ok', 'red_packet' => $rp]);
                 } else {
-                    $this->assign('ret', 5003);
-                    $this->assign('status', 'no enough coin');
+                    $this->assignAll(['ret' => 5003, 'status' => 'no enough coin']);
                 }
             } else {
-                $this->assign('ret', 5001);
-                $this->assign('status', 'invalid password');
+                $this->assignAll(['ret' => 5001, 'status' => 'invalid password']);
             }
         } else {
-            $this->assign('ret', 5006);
-            $this->assign('status', 'invalid price');
+            $this->assignAll(['ret' => 5006, 'status' => 'invalid price']);
         }
         $this->render('pay/red_packet.html');
     }
@@ -110,16 +98,12 @@ class PayController extends Controller
         if ($money > 0) {
             $creditModel = new CreditModel();
             if ($creditModel->cut($tp_user['uid'], -$money)) {
-                $this->assign('ret', 0);
-                $this->assign('status', 'ok');
-                $this->assign("money", $money);
+                $this->assignAll(['ret' => 0, 'status' => 'ok', "money" => $money]);
             } else {
-                $this->assign('ret', 5003);
-                $this->assign('status', 'no enough coin');
+                $this->assignAll(['ret' => 5003, 'status' => 'no enough coin']);
             }
         } else {
-            $this->assign('ret', 5005);
-            $this->assign('status', 'empty red packet');
+            $this->assignAll(['ret' => 5005, 'status' => 'empty red packet']);
         }
         $this->render('pay/pick.html');
     }
@@ -133,10 +117,7 @@ class PayController extends Controller
         $payInfo = (new PayOrderModel())->get($payTicket);
         $payInfo['paid'] = ($payInfo['uid'] > 0);
         unset($payInfo['uid']);
-        $this->assign('ret', 0);
-        $this->assign('status', 'ok');
-        $this->assignAll($payInfo);
-        $this->render('pay/view.html');
+        $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($payInfo)->render('pay/view.html');
     }
 
     /**
@@ -146,13 +127,7 @@ class PayController extends Controller
     {
         $tp_user = BunnyPHP::app()->get('tp_user');
         $credit = new CreditModel();
-        $this->assign('ret', 0);
-        $this->assign('status', 'ok');
-        $this->assign('credit', intval($credit->balance($tp_user['uid'])));
-        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
-            $this->assign('tp_user', $tp_user);
-        }
-        $this->render('pay/balance.html');
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => intval($credit->balance($tp_user['uid']))])->render('pay/balance.html');
     }
 
     /**
@@ -163,8 +138,6 @@ class PayController extends Controller
     {
         $tp_user = BunnyPHP::app()->get('tp_user');
         if (intval((new CreditModel())->balance($tp_user['uid'])) == -1) {
-            $this->assign('csrf_token', BunnyPHP::app()->get('csrf_token'));
-            $this->assign('tp_user', $tp_user);
             $this->render('pay/start.html');
         } else {
             $this->redirect('pay', 'balance');
@@ -182,17 +155,10 @@ class PayController extends Controller
             $tp_user = BunnyPHP::app()->get('tp_user');
             $credit = new CreditModel();
             (new PayPassModel())->setPassword($tp_user['uid'], md5($_POST['pass']));
-            $this->assign('ret', 0);
-            $this->assign('status', 'ok');
-            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
-                $this->assign('tp_user', $tp_user);
-            }
-            $this->assign('credit', $credit->start($tp_user['uid']));
             $service->sendMail('email/pay_start.html', ['nickname' => $tp_user['nickname'], 'site' => TP_SITE_NAME], $tp_user['email'], '您已开通' . TP_SITE_NAME . "支付服务");
-            $this->render('pay/start.html');
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => $credit->start($tp_user['uid'])])->render('pay/start.html');
         } else {
-            $this->assign('ret', 1004)->assign('status', 'empty arguments')->assign('tp_error_msg', "必要参数为空")
-                ->render('common/error.html');
+            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
         }
     }
 }
