@@ -49,12 +49,11 @@ class FeedController extends Controller
 
     /**
      * @filter auth canFeed
-     * @param array $path
+     * @param int $tid path(0)
+     * @param int $page path(1)
      */
-    public function ac_view(array $path)
+    public function ac_view(int $tid = 0, int $page = 1)
     {
-        $tid = isset($_REQUEST['tid']) ? $_REQUEST['tid'] : (isset($path[0]) ? $path[0] : 0);
-        $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : (isset($path[1]) ? $path[1] : 1);
         if ($this->_mode == BunnyPHP::MODE_API) {
             $tp_user = BunnyPHP::app()->get('tp_user');
             $this->assignAll(['ret' => 0, 'status' => 'ok', 'page' => $page]);
@@ -84,12 +83,11 @@ class FeedController extends Controller
 
     /**
      * @filter auth canFeed
-     * @param array $path
+     * @param string $username path(0)
+     * @param int $page path(1)
      */
-    public function ac_list(array $path)
+    public function ac_list($username = '', $page = 1)
     {
-        $username = isset($_REQUEST['username']) ? $_REQUEST['username'] : (isset($path[0]) ? $path[0] : 0);
-        $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : (isset($path[1]) ? $path[1] : 1);
         $user = (new UserModel())->getUserByUsername($username);
         if ($this->_mode == BunnyPHP::MODE_API) {
             if ($user['uid'] != null) {
@@ -110,11 +108,10 @@ class FeedController extends Controller
 
     /**
      * @filter auth canFeed
-     * @param array $path
+     * @param int $tid path(0)
      */
-    public function ac_comment(array $path)
+    public function ac_comment($tid = 0)
     {
-        $tid = isset($_REQUEST['tid']) ? $_REQUEST['tid'] : (isset($path[0]) ? $path[0] : 0);
         if ($this->_mode == BunnyPHP::MODE_API) {
             if (isset($_POST['content'])) {
                 if ($feed = (new FeedModel())->getFeed($tid)) {

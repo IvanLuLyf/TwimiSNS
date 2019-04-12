@@ -113,9 +113,9 @@ class PostController extends Controller
 
     /**
      * @filter auth canFeed
-     * @param $tid integer path(0,0)
+     * @param int $tid path(0,0)
      */
-    function ac_comment($tid)
+    function ac_comment(int $tid = 0)
     {
         $post = (new PostModel())->getPostById($tid);
         if ($post != null) {
@@ -130,35 +130,27 @@ class PostController extends Controller
         }
     }
 
-    function ac_search(UserService $userService)
+    function ac_search($word, UserService $userService, $page = 1, $limit = 20)
     {
-        if (isset($_REQUEST['word']) && $_REQUEST['word'] != '') {
-            $word = $_REQUEST['word'];
-            $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : 1;
-            $result = (new PostModel())->search($word, $page);
-            $endPage = ceil($result['total'] / 20);
-            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
-                $this->assign('tp_user', $userService->getLoginUser())
-                    ->assign('cur_ctr', 'post')->assign('end_page', $endPage);
-            }
-            $this->assign('word', $word);
-            $this->assign("page", $page)->assign('total', $result['total'])->assign("posts", $result['posts'])
-                ->render('post/search.html');
+        if ($word) {
+            $result = (new PostModel())->search($word, $page, $limit);
+            $endPage = ceil($result['total'] / $limit);
         } else {
-            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
-                $this->assign('word', '');
-                $this->assign('total', 0)->assign("posts", []);
-                $this->assign('tp_user', $userService->getLoginUser())->render('post/search.html');
-            }
+            $result = ['total' => 0, 'posts' => []];
+            $endPage = 0;
         }
+        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+            $this->assignAll(['tp_user' => $userService->getLoginUser(), 'cur_ctr' => 'post', 'end_page' => $endPage]);
+        }
+        $this->assignAll(['word' => $word, "page" => $page, 'total' => $result['total'], "posts" => $result['posts']])->render('post/search.html');
     }
 
     /**
      * @filter csrf
      * @filter auth
-     * @param $tid integer path(0,0)
+     * @param int $tid path(0,0)
      */
-    function ac_buy_get($tid)
+    function ac_buy_get(int $tid = 0)
     {
         $post = (new PostModel())->getPostById($tid);
         $tp_user = BunnyPHP::app()->get('tp_user');
@@ -182,9 +174,9 @@ class PostController extends Controller
     /**
      * @filter csrf check
      * @filter auth canPay
-     * @param $tid integer path(0,0)
+     * @param int $tid path(0,0)
      */
-    function ac_buy_post($tid)
+    function ac_buy_post(int $tid = 0)
     {
         $post = (new PostModel())->getPostById($tid);
         $tp_user = BunnyPHP::app()->get('tp_user');
