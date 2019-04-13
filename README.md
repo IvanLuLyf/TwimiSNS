@@ -1,6 +1,6 @@
 # TwimiSNS
 
-![MineBlog](static/img/logo.png?raw=true)
+![TwimiSNS](static/img/logo.png?raw=true)
 
 TwimiSNS is a SNS Engine Powered By BunnyPHP
 
