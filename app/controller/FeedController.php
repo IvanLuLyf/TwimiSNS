@@ -34,7 +34,7 @@ class FeedController extends Controller
                         if (in_array($_FILES["images"]["type"][$i], $image_type) && ($_FILES["images"]["size"][$i] < 2000000)) {
                             $t = time() % 1000;
                             $filename = "feed/$feedId-$i-$t.jpg";
-                            $url = $this->storage()->upload($filename, $_FILES["images"]["tmp_name"][$i]);
+                            $url = BunnyPHP::getStorage()->upload($filename, $_FILES["images"]["tmp_name"][$i]);
                             $feedImageModel->upload($tp_user['uid'], $feedId, $url);
                         }
                     }
