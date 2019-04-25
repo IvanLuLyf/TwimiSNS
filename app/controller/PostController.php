@@ -84,9 +84,18 @@ class PostController extends Controller
     function ac_list(array $path, UserService $userService)
     {
         $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : isset($path[0]) ? $path[0] : 1;
-        $postModel = (new PostModel());
-        $posts = $postModel->getPostByPage($page);
+        $cache = BunnyPHP::getCache();
         $tp_user = $userService->getLoginUser();
+        if ($cache->has('post/list/' . $page)) {
+            $cacheData = unserialize($cache->get('post/list/' . $page));
+            $posts = $cacheData['posts'];
+            $total = $cacheData['total'];
+        } else {
+            $postModel = (new PostModel());
+            $posts = $postModel->getPostByPage($page);
+            $total = $postModel->getTotal();
+            $cache->set('post/list/' . $page, serialize(['posts' => $posts, 'total' => $total]));
+        }
         foreach ($posts as &$post) {
             if ($post['extra'] != '') {
                 $extra = json_decode($post['extra'], true);
@@ -98,7 +107,6 @@ class PostController extends Controller
                 }
             }
         }
-        $total = $postModel->getTotal();
         $endPage = ceil($total / 20);
         if ($this->_mode == BunnyPHP::MODE_NORMAL) {
             include APP_PATH . 'library/Parser.php';
