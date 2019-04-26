@@ -2,29 +2,29 @@
 
 ![TwimiSNS](static/img/logo.png?raw=true)
 
-TwimiSNS is a SNS Engine Powered By BunnyPHP.
+TwimiSNS是一个基于BunnyPHP开发的SNS引擎.
 
 ![GitHub release](https://img.shields.io/github/release/ivanlulyf/twimisns.svg?color=brightgreen&style=flat-square)
 ![Code Size](https://img.shields.io/github/languages/code-size/ivanlulyf/mineblog.svg?color=orange&style=flat-square)
 ![GitHub](https://img.shields.io/github/license/ivanlulyf/twimisns.svg?color=blue&style=flat-square)
 ![PHP](https://img.shields.io/badge/PHP->%3D7.0.0-777bb3.svg?style=flat-square&logo=php)
 
-English | [中文](README_CN.md)
+[English](README.md) | 中文
 
-## Requirement
+## 环境要求
 
 * PHP >= 7.0
-* MySQL or SQLite
+* MySQL 或 SQLite
 
 
-## Installation
+## 安装
 
-### 1. Clone this repository to your site root.
+### 1. 复制本项目到网站根目录
 
-### 2. Set up your server
+### 2. 配置服务器环境
 > Apache
 
-Add following content to ```.htacess``` file.
+添加以下内容到 ```.htacess``` 文件中.
 
 ```apacheconfig
 <IfModule mod_rewrite.c>
@@ -44,9 +44,9 @@ location / {
 }
 ```
 
-### 3. Open http://yourdomain/install
+### 3. 打开 http://yourdomain/install 根据提示完成安装
 
-## Return Code Reference
+## 错误码表
 
 |  Code  | Description |
 |:---:|---|
