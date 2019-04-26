@@ -51,37 +51,37 @@ location / {
 |  Code  | Description |
 |:---:|---|
 |0|ok|
-|-1|network error|
-|-2|mod does not exist|
-|-3|action does not exist|
-|-4|template does not exist|
-|-5|template rendering error|
-|-6|database error|
-|-7|parameter cannot be empty|
-|-8|internal error|
-|1|invalid csrf token|
-|2|invalid file|
-|1001|wrong password|
-|1002|user does not exist|
-|1003|username already exists|
-|1004|invalid username|
-|1005|registration is not allowed|
-|1006|invalid id code|
-|1007|oauth is not enabled|
-|1008|invalid verification code|
-|2001|invalid client id|
-|2002|permission denied|
-|2003|invalid token|
-|2004|invalid oauth code|
-|2005|invalid refresh token|
-|3001|invalid tid|
-|3002|permission denied|
-|3003|already liked|
-|4001|user is not a friend|
-|4002|user is already a friend|
-|5001|wrong payment password|
-|5002|already paid|
-|5003|insufficient balance|
-|5004|no need to pay|
-|5005|empty red packet|
-|5006|invalid amount|
+|-1|网络错误|
+|-2|Mod不存在|
+|-3|Action不存在|
+|-4|模板不存在|
+|-5|模板渲染错误|
+|-6|数据库错误|
+|-7|参数不可为空|
+|-8|内部错误|
+|1|非法的csrf token|
+|2|无效的文件|
+|1001|密码错误|
+|1002|用户不存在|
+|1003|用户名已存在|
+|1004|无效的用户名|
+|1005|不允许注册|
+|1006|无效的id code|
+|1007|站点未开启OAuth|
+|1008|无效的验证码|
+|2001|无效的client id|
+|2002|没有权限|
+|2003|无效的token|
+|2004|无效的oauth code|
+|2005|无效的refresh token|
+|3001|无效的tid|
+|3002|没有权限|
+|3003|已赞|
+|4001|用户不是好友|
+|4002|用户已是好友|
+|5001|错误的支付密码|
+|5002|已支付|
+|5003|余额不足|
+|5004|不需要支付|
+|5005|红包为空|
+|5006|无效的金额|
