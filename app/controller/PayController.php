@@ -27,13 +27,13 @@ class PayController extends Controller
                     $this->assignAll(['ret' => 0, 'status' => 'ok']);
                 } else {
                     $payOrderModel->cancel($payTicket);
-                    $this->assignAll(['ret' => 5003, 'status' => 'no enough coin']);
+                    $this->assignAll(['ret' => 5003, 'status' => 'insufficient balance']);
                 }
             } else {
-                $this->assignAll(['ret' => 5002, 'status' => 'already pay']);
+                $this->assignAll(['ret' => 5002, 'status' => 'already paid']);
             }
         } else {
-            $this->assignAll(['ret' => 5001, 'status' => 'invalid password']);
+            $this->assignAll(['ret' => 5001, 'status' => 'wrong payment password']);
         }
         $this->render('pay/buy.html');
     }
@@ -50,7 +50,7 @@ class PayController extends Controller
             $payTicket = (new PayOrderModel())->ticket($tp_api['id'], $intro, $price);
             $this->assignAll(['ret' => 0, 'status' => 'ok', 'ticket' => $payTicket]);
         } else {
-            $this->assignAll(['ret' => 5006, 'status' => 'invalid price']);
+            $this->assignAll(['ret' => 5006, 'status' => 'invalid amount']);
         }
         $this->render('pay/request.html');
     }
@@ -75,13 +75,13 @@ class PayController extends Controller
                     $rp = (new RedPacketModel())->send($tp_api['id'], $tp_user['uid'], $total, $num, $message);
                     $this->assignAll(['ret' => 0, 'status' => 'ok', 'red_packet' => $rp]);
                 } else {
-                    $this->assignAll(['ret' => 5003, 'status' => 'no enough coin']);
+                    $this->assignAll(['ret' => 5003, 'status' => 'insufficient balance']);
                 }
             } else {
-                $this->assignAll(['ret' => 5001, 'status' => 'invalid password']);
+                $this->assignAll(['ret' => 5001, 'status' => 'wrong payment password']);
             }
         } else {
-            $this->assignAll(['ret' => 5006, 'status' => 'invalid price']);
+            $this->assignAll(['ret' => 5006, 'status' => 'invalid amount']);
         }
         $this->render('pay/red_packet.html');
     }
@@ -100,7 +100,7 @@ class PayController extends Controller
             if ($creditModel->cut($tp_user['uid'], -$money)) {
                 $this->assignAll(['ret' => 0, 'status' => 'ok', "money" => $money]);
             } else {
-                $this->assignAll(['ret' => 5003, 'status' => 'no enough coin']);
+                $this->assignAll(['ret' => 5003, 'status' => 'insufficient balance']);
             }
         } else {
             $this->assignAll(['ret' => 5005, 'status' => 'empty red packet']);
@@ -158,7 +158,7 @@ class PayController extends Controller
             $service->sendMail('email/pay_start.html', ['nickname' => $tp_user['nickname'], 'site' => TP_SITE_NAME], $tp_user['email'], '您已开通' . TP_SITE_NAME . "支付服务");
             $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => $credit->start($tp_user['uid'])])->render('pay/start.html');
         } else {
-            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => "必要参数为空"])->error();
         }
     }
 }

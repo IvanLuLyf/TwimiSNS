@@ -81,7 +81,7 @@ class UserController extends Controller
             }
             $this->render("user/register.html");
         } else {
-            $this->assignAll(['ret' => 1007, 'status' => 'register not allowed', 'tp_error_msg' => '站点关闭注册'])->error();
+            $this->assignAll(['ret' => 1005, 'status' => 'registration is not allowed', 'tp_error_msg' => '站点关闭注册'])->error();
         }
     }
 
@@ -124,7 +124,7 @@ class UserController extends Controller
                 $this->assignAll($result)->render();
             }
         } else {
-            $this->assignAll(['ret' => 1007, 'status' => 'register not allowed', 'tp_error_msg' => '站点关闭注册'])->error();
+            $this->assignAll(['ret' => 1005, 'status' => 'registration is not allowed', 'tp_error_msg' => '站点关闭注册'])->error();
         }
     }
 
@@ -149,10 +149,10 @@ class UserController extends Controller
                 $service->sendMail('email/forgot.html', ['nickname' => $user['nickname'], 'site' => TP_SITE_NAME, 'url' => TP_SITE_URL, 'code' => $code], $user['email'], '找回密码');
                 $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "邮件已发送"])->render('common/error.html');
             } else {
-                $this->assignAll(['ret' => 1002, 'status' => "user not exists", 'tp_error_msg' => '用户名不存在'])->render('user/forgot.html');
+                $this->assignAll(['ret' => 1002, 'status' => "user does not exist", 'tp_error_msg' => '用户名不存在'])->render('user/forgot.html');
             }
         } else {
-            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => '必要参数为空'])->render('user/forgot.html');
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->render('user/forgot.html');
         }
     }
 
@@ -164,7 +164,7 @@ class UserController extends Controller
         if (isset($_REQUEST['code'])) {
             $this->assign('code', $_REQUEST['code'])->render('user/reset.html');
         } else {
-            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => '必要参数为空'])->error();
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->error();
         }
     }
 
@@ -180,10 +180,10 @@ class UserController extends Controller
                 (new UserModel())->reset($uid, $_POST['password']);
                 $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "密码修改完成"])->render('common/error.html');
             } else {
-                $this->assignAll(['ret' => 1008, 'status' => 'expired', 'tp_error_msg' => '验证码已过期'])->error();
+                $this->assignAll(['ret' => 1008, 'status' => 'invalid verification code', 'tp_error_msg' => '验证码已过期'])->error();
             }
         } else {
-            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => '必要参数为空'])->error();
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->error();
         }
     }
 
@@ -225,7 +225,7 @@ class UserController extends Controller
                 (new AvatarModel())->upload($tp_user['uid'], $url);
                 $response = ['ret' => 0, 'status' => 'ok', 'url' => $url];
             } else {
-                $response = ['ret' => 1007, 'status' => 'wrong file'];
+                $response = ['ret' => 2, 'status' => 'invalid file'];
             }
             $this->assignAll($response);
         }
@@ -255,7 +255,7 @@ class UserController extends Controller
                     $this->assignAll(['ret' => 0, 'status' => 'ok']);
                     $this->assignAll($response);
                 } else {
-                    $this->assignAll(['ret' => 1008, 'status' => 'invalid id code']);
+                    $this->assignAll(['ret' => 1006, 'status' => 'invalid id code']);
                 }
             } else {
                 $row = (new UserModel())->getUserByUsername($username);
@@ -263,7 +263,7 @@ class UserController extends Controller
                     $this->assignAll(['ret' => 0, 'status' => 'ok']);
                     $this->assignAll($row);
                 } else {
-                    $this->assignAll(['ret' => 1005, 'status' => 'invalid username']);
+                    $this->assignAll(['ret' => 1004, 'status' => 'invalid username']);
                 }
             }
         }

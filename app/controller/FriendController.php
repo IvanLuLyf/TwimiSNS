@@ -34,7 +34,7 @@ class FriendController extends Controller
                 $this->assignAll($result)->render();
             }
         } else {
-            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->error();
         }
     }
 
@@ -52,7 +52,7 @@ class FriendController extends Controller
                 $this->assignAll($result)->render();
             }
         } else {
-            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->error();
         }
     }
 
@@ -70,7 +70,7 @@ class FriendController extends Controller
                 $this->assignAll($result)->render();
             }
         } else {
-            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->error();
         }
     }
 }

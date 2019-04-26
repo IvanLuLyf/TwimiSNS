@@ -88,7 +88,7 @@ class OauthController extends Controller
             $result['refresh_token'] = $appToken['refresh_token'];
             $this->assign('ret', 0)->assign('status', 'ok')->assignAll($result)->render();
         } else {
-            $this->assignAll(['ret' => 1002, 'status' => "user not exists"])->render();
+            $this->assignAll(['ret' => 1002, 'status' => "user does not exist"])->render();
         }
     }
 
@@ -195,7 +195,7 @@ class OauthController extends Controller
                 $oauthCodeModel->deleteCode($app_id, $_REQUEST['code']);
                 $this->render('common/error.html');
             } else {
-                $this->assignAll(['ret' => 2005, 'status' => 'invalid oauth code'])->error();
+                $this->assignAll(['ret' => 2004, 'status' => 'invalid oauth code'])->error();
             }
         } else {
             $this->assignAll(['ret' => 2001, 'status' => 'invalid client id'])->error();
@@ -211,10 +211,10 @@ class OauthController extends Controller
                 if ($token_row != null) {
                     $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($token_row)->render();
                 } else {
-                    $this->assignAll(['ret' => 2006, 'status' => 'invalid refresh token'])->error();
+                    $this->assignAll(['ret' => 2005, 'status' => 'invalid refresh token'])->error();
                 }
             } else {
-                $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => '必要参数为空'])->error();
+                $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->error();
             }
         } else {
             $this->assignAll(['ret' => 2001, 'status' => 'invalid client id'])->error();

@@ -37,7 +37,7 @@ class PostController extends Controller
                 $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid])->render();
             }
         } else {
-            $this->assignAll(['ret' => 1004, 'status' => 'empty arguments', 'tp_error_msg' => "必要参数为空"])->error();
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => "必要参数为空"])->error();
         }
     }
 
@@ -101,7 +101,7 @@ class PostController extends Controller
                 $extra = json_decode($post['extra'], true);
                 if ($extra['type'] == 'paid' and $post['username'] != $tp_user['username'] and !(new PostPayModel())->check($tp_user['uid'], $post['tid'])) {
                     $post['content'] = "[付费帖子]";
-                    $this->assign('coin', $extra['price']);
+                    $post['coin'] = $extra['price'];
                 } elseif ($extra['type'] == 'login' and $tp_user == null) {
                     $post['content'] = "[登录可见]";
                 }
@@ -196,7 +196,7 @@ class PostController extends Controller
                     (new PostPayModel())->pay($tp_user['uid'], $post['tid']);
                     $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid])->render('post/buy.html');
                 } else {
-                    $this->assignAll(['ret' => 5003, 'status' => 'no enough coin', 'tp_error_msg' => '余额不足'])->error();
+                    $this->assignAll(['ret' => 5003, 'status' => 'insufficient balance', 'tp_error_msg' => '余额不足'])->error();
                 }
             }
         } else {

@@ -75,9 +75,9 @@ class OauthService extends Service
             $r_pos = strrpos($open_id_str, ")");
             $open_id_str = substr($open_id_str, $l_pos + 1, $r_pos - $l_pos - 1);
         }
-        $open_id = json_decode($open_id_str, TRUE);
+        $open_id = json_decode($open_id_str, true);
         $user_info_url = 'https://graph.qq.com/user/get_user_info?' . 'access_token=' . $token['access_token'] . '&oauth_consumer_key=' . $oauth['key'] . '&openid=' . $open_id['openid'] . '&format=json';
-        $user_info = json_decode($this->do_get_request($user_info_url), TRUE);
+        $user_info = json_decode($this->do_get_request($user_info_url), true);
         return ['uid' => $open_id['openid'], 'nickname' => $user_info['nickname'], 'token' => $token['access_token'], 'expire' => time() + $token['expires_in']];
     }
 
@@ -87,7 +87,7 @@ class OauthService extends Service
         $token = [];
         parse_str($this->do_post_request($token_url, "client_id=" . $oauth['key'] . "&client_secret=" . $oauth['secret'] . "&code=" . $code . "&redirect_uri=" . $oauth['callback']), $token);
         $user_info_url = "https://api.github.com/user?access_token=" . $token['access_token'];
-        $user_info = json_decode($this->do_get_request($user_info_url), TRUE);
+        $user_info = json_decode($this->do_get_request($user_info_url), true);
         return ['uid' => $user_info['id'], 'nickname' => $user_info['login'], 'token' => $token['access_token'], 'expire' => time()];
     }
 
@@ -96,7 +96,7 @@ class OauthService extends Service
         $token_url = 'https://api.weibo.com/oauth2/access_token';
         $token = json_decode($this->do_post_request($token_url, "client_id=" . $oauth['key'] . "&client_secret=" . $oauth['secret'] . "&grant_type=authorization_code&code=" . $code . "&redirect_uri=" . $oauth['callback']), TRUE);
         $user_info_url = "https://api.weibo.com/2/users/show.json?access_token=" . $token['access_token'] . "&uid=" . $token['uid'];
-        $user_info = json_decode($this->do_get_request($user_info_url), TRUE);
+        $user_info = json_decode($this->do_get_request($user_info_url), true);
         return ['uid' => $token['uid'], 'nickname' => $user_info['screen_name'], 'token' => $token['access_token'], 'expire' => time() + $token['expires_in']];
     }
 
@@ -106,7 +106,7 @@ class OauthService extends Service
             $token = (new BindModel())->where(['uid = 1 and type="wb"'], [])->fetch()['token'];
         }
         $user_info_url = "https://api.weibo.com/2/users/show.json?access_token=$token&uid=$bind_id";
-        $user_info = json_decode($this->do_get_request($user_info_url), TRUE);
+        $user_info = json_decode($this->do_get_request($user_info_url), true);
         return str_replace('http:', 'https:', $user_info['avatar_large']);
     }
 
@@ -121,19 +121,11 @@ class OauthService extends Service
         $ctx = stream_context_create($params);
         $fp = @fopen($url, 'rb', false, $ctx);
         if (!$fp) {
-            $this->controller->assign('ret', 2004)
-                ->assign('status', "can't open url")
-                ->assign('tp_error_msg', "无法打开请求页面" . json_encode(error_get_last()))
-                ->render('common/error.html');
-            die();
+            $this->controller->assignAll(['ret' => -8, 'status' => 'internal error', 'tp_error_msg' => '无法打开请求页面' . json_encode(error_get_last())])->error();
         }
         $response = @stream_get_contents($fp);
         if ($response === false) {
-            $this->controller->assign('ret', 2005)
-                ->assign('status', "can't read content")
-                ->assign('tp_error_msg', "无法读取页面内容" . json_encode(error_get_last()))
-                ->render('common/error.html');
-            die();
+            $this->controller->assignAll(['ret' => -8, 'status' => 'internal error', 'tp_error_msg' => '无法读取页面内容' . json_encode(error_get_last())])->error();
         }
         return $response;
     }
@@ -145,19 +137,11 @@ class OauthService extends Service
         $ctx = stream_context_create($params);
         $fp = @fopen($url, 'rb', false, $ctx);
         if (!$fp) {
-            $this->controller->assign('ret', 2004)
-                ->assign('status', "can't open url")
-                ->assign('tp_error_msg', "无法打开请求页面")
-                ->render('common/error.html');
-            die();
+            $this->controller->assignAll(['ret' => -8, 'status' => 'internal error', 'tp_error_msg' => '无法打开请求页面' . json_encode(error_get_last())])->error();
         }
         $response = @stream_get_contents($fp);
         if ($response === false) {
-            $this->controller->assign('ret', 2005)
-                ->assign('status', "can't read content")
-                ->assign('tp_error_msg', "无法读取页面内容")
-                ->render('common/error.html');
-            die();
+            $this->controller->assignAll(['ret' => -8, 'status' => 'internal error', 'tp_error_msg' => '无法读取页面内容' . json_encode(error_get_last())])->error();
         }
         return $response;
     }

@@ -53,10 +53,10 @@ class FriendModel extends Model
             if ($this->where(["uid = :u and username = :un"], ['u' => $uid, 'un' => $username])->update($updates)) {
                 $response = ['ret' => 0, 'status' => 'ok'];
             } else {
-                $response = ['ret' => 1006, 'status' => "database error"];
+                $response = ['ret' => -6, 'status' => "database error"];
             }
         } else {
-            $response = ['ret' => 4001, 'status' => "no friend"];
+            $response = ['ret' => 4001, 'status' => "user is not a friend"];
         }
         return $response;
     }
@@ -65,14 +65,14 @@ class FriendModel extends Model
     {
         if ($username != $fusername) {
             if ($this->where(["uid = :u and username = :un"], ['u' => $uid, 'un' => $fusername])->fetch()) {
-                $response = ['ret' => 1009, 'status' => "already exist"];
+                $response = ['ret' => 4002, 'status' => "user is already a friend"];
             } else {
                 $this->add(['uid' => $uid, 'fuid' => $fuid, 'username' => $fusername, 'notename' => $fnickname, 'state' => 0]);
                 $this->add(['uid' => $fuid, 'fuid' => $uid, 'username' => $username, 'notename' => $nickname, 'state' => 1]);
                 $response = ['ret' => 0, 'status' => "ok"];
             }
         } else {
-            $response = ['ret' => 1005, 'status' => "invalid username"];
+            $response = ['ret' => 1004, 'status' => "invalid username"];
         }
         return $response;
     }
@@ -85,7 +85,7 @@ class FriendModel extends Model
             $this->where(["uid = :u and username= :un"], ['u' => $fuid, 'un' => $username])->update($updates);
             $response = ['ret' => 0, 'status' => "ok"];
         } else {
-            $response = ['ret' => 1005, 'status' => "invalid username"];
+            $response = ['ret' => 1004, 'status' => "invalid username"];
         }
         return $response;
     }

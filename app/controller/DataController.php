@@ -17,7 +17,7 @@ class DataController extends Controller
         $tp_user = BunnyPHP::app()->get('tp_user');
         $content = (new DataModel())->get($tp_user['uid'], $tp_api['id']);
         if ($content == null) $content = "";
-        $this->assign('ret', 0)->assign('status', 'ok')->assign('content', $content)->render();
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'content' => $content])->render();
     }
 
     /**
@@ -28,6 +28,6 @@ class DataController extends Controller
         $tp_api = BunnyPHP::app()->get('tp_api');
         $tp_user = BunnyPHP::app()->get('tp_user');
         (new DataModel())->set($tp_user['uid'], $tp_api['id'], $_POST['content']);
-        $this->assign('ret', 0)->assign('status', 'ok')->render();
+        $this->assignAll(['ret' => 0, 'status' => 'ok'])->render();
     }
 }

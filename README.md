@@ -4,8 +4,10 @@
 
 TwimiSNS is a SNS Engine Powered By BunnyPHP
 
-![GitHub release](https://img.shields.io/github/release/ivanlulyf/twimisns.svg?color=brightgreen)
-![GitHub](https://img.shields.io/github/license/ivanlulyf/twimisns.svg?color=blue)
+![GitHub release](https://img.shields.io/github/release/ivanlulyf/twimisns.svg?color=brightgreen&style=flat-square)
+![Code Size](https://img.shields.io/github/languages/code-size/ivanlulyf/mineblog.svg?color=orange&style=flat-square)
+![GitHub](https://img.shields.io/github/license/ivanlulyf/twimisns.svg?color=blue&style=flat-square)
+![PHP](https://img.shields.io/badge/PHP->%3D7.0.0-777bb3.svg?style=flat-square&logo=php)
 
 ## Requirement
 
@@ -22,7 +24,7 @@ TwimiSNS is a SNS Engine Powered By BunnyPHP
 
 Add following content to ```.htacess``` file.
 
-```
+```apacheconfig
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -34,7 +36,7 @@ Add following content to ```.htacess``` file.
 
 > Nginx
 
-```
+```nginx
 location / {
     try_files $uri $uri/ /index.php$is_args$args;
 }
@@ -46,30 +48,38 @@ location / {
 
 |  Code  | Description |
 |------- |-------------|
-|0       |ok           |
-|1001    |password error|
-|1002    |user not exists|
-|1003    |username exists|
-|1004    |empty arguments|
-|1005    |invalid username|
-|1006    |database error|
-|1007    |register not allowed|
-|1008    |invalid id code|
-|1009    |already exist|
-|1010    |oauth is not enabled|
-|2001    |invalid client id|
-|2002    |permission denied|
-|2003    |invalid token|
-|2004    |invalid crsf token|
-|2005    |invalid oauth code|
-|2006    |invalid refresh token|
-|3001    |invalid tid|
-|3002    |already liked|
-|3003    |invalid action|
-|4001    |no friend|
-|5001    |invalid password|
-|5002    |already pay|
-|5003    |no enough coin|
-|5004    |no need to pay|
-|5005    |empty red packet|
-|5006    |invalid price|
+|0|ok|
+|-1|network error|
+|-2|mod does not exist|
+|-3|action does not exist|
+|-4|template does not exist|
+|-5|template rendering error|
+|-6|database error|
+|-7|parameter cannot be empty|
+|-8|internal error|
+|1|invalid csrf token|
+|2|invalid file|
+|1001|wrong password|
+|1002|user does not exist|
+|1003|username already exists|
+|1004|invalid username|
+|1005|registration is not allowed|
+|1006|invalid id code|
+|1007|oauth is not enabled|
+|1008|invalid verification code|
+|2001|invalid client id|
+|2002|permission denied|
+|2003|invalid token|
+|2004|invalid oauth code|
+|2005|invalid refresh token|
+|3001|invalid tid|
+|3002|permission denied|
+|3003|already liked|
+|4001|user is not a friend|
+|4002|user is already a friend|
+|5001|wrong payment password|
+|5002|already paid|
+|5003|insufficient balance|
+|5004|no need to pay|
+|5005|empty red packet|
+|5006|invalid amount|

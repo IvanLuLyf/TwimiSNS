@@ -41,7 +41,7 @@ class FeedController extends Controller
                 }
                 $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $feedId]);
             } else {
-                $this->assignAll(['ret' => 1004, 'status' => 'empty arguments']);
+                $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty']);
             }
         }
         $this->render();
@@ -100,7 +100,7 @@ class FeedController extends Controller
                 $user_info = (new UserInfoModel())->get($user['uid']);
                 $this->assignAll(['ret' => 0, 'status' => 'ok', 'page' => $page, 'user_info' => $user_info, 'feeds' => $feeds]);
             } else {
-                $this->assignAll(['ret' => 1002, 'status' => "user not exists"]);
+                $this->assignAll(['ret' => 1002, 'status' => "user does not exist"]);
             }
         }
         $this->render();
@@ -123,7 +123,7 @@ class FeedController extends Controller
                     $this->assignAll(['ret' => 3001, 'status' => 'invalid tid']);
                 }
             } else {
-                $this->assignAll(['ret' => 1004, 'status' => 'empty arguments']);
+                $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty']);
             }
         }
         $this->render();
@@ -140,7 +140,7 @@ class FeedController extends Controller
             if ($feed = $feedModel->getFeed($tid)) {
                 $tp_user = BunnyPHP::app()->get('tp_user');
                 if ((new LikeModel())->isLike($tp_user['uid'], 3, $tid) == 1) {
-                    $this->assignAll(['ret' => 3002, 'status' => 'already liked']);
+                    $this->assignAll(['ret' => 3003, 'status' => 'already liked']);
                 } else {
                     (new LikeModel())->like($tp_user['uid'], 3, $tid);
                     $like_num = $feedModel->likeFeed($tid);
@@ -168,7 +168,7 @@ class FeedController extends Controller
                     $images = (new FeedImageModel())->getFeedImageByTid($tid);
                     if ($images != null) {
                         foreach ($images as $image) {
-                            $this->storage()->remove($image['url']);
+                            BunnyPHP::getStorage()->remove($image['url']);
                         }
                     }
                     (new FeedImageModel())->where('tid=:t', ['t' => $tid])->delete();
@@ -177,7 +177,7 @@ class FeedController extends Controller
                     $feedModel->where('tid=:t', ['t' => $tid])->delete();
                     $this->assignAll(['ret' => 0, 'status' => 'ok']);
                 } else {
-                    $this->assignAll(['ret' => 3003, 'status' => 'invalid action']);
+                    $this->assignAll(['ret' => 3002, 'status' => 'permission denied']);
                 }
             } else {
                 $this->assignAll(['ret' => 3001, 'status' => 'invalid tid']);
