@@ -32,10 +32,11 @@ class PostModel extends Model
 
     public function search($word, $page = 1, $size = 20)
     {
+        $like_word = '%' . $word . '%';
         $posts = $this->join(UserModel::class, ['username'], ['nickname'])
-            ->where('title like :w or content like :w', ['w' => "%$word%"])->order(['tid desc'])->limit($size, ($page - 1) * $size)
+            ->where('title like :wt or content like :wc', ['wt' => $like_word, 'wc' => $like_word])->order(['tid desc'])->limit($size, ($page - 1) * $size)
             ->fetchAll();
-        $total = $this->where('title like :w or content like :w', ['w' => "%$word%"])->fetch("count(*) num")['num'];
+        $total = $this->where('title like :wt or content like :wc', ['wt' => $like_word, 'wc' => $like_word])->fetch("count(*) num")['num'];
         return ['posts' => $posts, 'total' => $total];
     }
 

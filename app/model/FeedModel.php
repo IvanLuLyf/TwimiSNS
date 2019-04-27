@@ -30,7 +30,7 @@ class FeedModel extends Model
         $ft = FriendModel::name();
         return $this->join(FriendModel::class, ['username', 'uid' => $uid, 'state' => 2], ['notename'])
             ->join(LikeModel::class, ['tid', 'aid' => 3, 'uid' => $uid], [["state", "(%s is not null) as islike"]])
-            ->where(["{$ft}.uid = :u or {$tb}.uid= :u"], ['u' => $uid])
+            ->where(["{$ft}.uid = :u or {$tb}.uid= :um"], ['u' => $uid, 'um' => $uid])
             ->order(["tid desc"])
             ->limit(20, ($page - 1) * 20)
             ->fetchAll();
