@@ -12,6 +12,7 @@ class ArticleModel extends Model
         'tid' => ['integer', 'not null'],
         'cid' => ['integer', 'not null'],
         'title' => ['text', 'not null'],
+        'summary' => ['text'],
         'content' => ['text', 'not null'],
         'timestamp' => ['text'],
     ];
