@@ -5,6 +5,11 @@
  * Date: 2019/2/28
  * Time: 21:50
  */
+
+use BunnyPHP\Config;
+use BunnyPHP\Service;
+use BunnyPHP\Template;
+
 require APP_PATH . "library/Mailer.php";
 
 class EmailService extends Service

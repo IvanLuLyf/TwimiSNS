@@ -1,11 +1,15 @@
 <?php
+
+use BunnyPHP\Config;
+use BunnyPHP\Controller;
+use BunnyPHP\Service;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/2/26
  * Time: 17:31
  */
-
 class OauthService extends Service
 {
     private $controller;
@@ -54,7 +58,7 @@ class OauthService extends Service
         return $imgUrl;
     }
 
-    private function tm_oauth($oauth, $code)
+    private function tm_oauth($oauth, $code): array
     {
         $strInfo = $this->do_post_request("{$oauth['url']}/api/oauth/token", "client_id=" . $oauth['key'] . "&client_secret=" . $oauth['secret'] . "&code=" . $code);
         $oauth_data = json_decode($strInfo, true);
@@ -64,7 +68,7 @@ class OauthService extends Service
         return ['uid' => $user_info['uid'], 'nickname' => $user_info['nickname'], 'token' => $oauthToken, 'expire' => $oauth_data['expire']];
     }
 
-    private function qq_oauth($oauth, $code)
+    private function qq_oauth($oauth, $code): array
     {
         $token_url = 'https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&' . 'client_id=' . $oauth['key'] . '&redirect_uri=' . urlencode($oauth['callback']) . '&client_secret=' . $oauth['secret'] . '&code=' . $code;
         $token = [];
@@ -81,7 +85,7 @@ class OauthService extends Service
         return ['uid' => $open_id['openid'], 'nickname' => $user_info['nickname'], 'token' => $token['access_token'], 'expire' => time() + $token['expires_in']];
     }
 
-    private function gh_oauth($oauth, $code)
+    private function gh_oauth($oauth, $code): array
     {
         $token_url = 'https://github.com/login/oauth/access_token';
         $token = [];
@@ -91,7 +95,7 @@ class OauthService extends Service
         return ['uid' => $user_info['id'], 'nickname' => $user_info['login'], 'token' => $token['access_token'], 'expire' => time()];
     }
 
-    private function wb_oauth($oauth, $code)
+    private function wb_oauth($oauth, $code): array
     {
         $token_url = 'https://api.weibo.com/oauth2/access_token';
         $token = json_decode($this->do_post_request($token_url, "client_id=" . $oauth['key'] . "&client_secret=" . $oauth['secret'] . "&grant_type=authorization_code&code=" . $code . "&redirect_uri=" . $oauth['callback']), TRUE);
@@ -100,7 +104,7 @@ class OauthService extends Service
         return ['uid' => $token['uid'], 'nickname' => $user_info['screen_name'], 'token' => $token['access_token'], 'expire' => time() + $token['expires_in']];
     }
 
-    private function wb_avatar($bind_id, $token)
+    private function wb_avatar($bind_id, $token): string
     {
         if ($token == '') {
             $token = (new BindModel())->where(['uid = 1 and type="wb"'], [])->fetch()['token'];
@@ -110,7 +114,7 @@ class OauthService extends Service
         return str_replace('http:', 'https:', $user_info['avatar_large']);
     }
 
-    private function qq_avatar($oauth, $bind_id)
+    private function qq_avatar($oauth, $bind_id): string
     {
         return "https://qzapp.qlogo.cn/qzapp/{$oauth['key']}/$bind_id/100";
     }
