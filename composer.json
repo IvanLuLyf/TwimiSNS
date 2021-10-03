@@ -1,0 +1,17 @@
+{
+  "name": "ivanlulyf/sns",
+  "description": "TwimiSNS",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "IvanLu",
+      "email": "me@ivanlu.cn"
+    }
+  ],
+  "require": {
+    "ivanlulyf/bunnyphp": "^3.0",
+    "ext-json": "*",
+    "ext-pdo": "*"
+  }
+}
