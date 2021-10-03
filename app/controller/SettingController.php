@@ -1,11 +1,15 @@
 <?php
+
+use BunnyPHP\BunnyPHP;
+use BunnyPHP\Config;
+use BunnyPHP\Controller;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/10/13
  * Time: 1:29
  */
-
 class SettingController extends Controller
 {
     public function ac_index()
@@ -43,7 +47,7 @@ class SettingController extends Controller
             if (count($path) < 1) $path = [''];
             list($type) = $path;
             $oauth_enabled = Config::load('oauth')->get('enabled', []);
-            $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : $type;
+            $type = $_REQUEST['type'] ?? $type;
             $type = $type == '' ? $oauth_enabled[0][0] : $type;
             $tp_user = BunnyPHP::app()->get('tp_user');
             $bind = (new BindModel())->where(['uid=:u and type=:t'], ['u' => $tp_user['uid'], 't' => $type])->fetch();

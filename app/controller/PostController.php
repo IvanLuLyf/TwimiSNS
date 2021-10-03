@@ -1,11 +1,15 @@
 <?php
+
+use BunnyPHP\BunnyPHP;
+use BunnyPHP\Config;
+use BunnyPHP\Controller;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/7/29
  * Time: 3:24
  */
-
 class PostController extends Controller
 {
 
@@ -31,9 +35,9 @@ class PostController extends Controller
     {
         if (isset($_POST['title']) && isset($_POST['content'])) {
             $tid = (new PostModel())->sendPost(BunnyPHP::app()->get('tp_user'), $_POST['title'], $_POST['content']);
-            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+            if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
                 $this->redirect('post', 'view', ['tid' => $tid]);
-            } elseif ($this->_mode == BunnyPHP::MODE_API) {
+            } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
                 $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid])->render();
             }
         } else {
@@ -60,7 +64,7 @@ class PostController extends Controller
                 }
             }
             $comments = (new CommentModel())->listComment($tid, 1);
-            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+            if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
                 $this->assign('show_state', $showState);
                 $this->assign('tp_user', $tp_user);
                 $this->assign('cur_ctr', 'post');
@@ -83,7 +87,7 @@ class PostController extends Controller
 
     function ac_list(array $path, UserService $userService)
     {
-        $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : isset($path[0]) ? $path[0] : 1;
+        $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : (isset($path[0]) ? $path[0] : 1);
         $cache = BunnyPHP::getCache();
         $tp_user = $userService->getLoginUser();
         if ($cache->has('post/list/' . $page)) {
@@ -108,7 +112,7 @@ class PostController extends Controller
             }
         }
         $endPage = ceil($total / 20);
-        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             include APP_PATH . 'library/Parser.php';
             $parser = new HyperDown\Parser;
             $this->assign('parser', $parser);
@@ -128,9 +132,9 @@ class PostController extends Controller
         $post = (new PostModel())->getPostById($tid);
         if ($post != null) {
             (new CommentModel())->sendComment($tid, 1, BunnyPHP::app()->get('tp_user'), $_POST['content']);
-            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+            if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
                 $this->redirect('post', 'view', ['tid' => $tid]);
-            } elseif ($this->_mode == BunnyPHP::MODE_API) {
+            } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
                 $this->assignAll(['ret' => 0, 'status' => 'ok'])->render();
             }
         } else {
@@ -147,7 +151,7 @@ class PostController extends Controller
             $result = ['total' => 0, 'posts' => []];
             $endPage = 0;
         }
-        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             $this->assignAll(['tp_user' => $userService->getLoginUser(), 'cur_ctr' => 'post', 'end_page' => $endPage]);
         }
         $this->assignAll(['word' => $word, "page" => $page, 'total' => $result['total'], "posts" => $result['posts']])->render('post/search.html');
@@ -162,7 +166,7 @@ class PostController extends Controller
     {
         $post = (new PostModel())->getPostById($tid);
         $tp_user = BunnyPHP::app()->get('tp_user');
-        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             if ($post['extra'] != '') {
                 $extra = json_decode($post['extra'], true);
                 if ($extra['type'] == 'paid' and $post['username'] != $tp_user['username'] and !(new PostPayModel())->check($tp_user['uid'], $post['tid'])) {

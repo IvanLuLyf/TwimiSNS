@@ -1,11 +1,14 @@
 <?php
+
+use BunnyPHP\BunnyPHP;
+use BunnyPHP\Controller;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/3/2
  * Time: 18:25
  */
-
 class PayController extends Controller
 {
     /**

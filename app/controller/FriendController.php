@@ -1,11 +1,14 @@
 <?php
+
+use BunnyPHP\BunnyPHP;
+use BunnyPHP\Controller;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/2/18
  * Time: 2:14
  */
-
 class FriendController extends Controller
 {
     /**
@@ -16,7 +19,7 @@ class FriendController extends Controller
         $state = isset($_REQUEST['state']) ? $_REQUEST['state'] : 2;
         $tp_user = BunnyPHP::app()->get('tp_user');
         $friends = (new FriendModel())->listFriend($tp_user['uid'], $state);
-        if ($this->_mode == BunnyPHP::MODE_API) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             $this->assignAll(['ret' => 0, 'status' => 'ok', 'friends' => $friends]);
         }
         $this->render();
@@ -29,7 +32,7 @@ class FriendController extends Controller
     {
         if (isset($_POST['username']) && isset($_POST['notename'])) {
             $tp_user = BunnyPHP::app()->get('tp_user');
-            if ($this->_mode == BunnyPHP::MODE_API) {
+            if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
                 $result = (new FriendModel())->noteFriend($tp_user['uid'], $_POST['username'], $_POST['notename']);
                 $this->assignAll($result)->render();
             }
@@ -45,7 +48,7 @@ class FriendController extends Controller
     {
         if (isset($_POST['username'])) {
             $tp_user = BunnyPHP::app()->get('tp_user');
-            if ($this->_mode == BunnyPHP::MODE_API) {
+            if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
                 $user = (new UserModel())->getUserByUid($tp_user['uid']);
                 $f_user = (new UserModel())->getUserByUsername($_POST['username']);
                 $result = (new FriendModel())->addFriend($user['uid'], $f_user['uid'], $user['username'], $f_user['username'], $user['nickname'], $f_user['nickname']);
@@ -63,7 +66,7 @@ class FriendController extends Controller
     {
         if (isset($_POST['username'])) {
             $tp_user = BunnyPHP::app()->get('tp_user');
-            if ($this->_mode == BunnyPHP::MODE_API) {
+            if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
                 $user = (new UserModel())->getUserByUid($tp_user['uid']);
                 $f_user = (new UserModel())->getUserByUsername($_POST['username']);
                 $result = (new FriendModel())->acceptFriend($user['uid'], $f_user['uid'], $user['username'], $f_user['username']);

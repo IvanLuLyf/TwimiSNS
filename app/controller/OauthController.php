@@ -1,11 +1,15 @@
 <?php
+
+use BunnyPHP\BunnyPHP;
+use BunnyPHP\Config;
+use BunnyPHP\Controller;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/7/30
  * Time: 16:27
  */
-
 class OauthController extends Controller
 {
     function ac_connect(array $path, $referer)
@@ -40,7 +44,6 @@ class OauthController extends Controller
     {
         if (count($path) < 1) $path = [''];
         list($type) = $path;
-        $uid = null;
         $bind_model = new BindModel();
         if (isset($_GET['code'])) {
             $bind = (new OauthService($this))->oauth($type);
@@ -115,7 +118,7 @@ class OauthController extends Controller
             }
         } else {
             $this->assignAll($result);
-            $this->assign('oauth', ['type' => $type, 'nickname' => isset($_POST['nickname']) ? $_POST['nickname'] : ''])
+            $this->assign('oauth', ['type' => $type, 'nickname' => $_POST['nickname'] ?? ''])
                 ->render('oauth/connect.html');
         }
     }

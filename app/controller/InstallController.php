@@ -1,11 +1,15 @@
 <?php
+
+use BunnyPHP\Config;
+use BunnyPHP\Controller;
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/9/28
  * Time: 17:12
  */
-
 class InstallController extends Controller
 {
     public function ac_index()

@@ -1,5 +1,8 @@
 <?php
 
+use BunnyPHP\BunnyPHP;
+use BunnyPHP\Controller;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
@@ -13,7 +16,7 @@ class FeedController extends Controller
      */
     public function ac_send()
     {
-        if ($this->_mode == BunnyPHP::MODE_API) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             if (isset($_POST['content'])) {
                 $imageCount = 0;
                 if (isset($_FILES['images'])) {
@@ -54,7 +57,7 @@ class FeedController extends Controller
      */
     public function ac_view(int $tid = 0, int $page = 1)
     {
-        if ($this->_mode == BunnyPHP::MODE_API) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             $tp_user = BunnyPHP::app()->get('tp_user');
             $this->assignAll(['ret' => 0, 'status' => 'ok', 'page' => $page]);
             if ($tid == 0) {
@@ -86,10 +89,10 @@ class FeedController extends Controller
      * @param string $username path(0)
      * @param int $page path(1)
      */
-    public function ac_list($username = '', $page = 1)
+    public function ac_list(string $username = '', int $page = 1)
     {
         $user = (new UserModel())->getUserByUsername($username);
-        if ($this->_mode == BunnyPHP::MODE_API) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             if ($user['uid'] != null) {
                 $feeds = (new FeedModel())->userFeed($username, $page);
                 foreach ($feeds as &$feed) {
@@ -110,9 +113,9 @@ class FeedController extends Controller
      * @filter auth canFeed
      * @param int $tid path(0)
      */
-    public function ac_comment($tid = 0)
+    public function ac_comment(int $tid = 0)
     {
-        if ($this->_mode == BunnyPHP::MODE_API) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             if (isset($_POST['content'])) {
                 if ($feed = (new FeedModel())->getFeed($tid)) {
                     $tp_user = BunnyPHP::app()->get('tp_user');
@@ -134,8 +137,8 @@ class FeedController extends Controller
      */
     function ac_like()
     {
-        $tid = isset($_REQUEST['tid']) ? $_REQUEST['tid'] : 0;
-        if ($this->_mode == BunnyPHP::MODE_API) {
+        $tid = $_REQUEST['tid'] ?? 0;
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             $feedModel = new FeedModel();
             if ($feed = $feedModel->getFeed($tid)) {
                 $tp_user = BunnyPHP::app()->get('tp_user');
@@ -159,8 +162,8 @@ class FeedController extends Controller
      */
     function ac_delete()
     {
-        $tid = isset($_REQUEST['tid']) ? $_REQUEST['tid'] : 0;
-        if ($this->_mode == BunnyPHP::MODE_API) {
+        $tid = $_REQUEST['tid'] ?? 0;
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             $feedModel = new FeedModel();
             if ($feed = $feedModel->getFeed($tid)) {
                 $tp_user = BunnyPHP::app()->get('tp_user');

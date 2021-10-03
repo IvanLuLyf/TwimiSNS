@@ -1,11 +1,16 @@
 <?php
+
+use BunnyPHP\BunnyPHP;
+use BunnyPHP\Config;
+use BunnyPHP\Controller;
+use BunnyPHP\View;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/7/28
  * Time: 18:43
  */
-
 class UserController extends Controller
 {
     /**
@@ -18,7 +23,7 @@ class UserController extends Controller
             BunnyPHP::getRequest()->setSession('referer', $referer);
             $this->assign('referer', $referer);
         }
-        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             $oauth = [];
             if (Config::check("oauth")) {
                 $oauth = Config::load('oauth')->get('enabled', []);
@@ -36,11 +41,11 @@ class UserController extends Controller
     public function ac_login_post($referer)
     {
         $result = (new UserModel())->login($_POST['username'], $_POST['password']);
-        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             if ($result['ret'] == 0) {
                 BunnyPHP::getRequest()->setSession('token', $result['token']);
                 $refererUrl = BunnyPHP::getRequest()->delSession('referer');
-                $refererUrl = $referer ? $referer : $refererUrl;
+                $refererUrl = $referer ?: $refererUrl;
                 if ($refererUrl) {
                     $this->redirect($refererUrl);
                 } else {
@@ -54,7 +59,7 @@ class UserController extends Controller
                 }
                 $this->assign('oauth', $oauth)->render('user/login.html');
             }
-        } elseif ($this->_mode == BunnyPHP::MODE_API) {
+        } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             if ($result['ret'] == 0) {
                 $app = BunnyPHP::app()->get('tp_api');
                 $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id'], $app['type']);
@@ -94,7 +99,7 @@ class UserController extends Controller
     {
         if (Config::load('config')->get('allow_reg')) {
             $result = (new UserModel())->register($_POST['username'], $_POST['password'], $_POST['email'], $_POST['nickname']);
-            if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+            if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
                 if ($result['ret'] == 0) {
                     $service = new EmailService();
                     $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
@@ -109,7 +114,7 @@ class UserController extends Controller
                 } else {
                     $this->assignAll($result)->render('user/register.html');
                 }
-            } elseif ($this->_mode == BunnyPHP::MODE_API) {
+            } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
                 if ($result['ret'] == 0) {
                     $service = new EmailService();
                     $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
@@ -229,7 +234,7 @@ class UserController extends Controller
             }
             $this->assignAll($response);
         }
-        if ($this->_mode == BunnyPHP::MODE_NORMAL) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             $this->redirect('setting', 'avatar');
         } else {
             $this->render('setting/avatar.html');
@@ -241,9 +246,9 @@ class UserController extends Controller
      */
     public function ac_info()
     {
-        if ($this->_mode == BunnyPHP::MODE_API) {
-            $username = isset($_REQUEST['username']) ? $_REQUEST['username'] : '';
-            $id_code = isset($_REQUEST['id_code']) ? $_REQUEST['id_code'] : '';
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
+            $username = $_REQUEST['username'] ?? '';
+            $id_code = $_REQUEST['id_code'] ?? '';
             if ($username == '' && $id_code == '') {
                 $tp_user = BunnyPHP::app()->get('tp_user');
                 $this->assignAll(['ret' => 0, 'status' => 'ok']);
@@ -283,8 +288,8 @@ class UserController extends Controller
     public function ac_detail(array $path, UserService $userService)
     {
         if (count($path) == 0) $path = ['', ''];
-        $username = isset($_GET['username']) ? $_GET['username'] : $path[0];
-        $tab = isset($_GET['tab']) ? $_GET['tab'] : (isset($path[1]) ? $path[1] : 'post');
+        $username = $_GET['username'] ?? $path[0];
+        $tab = $_GET['tab'] ?? ($path[1] ?? 'post');
 
         $tp_user = $userService->getLoginUser();
         if ($username == '') {

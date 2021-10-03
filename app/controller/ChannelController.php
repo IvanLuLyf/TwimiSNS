@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Controller;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/5/1
  * Time: 19:33
  */
-
 class ChannelController extends Controller
 {
     /**
