@@ -5,16 +5,15 @@
  * Date: 2018/8/4
  * Time: 22:12
  */
-
-
 require_once APP_PATH . "library/AliOSS/autoload.php";
 
+use BunnyPHP\Storage;
 use OSS\OssClient;
 use OSS\Core\OssException;
 
 class AliStorage implements Storage
 {
-    protected $ossClient;
+    protected OssClient $ossClient;
     protected $accessKeyId;
     protected $accessKeySecret;
     protected $endpoint;
@@ -31,15 +30,14 @@ class AliStorage implements Storage
 
         try {
             $this->ossClient = new OssClient($this->accessKeyId, $this->accessKeySecret, $this->endpoint);
-        } catch (\OSS\Core\OssException $e) {
+        } catch (OssException $e) {
             exit($e->getMessage());
         }
     }
 
     public function read($filename)
     {
-        $content = $this->ossClient->getObject($this->bucket, $filename);
-        return $content;
+        return $this->ossClient->getObject($this->bucket, $filename);
     }
 
     public function write($filename, $content)
@@ -47,7 +45,7 @@ class AliStorage implements Storage
         $this->ossClient->putObject($this->bucket, $filename, $content);
     }
 
-    public function upload($filename, $path)
+    public function upload(string $filename, string $path): string
     {
         try {
             $this->ossClient->uploadFile($this->bucket, $filename, $path);
