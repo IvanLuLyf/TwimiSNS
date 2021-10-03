@@ -100,8 +100,8 @@ class Mailer
     private function connectMX($address)
     {
         $domain = preg_replace("/^.+@([^@]+)$/", "\1", $address);
-        if (!@getmxrr($domain, $MXHOSTS)) return false;
-        foreach ($MXHOSTS as $host) {
+        if (!@getmxrr($domain, $MX_HOSTS)) return false;
+        foreach ($MX_HOSTS as $host) {
             $this->sock = @fsockopen($host, $this->port, $errno, $errstr, $this->time_out);
             if (!($this->sock && $this->sendOk())) {
                 continue;
