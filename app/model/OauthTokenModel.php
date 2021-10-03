@@ -1,5 +1,7 @@
 <?php
 
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
@@ -27,7 +29,7 @@ class OauthTokenModel extends Model
         }
     }
 
-    public function get($uid, $clientId, $appType)
+    public function get($uid, $clientId, $appType): array
     {
         $timestamp = time();
         if (intval($appType) == 1 || intval($appType) == 2) {
@@ -58,7 +60,7 @@ class OauthTokenModel extends Model
         return $response;
     }
 
-    public function refresh($accessToken, $clientId, $refreshToken)
+    public function refresh($accessToken, $clientId, $refreshToken): ?array
     {
         $tokenRow = $this->where(["client_id = ? and token = ?"], [$clientId, $accessToken])->fetch();
         $token_id = $tokenRow['id'];

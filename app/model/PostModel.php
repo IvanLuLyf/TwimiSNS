@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/2/13
  * Time: 15:51
  */
-
 class PostModel extends Model
 {
     protected $_column = [
@@ -30,7 +32,7 @@ class PostModel extends Model
         return $this->fetch("count(*) num")['num'];
     }
 
-    public function search($word, $page = 1, $size = 20)
+    public function search($word, $page = 1, $size = 20): array
     {
         $like_word = '%' . $word . '%';
         $posts = $this->join(UserModel::class, ['username'], ['nickname'])
@@ -48,7 +50,7 @@ class PostModel extends Model
 
     public function getPostByUsername($username)
     {
-        return $this->where("username=:un", ['un' => $username])->order(['tid desc'])->fetchAll();
+        return $this->where('username=:un', ['un' => $username])->order(['tid desc'])->fetchAll();
     }
 
     public function sendPost($user, $title, $content)

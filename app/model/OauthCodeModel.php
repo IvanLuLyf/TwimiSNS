@@ -1,5 +1,7 @@
 <?php
 
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
@@ -18,7 +20,7 @@ class OauthCodeModel extends Model
     protected $_pk = ['id'];
     protected $_ai = 'id';
 
-    public function getCode($clientId, $appId, $uid, $timestamp)
+    public function getCode($clientId, $appId, $uid, $timestamp): string
     {
         $code = md5($uid . $clientId . $timestamp);
         $this->add(['uid' => $uid, 'appid' => $appId, 'code' => $code, 'expire' => ($timestamp + 604800)]);

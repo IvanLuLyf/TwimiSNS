@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/7/29
  * Time: 1:27
  */
-
 class UserModel extends Model
 {
     protected $_column = [
@@ -44,7 +46,7 @@ class UserModel extends Model
         return $this->where("uid = :u", ['u' => $uid])->update(['password' => md5($password)]);
     }
 
-    public function login(string $username, string $password)
+    public function login(string $username, string $password): array
     {
         $user = $this->where("username = :u or email = :e", ['u' => $username, 'e' => $username])->fetch();
         if ($user != null) {
@@ -68,7 +70,7 @@ class UserModel extends Model
         return $response;
     }
 
-    public function register($username, $password, $email, $nickname = '')
+    public function register($username, $password, $email, $nickname = ''): array
     {
         if (isset($password) && isset($email)) {
             if (preg_match('/^[A-Za-z0-9_]+$/u', $username) && strlen($username) >= 4) {
@@ -98,37 +100,34 @@ class UserModel extends Model
 
     public function check($token)
     {
-        $user = $this->where(["token = ? and expire> ?"], [$token, time()])->fetch();
-        return $user;
+        return $this->where('token = ? and expire> ?', [$token, time()])->fetch();
     }
 
-    public function getUserByUid($uid)
+    public function getUserByUid($uid): array
     {
-        $user = $this->where("uid = ?", [$uid])->fetch();
-        $response = [
+        $user = $this->where('uid = ?', [$uid])->fetch();
+        return [
             'uid' => $uid,
             'username' => $user['username'],
             'email' => $user['email'],
             'nickname' => $user['nickname']
         ];
-        return $response;
     }
 
-    public function getUserByUsername($username)
+    public function getUserByUsername($username): array
     {
-        $user = $this->where("username = ?", [$username])->fetch();
-        $response = [
+        $user = $this->where('username = ?', [$username])->fetch();
+        return [
             'uid' => $user['uid'],
             'username' => $user['username'],
             'email' => $user['email'],
             'nickname' => $user['nickname']
         ];
-        return $response;
     }
 
     public function getTokenByUid($uid)
     {
-        if ($user = $this->where("uid = ?", [$uid])->fetch()) {
+        if ($user = $this->where('uid = ?', [$uid])->fetch()) {
             return $user['token'];
         } else {
             return null;

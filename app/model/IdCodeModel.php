@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/3/8
  * Time: 20:17
  */
-
 class IdCodeModel extends Model
 {
     protected $_column = [

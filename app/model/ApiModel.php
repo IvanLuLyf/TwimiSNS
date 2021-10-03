@@ -1,5 +1,7 @@
 <?php
 
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
@@ -23,7 +25,7 @@ class ApiModel extends Model
     protected $_pk = ['id'];
     protected $_ai = 'id';
 
-    public function check($clientId)
+    public function check($clientId): ?array
     {
         if ($row = $this->where(["client_id = ?"], [$clientId])->fetch()) {
             return [

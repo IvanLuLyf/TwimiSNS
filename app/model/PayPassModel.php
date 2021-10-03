@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/3/2
  * Time: 18:19
  */
-
 class PayPassModel extends Model
 {
     protected $_column = [

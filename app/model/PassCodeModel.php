@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/2/28
  * Time: 22:34
  */
-
 class PassCodeModel extends Model
 {
     protected $_column = [

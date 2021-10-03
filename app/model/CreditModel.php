@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/3/2
  * Time: 15:07
  */
-
 class CreditModel extends Model
 {
     protected $_column = [
@@ -14,7 +16,7 @@ class CreditModel extends Model
     ];
     protected $_pk = ['uid'];
 
-    public function transfer($from_uid, $to_uid, $credit)
+    public function transfer($from_uid, $to_uid, $credit): bool
     {
         $from_credit = $this->where(["uid = :u"], ['u' => $from_uid])->fetch();
         $to_credit = $this->where(["uid = :u"], ['u' => $to_uid])->fetch();
@@ -34,7 +36,7 @@ class CreditModel extends Model
         }
     }
 
-    public function cut($uid, $credit)
+    public function cut($uid, $credit): bool
     {
         $from_credit = $this->where(["uid = :u"], ['u' => $uid])->fetch();
         if ($from_credit != null) {
@@ -50,7 +52,7 @@ class CreditModel extends Model
         }
     }
 
-    public function start($uid)
+    public function start($uid): int
     {
         if ($this->where(['uid=:u'], ['u' => $uid])->fetch()) {
             return -1;

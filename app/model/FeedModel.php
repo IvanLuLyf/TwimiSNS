@@ -1,5 +1,7 @@
 <?php
 
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu

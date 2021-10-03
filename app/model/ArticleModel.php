@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/2/13
  * Time: 15:51
  */
-
 class ArticleModel extends Model
 {
     protected $_column = [

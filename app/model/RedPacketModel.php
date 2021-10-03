@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/3/28
  * Time: 14:38
  */
-
 class RedPacketModel extends Model
 {
     protected $_column = [

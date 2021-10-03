@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/3/15
  * Time: 16:45
  */
-
 class DataModel extends Model
 {
     protected $_column = [

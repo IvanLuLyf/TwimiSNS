@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/10/13
  * Time: 17:30
  */
-
 class AvatarModel extends Model
 {
     protected $_column = [

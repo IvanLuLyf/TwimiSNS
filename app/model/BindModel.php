@@ -1,11 +1,13 @@
 <?php
+
+use BunnyPHP\Model;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/3/1
  * Time: 19:08
  */
-
 class BindModel extends Model
 {
     protected $_column = [
