@@ -1,18 +1,21 @@
 <?php
+
+use BunnyPHP\BunnyPHP;
+use BunnyPHP\Filter;
+
 /**
  * Created by PhpStorm.
  * User: IvanLu
  * Date: 2019/3/1
  * Time: 15:45
  */
-
 class CsrfFilter extends Filter
 {
-    public function doFilter($fa = [])
+    public function doFilter($param = []): int
     {
-        if ($this->_mode == BunnyPHP::MODE_NORMAL || $this->_mode == BunnyPHP::MODE_AJAX) {
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL || BUNNY_APP_MODE == BunnyPHP::MODE_AJAX) {
             $csrf_token = BunnyPHP::getRequest()->getSession('csrf_token');
-            if (in_array('check', $fa)) {
+            if (in_array('check', $param)) {
                 if ($csrf_token && !empty($_POST['csrf_token']) && $_POST['csrf_token'] == $csrf_token) {
                     unset($_SESSION['csrf_token']);
                 } else {
