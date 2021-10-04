@@ -1,11 +1,11 @@
 <html lang="zh-cn">
 <head>
     <title>频道 - <?= constant("TP_SITE_NAME") ?></title>
-    <?php include "template/common/header.html"; ?>
+    <?php include APP_PATH . 'template/common/header.php'; ?>
     <link href="/static/css/article.css" rel="stylesheet">
 </head>
 <body>
-<?php include "template/common/navbar.html"; ?>
+<?php include APP_PATH . 'template/common/navbar.php'; ?>
 <div class="container">
     <div class="row">
         <div class="col-lg-9">
@@ -23,7 +23,7 @@
                         <div class="media">
                             <img class="rounded-circle"
                                  src="<?= $channel['avatar'] ?>"
-                                 width="48px"/>
+                                 width="48px" alt="avatar"/>
                             <div class="media-body ml-3">
                                 <div>
 								<span class="username">
@@ -45,6 +45,6 @@
         </div>
     </div>
 </div>
-<?php include "template/common/footer.html"; ?>
+<?php include APP_PATH . 'template/common/footer.php'; ?>
 </body>
 </html>
