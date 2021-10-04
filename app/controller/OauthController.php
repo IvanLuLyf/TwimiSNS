@@ -67,7 +67,7 @@ class OauthController extends Controller
                     if (Config::load('config')->get('allow_reg')) {
                         $this->assign('allow_reg', true);
                     }
-                    $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])->render('oauth/connect.html');
+                    $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])->render('oauth/connect.php');
                 }
             }
         }
@@ -119,7 +119,7 @@ class OauthController extends Controller
         } else {
             $this->assignAll($result);
             $this->assign('oauth', ['type' => $type, 'nickname' => $_POST['nickname'] ?? ''])
-                ->render('oauth/connect.html');
+                ->render('oauth/connect.php');
         }
     }
 
@@ -138,12 +138,12 @@ class OauthController extends Controller
                     ->assign('client_name', $app['name'])
                     ->assign('client_icon', $app['icon'])
                     ->assign('redirect_uri', $_REQUEST['redirect_uri']);
-                $this->render('oauth/login.html');
+                $this->render('oauth/login.php');
             } else {
-                $this->assignAll(['tp_error_msg' => '非法的应用网址', 'tp_hide' => true])->render('oauth/login.html');
+                $this->assignAll(['tp_error_msg' => '非法的应用网址', 'tp_hide' => true])->render('oauth/login.php');
             }
         } else {
-            $this->assignAll(['tp_error_msg' => '非法的Client ID', 'tp_hide' => true])->render('oauth/login.html');
+            $this->assignAll(['tp_error_msg' => '非法的Client ID', 'tp_hide' => true])->render('oauth/login.php');
         }
     }
 
@@ -174,15 +174,15 @@ class OauthController extends Controller
                             else
                                 $this->redirect("$url?code=$code");
                         } else {
-                            $this->assignAll($result)->render('oauth/login.html');
+                            $this->assignAll($result)->render('oauth/login.php');
                         }
                     }
                 }
             } else {
-                $this->assignAll(['tp_error_msg' => '非法的应用网址', 'tp_hide' => true])->render('oauth/login.html');
+                $this->assignAll(['tp_error_msg' => '非法的应用网址', 'tp_hide' => true])->render('oauth/login.php');
             }
         } else {
-            $this->assignAll(['tp_error_msg' => '非法的Client ID', 'tp_hide' => true])->render('oauth/login.html');
+            $this->assignAll(['tp_error_msg' => '非法的Client ID', 'tp_hide' => true])->render('oauth/login.php');
         }
     }
 
@@ -196,7 +196,7 @@ class OauthController extends Controller
                 $token_row = (new OauthTokenModel())->get($uid, $app_key, $app['type']);
                 $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($token_row);
                 $oauthCodeModel->deleteCode($app_id, $_REQUEST['code']);
-                $this->render('common/error.html');
+                $this->render('common/error.php');
             } else {
                 $this->assignAll(['ret' => 2004, 'status' => 'invalid oauth code'])->error();
             }
