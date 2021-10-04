@@ -1,10 +1,10 @@
-<html lang="zh-cn">
+<html lang="zh">
 <head>
-    <title><?=constant("TP_SITE_NAME")?></title>
-    <?php include "template/common/header.html"; ?>
+    <title><?= constant("TP_SITE_NAME") ?></title>
+    <?php include APP_PATH . 'template/common/header.php'; ?>
 </head>
 <body>
-<?php include "template/common/navbar.html"; ?>
+<?php include APP_PATH . 'template/common/navbar.php'; ?>
 <div class="container">
     <div class="row">
         <div class="col-lg-7">
@@ -12,15 +12,15 @@
                 <div class="card-body">
                     <h3 class="card-title">重设密码</h3>
                     <?php if (isset($tp_error_msg)): ?>
-                    <div id="err_alert" class="alert alert-danger login-alert">
-                        <a href="#" class="close" data-dismiss="alert">&times;</a>
-                        <strong>提示信息:</strong><?=$tp_error_msg; ?>
-                    </div>
+                        <div id="err_alert" class="alert alert-danger login-alert">
+                            <a href="#" class="close" data-dismiss="alert">&times;</a>
+                            <strong>提示信息:</strong><?= $tp_error_msg; ?>
+                        </div>
                     <?php endif; ?>
                     <form class="form-horizontal" role="form" action="/user/reset"
                           method="post">
-                        <input type="hidden" name="csrf_token" value="<?=$csrf_token?>"/>
-                        <input type="hidden" name="code" value="<?=$code?>"/>
+                        <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>"/>
+                        <input type="hidden" name="code" value="<?= $code ?>"/>
                         <div class="form-group">
                             <label for="password">密码</label>
                             <input type="password" class="form-control" id="password" name="password"
@@ -40,6 +40,6 @@
         </div>
     </div>
 </div>
-<?php include "template/common/footer.html"; ?>
+<?php include APP_PATH . 'template/common/footer.php'; ?>
 </body>
 </html>

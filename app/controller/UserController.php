@@ -6,7 +6,6 @@ use BunnyPHP\Controller;
 use BunnyPHP\View;
 
 /**
- * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/7/28
  * Time: 18:43
@@ -30,7 +29,7 @@ class UserController extends Controller
             }
             $this->assign('oauth', $oauth);
         }
-        $this->render("user/login.html");
+        $this->render("user/login.php");
     }
 
     /**
@@ -57,7 +56,7 @@ class UserController extends Controller
                 if (Config::check("oauth")) {
                     $oauth = Config::load('oauth')->get('enabled', []);
                 }
-                $this->assign('oauth', $oauth)->render('user/login.html');
+                $this->assign('oauth', $oauth)->render('user/login.php');
             }
         } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             if ($result['ret'] == 0) {
@@ -84,7 +83,7 @@ class UserController extends Controller
                 BunnyPHP::getRequest()->setSession('referer', $referer);
                 $this->assign('referer', $referer);
             }
-            $this->render("user/register.html");
+            $this->render("user/register.php");
         } else {
             $this->assignAll(['ret' => 1005, 'status' => 'registration is not allowed', 'tp_error_msg' => '站点关闭注册'])->error();
         }
@@ -102,7 +101,7 @@ class UserController extends Controller
             if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
                 if ($result['ret'] == 0) {
                     $service = new EmailService();
-                    $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
+                    $service->sendMail('email/reg.php', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
                     BunnyPHP::getRequest()->setSession('token', $result['token']);
                     $refererUrl = BunnyPHP::getRequest()->delSession('referer');
                     $refererUrl = $referer ? $referer : $refererUrl;
@@ -112,12 +111,12 @@ class UserController extends Controller
                         $this->redirect('index', 'index');
                     }
                 } else {
-                    $this->assignAll($result)->render('user/register.html');
+                    $this->assignAll($result)->render('user/register.php');
                 }
             } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
                 if ($result['ret'] == 0) {
                     $service = new EmailService();
-                    $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
+                    $service->sendMail('email/reg.php', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
                     $app = BunnyPHP::app()->get('tp_api');
                     $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id'], $app['type']);
                     $result['token'] = $appToken['token'];
@@ -138,7 +137,7 @@ class UserController extends Controller
      */
     public function ac_forgot_get()
     {
-        $this->render('user/forgot.html');
+        $this->render('user/forgot.php');
     }
 
     /**
@@ -152,12 +151,12 @@ class UserController extends Controller
                 $service = new EmailService();
                 $code = (new PassCodeModel())->getCode($user['uid']);
                 $service->sendMail('email/forgot.html', ['nickname' => $user['nickname'], 'site' => TP_SITE_NAME, 'url' => TP_SITE_URL, 'code' => $code], $user['email'], '找回密码');
-                $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "邮件已发送"])->render('common/error.html');
+                $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "邮件已发送"])->render('common/error.php');
             } else {
-                $this->assignAll(['ret' => 1002, 'status' => "user does not exist", 'tp_error_msg' => '用户名不存在'])->render('user/forgot.html');
+                $this->assignAll(['ret' => 1002, 'status' => "user does not exist", 'tp_error_msg' => '用户名不存在'])->render('user/forgot.php');
             }
         } else {
-            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->render('user/forgot.html');
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->render('user/forgot.php');
         }
     }
 
@@ -167,7 +166,7 @@ class UserController extends Controller
     public function ac_reset_get()
     {
         if (isset($_REQUEST['code'])) {
-            $this->assign('code', $_REQUEST['code'])->render('user/reset.html');
+            $this->assign('code', $_REQUEST['code'])->render('user/reset.php');
         } else {
             $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->error();
         }
@@ -183,7 +182,7 @@ class UserController extends Controller
             $uid = (new PassCodeModel())->checkCode($_POST['code']);
             if ($uid != null) {
                 (new UserModel())->reset($uid, $_POST['password']);
-                $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "密码修改完成"])->render('common/error.html');
+                $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "密码修改完成"])->render('common/error.php');
             } else {
                 $this->assignAll(['ret' => 1008, 'status' => 'invalid verification code', 'tp_error_msg' => '验证码已过期'])->error();
             }
@@ -237,7 +236,7 @@ class UserController extends Controller
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             $this->redirect('setting', 'avatar');
         } else {
-            $this->render('setting/avatar.html');
+            $this->render('setting/avatar.php');
         }
     }
 
@@ -272,7 +271,7 @@ class UserController extends Controller
                 }
             }
         }
-        $this->render('user/info.html');
+        $this->render('user/info.php');
     }
 
     /**
@@ -311,6 +310,6 @@ class UserController extends Controller
         $this->assign('tab', $tab);
         $this->assign('user', $user);
         $this->assign('user_info', $user_info);
-        $this->render('user/detail.html');
+        $this->render('user/detail.php');
     }
 }
