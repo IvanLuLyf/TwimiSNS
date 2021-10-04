@@ -17,6 +17,6 @@ class ChannelController extends Controller
     {
         $channel = (new ChannelModel())->getChannelByName($name);
         $articles = (new ArticleModel())->getArticlesByChannel($channel['cid']);
-        $this->assignAll(['ret' => 0, 'status' => 'ok', 'channel' => $channel, 'articles' => $articles])->render('channel/channel.html');
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'channel' => $channel, 'articles' => $articles])->render('channel/channel.php');
     }
 }
