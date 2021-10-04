@@ -2,7 +2,7 @@
 <html lang="zh-cn">
 <head>
     <title>安装TwimiSNS</title>
-    <?php include "template/common/header.html"; ?>
+    <?php include APP_PATH . 'template/common/header.html'; ?>
 </head>
 <body>
 <div class="container">
@@ -19,7 +19,8 @@
                 </div>
                 <div class="form-group">
                     <label for="site_url">站点地址</label>
-                    <input type="text" name="site_url" class="form-control" id="site_url" placeholder="站点名称" value="<?=$_SERVER['HTTP_HOST']?>" required>
+                    <input type="text" name="site_url" class="form-control" id="site_url" placeholder="站点名称"
+                           value="<?= $_SERVER['HTTP_HOST'] ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="username">管理员用户名</label>
@@ -39,7 +40,8 @@
                 </div>
                 <div class="form-group">
                     <div class="form-check">
-                        <input name="allow_reg" class="form-check-input" type="checkbox" id="allow_reg" value="" checked>
+                        <input name="allow_reg" class="form-check-input" type="checkbox" id="allow_reg" value=""
+                               checked>
                         <label class="form-check-label" for="allow_reg">
                             允许注册
                         </label>

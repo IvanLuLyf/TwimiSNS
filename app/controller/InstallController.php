@@ -5,7 +5,6 @@ use BunnyPHP\Controller;
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/9/28
  * Time: 17:12
@@ -16,9 +15,9 @@ class InstallController extends Controller
     {
         if (Config::checkLock('install')) {
             $this->assign('err_msg', '检测到./config/install.lock请先删除后安装本程序');
-            $this->render('install/error.html');
+            $this->render('install/error.php');
         } else {
-            $this->render('install/index.html');
+            $this->render('install/index.php');
         }
     }
 
@@ -26,9 +25,9 @@ class InstallController extends Controller
     {
         if (Config::checkLock('install')) {
             $this->assign('err_msg', '检测到./config/install.lock请先删除后安装本程序');
-            $this->render('install/error.html');
+            $this->render('install/error.php');
         } else {
-            $this->render('install/step1.html');
+            $this->render('install/step1.php');
         }
     }
 
@@ -36,7 +35,7 @@ class InstallController extends Controller
     {
         if (Config::checkLock('install')) {
             $this->assign('err_msg', '检测到./config/install.lock请先删除后安装本程序');
-            $this->render('install/error.html');
+            $this->render('install/error.php');
         } else {
             if ($db_type == 'mysql') {
                 $dsn = "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4";
@@ -60,14 +59,14 @@ class InstallController extends Controller
                         'prefix' => $db_prefix,
                     ];
                     $_SESSION['db_info'] = $db_info;
-                    $this->render('install/step2.html');
+                    $this->render('install/step2.php');
                 } else {
                     $this->assign('err_msg', '无法连接数据库请检查配置');
-                    $this->render('install/error.html');
+                    $this->render('install/error.php');
                 }
             } catch (Exception $e) {
                 $this->assign('err_msg', '无法连接数据库请检查配置');
-                $this->render('install/error.html');
+                $this->render('install/error.php');
             }
         }
     }
@@ -76,7 +75,7 @@ class InstallController extends Controller
     {
         if (Config::checkLock('install')) {
             $this->assign('err_msg', '检测到./config/install.lock请先删除后安装本程序');
-            $this->render('install/error.html');
+            $this->render('install/error.php');
         } else {
             session_start();
             $db_info = $_SESSION['db_info'];
@@ -114,7 +113,7 @@ class InstallController extends Controller
 
             $lock_file = fopen(APP_PATH . "config/install.lock", "w") or die("Unable to open file!");
             fclose($lock_file);
-            $this->render('install/success.html');
+            $this->render('install/success.php');
         }
     }
 }

@@ -2,7 +2,7 @@
 <html lang="zh-cn">
 <head>
     <title>安装TwimiSNS</title>
-    <?php include "template/common/header.html"; ?>
+    <?php include APP_PATH . 'template/common/header.html'; ?>
 </head>
 <body>
 <div class="container">
