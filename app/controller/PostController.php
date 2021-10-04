@@ -11,6 +11,12 @@ use BunnyPHP\Controller;
  */
 class PostController extends Controller
 {
+    private PostModel $postModel;
+
+    public function __construct(PostModel $postModel)
+    {
+        $this->postModel = $postModel;
+    }
 
     public function ac_index()
     {
@@ -33,7 +39,7 @@ class PostController extends Controller
     public function ac_create_post()
     {
         if (isset($_POST['title']) && isset($_POST['content'])) {
-            $tid = (new PostModel())->sendPost(BunnyPHP::app()->get('tp_user'), $_POST['title'], $_POST['content']);
+            $tid = $this->postModel->sendPost(BunnyPHP::app()->get('tp_user'), $_POST['title'], $_POST['content']);
             if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
                 $this->redirect('post', 'view', ['tid' => $tid]);
             } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
@@ -44,10 +50,13 @@ class PostController extends Controller
         }
     }
 
-    public function ac_view(array $path, UserService $userService)
+    /**
+     * @param UserService $userService
+     * @param int $tid path(0,0)
+     */
+    public function ac_view(UserService $userService, int $tid = 0)
     {
-        $tid = isset($_REQUEST['tid']) ? $_REQUEST['tid'] : (isset($path[0]) ? $path[0] : 0);
-        $post = (new PostModel())->getPostById($tid);
+        $post = $this->postModel->getPostById($tid);
         $tp_user = $userService->getLoginUser();
         $showState = 0;
         if ($post != null) {
@@ -72,33 +81,28 @@ class PostController extends Controller
                 $html_content = $parser->makeHtml($post['content']);
                 $this->assign("html_content", $html_content);
                 $oauth = [];
-                if (Config::check("oauth")) {
+                if (Config::check('oauth')) {
                     $oauth = Config::load('oauth')->get('enabled', []);
                 }
                 $this->assign('oauth', $oauth);
             }
-            $this->assign("post", $post)->assign('comments', $comments)
+            $this->assign('post', $post)
+                ->assign('comments', $comments)
                 ->render('post/view.php');
         } else {
             $this->assignAll(['ret' => 3001, 'status' => 'invalid tid', 'tp_error_msg' => '帖子不存在'])->error();
         }
     }
 
-    function ac_list(array $path, UserService $userService)
+    /**
+     * @param UserService $userService
+     * @param int $page path(0,1)
+     */
+    function ac_list(UserService $userService, int $page = 1)
     {
-        $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : (isset($path[0]) ? $path[0] : 1);
-        $cache = BunnyPHP::getCache();
         $tp_user = $userService->getLoginUser();
-        if ($cache->has('post/list/' . $page)) {
-            $cacheData = unserialize($cache->get('post/list/' . $page));
-            $posts = $cacheData['posts'];
-            $total = $cacheData['total'];
-        } else {
-            $postModel = (new PostModel());
-            $posts = $postModel->getPostByPage($page);
-            $total = $postModel->getTotal();
-            $cache->set('post/list/' . $page, serialize(['posts' => $posts, 'total' => $total]));
-        }
+        $posts = $this->postModel->getPostByPage($page);
+        $total = $this->postModel->getTotal();
         foreach ($posts as &$post) {
             if ($post['extra'] != '') {
                 $extra = json_decode($post['extra'], true);
@@ -118,7 +122,9 @@ class PostController extends Controller
             $this->assign('tp_user', $tp_user)
                 ->assign('cur_ctr', 'post')->assign('end_page', $endPage);
         }
-        $this->assign('total', $total)->assign("page", $page)->assign("posts", $posts)
+        $this->assign('total', $total)
+            ->assign('page', $page)
+            ->assign('posts', $posts)
             ->render('post/list.php');
     }
 
@@ -128,7 +134,7 @@ class PostController extends Controller
      */
     function ac_comment(int $tid = 0)
     {
-        $post = (new PostModel())->getPostById($tid);
+        $post = $this->postModel->getPostById($tid);
         if ($post != null) {
             (new CommentModel())->sendComment($tid, 1, BunnyPHP::app()->get('tp_user'), $_POST['content']);
             if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
@@ -144,7 +150,7 @@ class PostController extends Controller
     function ac_search($word, UserService $userService, $page = 1, $limit = 20)
     {
         if ($word) {
-            $result = (new PostModel())->search($word, $page, $limit);
+            $result = $this->postModel->search($word, $page, $limit);
             $endPage = ceil($result['total'] / $limit);
         } else {
             $result = ['total' => 0, 'posts' => []];
@@ -153,7 +159,7 @@ class PostController extends Controller
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             $this->assignAll(['tp_user' => $userService->getLoginUser(), 'cur_ctr' => 'post', 'end_page' => $endPage]);
         }
-        $this->assignAll(['word' => $word, "page" => $page, 'total' => $result['total'], "posts" => $result['posts']])->render('post/search.php');
+        $this->assignAll(['word' => $word, 'page' => $page, 'total' => $result['total'], 'posts' => $result['posts']])->render('post/search.php');
     }
 
     /**
@@ -163,7 +169,7 @@ class PostController extends Controller
      */
     function ac_buy_get(int $tid = 0)
     {
-        $post = (new PostModel())->getPostById($tid);
+        $post = $this->postModel->getPostById($tid);
         $tp_user = BunnyPHP::app()->get('tp_user');
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             if ($post['extra'] != '') {
@@ -189,7 +195,7 @@ class PostController extends Controller
      */
     function ac_buy_post(int $tid = 0)
     {
-        $post = (new PostModel())->getPostById($tid);
+        $post = $this->postModel->getPostById($tid);
         $tp_user = BunnyPHP::app()->get('tp_user');
         if ($post['extra'] != '') {
             $extra = json_decode($post['extra'], true);
