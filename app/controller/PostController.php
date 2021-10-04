@@ -5,7 +5,6 @@ use BunnyPHP\Config;
 use BunnyPHP\Controller;
 
 /**
- * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/7/29
  * Time: 3:24
@@ -24,7 +23,7 @@ class PostController extends Controller
      */
     public function ac_create_get()
     {
-        $this->render('post/create.html');
+        $this->render('post/create.php');
     }
 
     /**
@@ -79,7 +78,7 @@ class PostController extends Controller
                 $this->assign('oauth', $oauth);
             }
             $this->assign("post", $post)->assign('comments', $comments)
-                ->render('post/view.html');
+                ->render('post/view.php');
         } else {
             $this->assignAll(['ret' => 3001, 'status' => 'invalid tid', 'tp_error_msg' => '帖子不存在'])->error();
         }
@@ -120,7 +119,7 @@ class PostController extends Controller
                 ->assign('cur_ctr', 'post')->assign('end_page', $endPage);
         }
         $this->assign('total', $total)->assign("page", $page)->assign("posts", $posts)
-            ->render('post/list.html');
+            ->render('post/list.php');
     }
 
     /**
@@ -154,7 +153,7 @@ class PostController extends Controller
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             $this->assignAll(['tp_user' => $userService->getLoginUser(), 'cur_ctr' => 'post', 'end_page' => $endPage]);
         }
-        $this->assignAll(['word' => $word, "page" => $page, 'total' => $result['total'], "posts" => $result['posts']])->render('post/search.html');
+        $this->assignAll(['word' => $word, "page" => $page, 'total' => $result['total'], "posts" => $result['posts']])->render('post/search.php');
     }
 
     /**
@@ -175,7 +174,7 @@ class PostController extends Controller
                         $this->redirect('pay', 'start');
                         return;
                     }
-                    $this->assignAll(['coin' => $extra['price'], 'balance' => $balance, 'tid' => $tid, 'title' => $post['title']])->render('post/buy.html');
+                    $this->assignAll(['coin' => $extra['price'], 'balance' => $balance, 'tid' => $tid, 'title' => $post['title']])->render('post/buy.php');
                 }
             } else {
                 $this->assignAll(['ret' => 5004, 'status' => 'no need to pay', 'tp_error_msg' => '帖子不需要支付'])->error();
@@ -198,7 +197,7 @@ class PostController extends Controller
                 $author = (new UserModel())->getUserByUsername($post['username']);
                 if ((new CreditModel())->transfer($tp_user['uid'], $author['uid'], doubleval($extra['price']))) {
                     (new PostPayModel())->pay($tp_user['uid'], $post['tid']);
-                    $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid])->render('post/buy.html');
+                    $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid])->render('post/buy.php');
                 } else {
                     $this->assignAll(['ret' => 5003, 'status' => 'insufficient balance', 'tp_error_msg' => '余额不足'])->error();
                 }
