@@ -5,7 +5,6 @@ use BunnyPHP\Config;
 use BunnyPHP\Controller;
 
 /**
- * Created by PhpStorm.
  * User: IvanLu
  * Date: 2018/10/13
  * Time: 1:29
@@ -22,7 +21,7 @@ class SettingController extends Controller
      */
     public function ac_avatar()
     {
-        $this->assign('cur_st', 'avatar')->render('setting/avatar.html');
+        $this->assign('cur_st', 'avatar')->render('setting/avatar.php');
     }
 
     /**
@@ -66,7 +65,7 @@ class SettingController extends Controller
             $this->assign("oauth_list", $oauth_enabled);
             $this->assign('cur_st', "oauth")
                 ->assign('oauth', ['type' => $type, 'name' => $name])
-                ->render('setting/oauth.html');
+                ->render('setting/oauth.php');
         } else {
             $this->assignAll(['ret' => 1007, 'status' => 'oauth is not enabled', 'tp_error_msg' => '站点未开启OAuth'])->error();
         }

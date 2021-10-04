@@ -1,12 +1,12 @@
-<html lang="zh-cn">
+<html lang="zh">
 <head>
-    <title>头像 - <?=constant("TP_SITE_NAME")?></title>
-    <?php include "template/common/header.html"; ?>
+    <title>头像 - <?= constant('TP_SITE_NAME') ?></title>
+    <?php include APP_PATH . 'template/common/header.php'; ?>
     <link href="https://cdn.bootcss.com/croppie/2.6.3/croppie.min.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/croppie/2.6.3/croppie.min.js"></script>
 </head>
 <body>
-<?php include "template/common/navbar.html"; ?>
+<?php include APP_PATH . 'template/common/navbar.php'; ?>
 <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -29,7 +29,7 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-3">
-            <?php include "template/setting/nav.html"; ?>
+            <?php include APP_PATH . 'template/setting/nav.php'; ?>
         </div>
         <div class="col-lg-9">
             <div class="card neo_card mt-4">
@@ -38,7 +38,7 @@
                         <div class="form-group">
                             <label>当前头像</label>
                             <img id="img_avatar" height="100px" width="100px" style="display: block;"
-                                 class="rounded-circle" src="/user/avatar/<?=$tp_user['uid']?>">
+                                 class="rounded-circle" src="/user/avatar/<?= $tp_user['uid'] ?>" alt="avatar">
                         </div>
                         <div id="avatar-container">
                             <div id="avatar_crop" class="" style="width:100%;display: none;max-height: 400px;">
@@ -66,7 +66,7 @@
         </div>
     </div>
 </div>
-<?php include "template/common/footer.html"; ?>
+<?php include APP_PATH . 'template/common/footer.php'; ?>
 <script>
     let cropper = null;
     let img_blob = null;
