@@ -20,7 +20,7 @@ class FriendController extends Controller
     /**
      * @filter auth canGetFriend
      */
-    function ac_list()
+    public function ac_list()
     {
         $state = $_REQUEST['state'] ?? 2;
         $tp_user = BunnyPHP::app()->get('tp_user');
@@ -31,7 +31,7 @@ class FriendController extends Controller
     /**
      * @filter auth canGetFriend
      */
-    function ac_note()
+    public function ac_note()
     {
         if (!isset($_POST['username']) || !isset($_POST['notename'])) {
             return ['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'];
@@ -43,7 +43,7 @@ class FriendController extends Controller
     /**
      * @filter auth canGetFriend
      */
-    function ac_add(UserModel $userModel)
+    public function ac_add(UserModel $userModel)
     {
         if (!isset($_POST['username'])) {
             return ['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'];
@@ -57,7 +57,7 @@ class FriendController extends Controller
     /**
      * @filter auth canGetFriend
      */
-    function ac_accept(UserModel $userModel)
+    public function ac_accept(UserModel $userModel)
     {
         if (!isset($_POST['username'])) {
             return ['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'];
