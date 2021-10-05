@@ -197,11 +197,13 @@ class UserController extends Controller
         $this->redirect('user', 'login');
     }
 
-    public function ac_avatar_get(array $path, $username)
+    /**
+     * @param string $uid path(0,0)
+     * @param string $username
+     */
+    public function ac_avatar_get(string $uid, string $username = '')
     {
-        if (count($path) == 0) $path = [0];
-        $uid = isset($_GET['uid']) ? $_GET['uid'] : $path[0];
-        $imgUrl = "/static/img/avatar.png";
+        $imgUrl = '/static/img/avatar.png';
         if ($username != null) {
             if ($uid = (new UserModel())->where(["username = :username"], ['username' => $username])->fetch()['uid']) {
                 $imgUrl = (new AvatarModel())->getAvatar($uid);
