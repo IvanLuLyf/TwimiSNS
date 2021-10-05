@@ -2,5 +2,7 @@
   "name": "TwimiSNS",
   "description": "A SNS Engine Powered By BunnyPHP",
   "repository": "https://github.com/IvanLuLyf/TwimiSNS",
-  "addons": []
+  "addons": [
+    "heroku-postgresql"
+  ]
 }
