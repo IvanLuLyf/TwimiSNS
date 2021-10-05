@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4d9c9cac6139d069404cade4ebf3cf89",
+    "content-hash": "0d0ef4b31facde1eaffc8069940ed675",
     "packages": [
         {
             "name": "ivanlulyf/bunnyphp",
-            "version": "3.0.1",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IvanLuLyf/BunnyPHP.git",
-                "reference": "5fa426ac5d1c82ef8b51dc32cb7a0813bbf0cd11"
+                "reference": "a87fcda831bae5fe164810affbaf25d7f03cdc1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IvanLuLyf/BunnyPHP/zipball/5fa426ac5d1c82ef8b51dc32cb7a0813bbf0cd11",
-                "reference": "5fa426ac5d1c82ef8b51dc32cb7a0813bbf0cd11",
+                "url": "https://api.github.com/repos/IvanLuLyf/BunnyPHP/zipball/a87fcda831bae5fe164810affbaf25d7f03cdc1d",
+                "reference": "a87fcda831bae5fe164810affbaf25d7f03cdc1d",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,7 @@
                 "issues": "https://github.com/IvanLuLyf/BunnyPHP/issues",
                 "source": "https://github.com/IvanLuLyf/BunnyPHP"
             },
-            "time": "2021-10-02T05:46:37+00:00"
+            "time": "2021-10-05T16:17:05+00:00"
         }
     ],
     "packages-dev": [],
@@ -65,7 +65,8 @@
     "prefer-lowest": false,
     "platform": {
         "ext-json": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-iconv": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
