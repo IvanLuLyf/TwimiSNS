@@ -38,15 +38,12 @@ class SettingController extends Controller
 
     /**
      * @filter auth
-     * @param array $path
+     * @param string $type path(0)
      */
-    public function ac_oauth(array $path)
+    public function ac_oauth(string $type = '')
     {
         if (Config::check('oauth')) {
-            if (count($path) < 1) $path = [''];
-            list($type) = $path;
             $oauth_enabled = Config::load('oauth')->get('enabled', []);
-            $type = $_REQUEST['type'] ?? $type;
             $type = $type == '' ? $oauth_enabled[0][0] : $type;
             $tp_user = BunnyPHP::app()->get('tp_user');
             $bind = (new BindModel())->where(['uid=:u and type=:t'], ['u' => $tp_user['uid'], 't' => $type])->fetch();
@@ -73,12 +70,10 @@ class SettingController extends Controller
 
     /**
      * @filter auth
-     * @param array $path
+     * @param string $type path(0)
      */
-    public function ac_oauth_avatar(array $path)
+    public function ac_oauth_avatar(string $type = '')
     {
-        if (count($path) < 1) $path = [''];
-        list($type) = $path;
         $tp_user = BunnyPHP::app()->get('tp_user');
         if (!empty($tp_user['uid'])) {
             (new AvatarModel())->upload($tp_user['uid'], $_REQUEST['avatar']);
