@@ -2,6 +2,7 @@
 return [
     'db' => [
         'prefix' => 'tp_',
+        'url' => $_ENV['DATABASE_URL'] ?? '',
         'dsn' => $_ENV['DATABASE_DSN'] ?? '',
         'type' => $_ENV['DATABASE_TYPE'] ?? 'sqlite',
         'database' => $_ENV['DATABASE_NAME'] ?? 'sns.sqlite3',
