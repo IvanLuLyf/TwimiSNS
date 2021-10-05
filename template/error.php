@@ -1,6 +1,6 @@
 <html lang="zh">
 <head>
-    <title><?=constant("TP_SITE_NAME")?></title>
+    <title><?= constant('TP_SITE_NAME') ?></title>
     <?php include APP_PATH . 'template/common/header.php'; ?>
 </head>
 <body>
@@ -10,7 +10,7 @@
         <div class="col-lg-9">
             <div class="card neo_card mt-4">
                 <div class="card-body">
-                    <h1 class="card-title"><?=$tp_error_msg?></h1>
+                    <h1 class="card-title"><?= $tp_error_msg ?? $bunny_error ?? '' ?></h1>
                     <a class="btn btn-dark text-white mt-5" href="/" role="button">返回首页</a>
                 </div>
             </div>
