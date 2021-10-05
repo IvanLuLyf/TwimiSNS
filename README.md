@@ -9,12 +9,14 @@ TwimiSNS is a SNS Engine Powered By BunnyPHP.
 ![GitHub](https://img.shields.io/github/license/ivanlulyf/twimisns.svg?color=blue&style=flat-square)
 ![PHP](https://img.shields.io/badge/PHP->%3D7.0.0-777bb3.svg?style=flat-square&logo=php)
 
+[![Deploy to Heroku](https://img.shields.io/badge/-Deploy%20to%20Heroku-%237056BF?logo=heroku&style=flat-square&labelColor=%237056BF&logoColor=white)](https://heroku.com/deploy?template=https://github.com/IvanLuLyf/TwimiSNS)
+
 English | [中文](README_CN.md)
 
 ## Requirement
 
-* PHP >= 7.0
-* MySQL or SQLite
+* PHP >= 7.4
+* PostgreSQL, MySQL or SQLite
 
 
 ## Installation
@@ -22,7 +24,7 @@ English | [中文](README_CN.md)
 ### 1. Clone this repository to your site root.
 
 ### 2. Set up your server
-> Apache
+#### Apache
 
 Add following content to ```.htacess``` file.
 
@@ -36,7 +38,7 @@ Add following content to ```.htacess``` file.
 ```
 
 
-> Nginx
+#### Nginx
 
 ```nginx
 location / {

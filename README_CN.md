@@ -9,20 +9,21 @@ TwimiSNS是一个基于BunnyPHP开发的SNS引擎.
 ![GitHub](https://img.shields.io/github/license/ivanlulyf/twimisns.svg?color=blue&style=flat-square)
 ![PHP](https://img.shields.io/badge/PHP->%3D7.0.0-777bb3.svg?style=flat-square&logo=php)
 
+[![Deploy to Heroku](https://img.shields.io/badge/-Deploy%20to%20Heroku-%237056BF?logo=heroku&style=flat-square&labelColor=%237056BF&logoColor=white)](https://heroku.com/deploy?template=https://github.com/IvanLuLyf/TwimiSNS)
+
 [English](README.md) | 中文
 
 ## 环境要求
 
-* PHP >= 7.0
-* MySQL 或 SQLite
-
+* PHP >= 7.4
+* PostgreSQL, MySQL 或 SQLite
 
 ## 安装
 
 ### 1. 复制本项目到网站根目录
 
 ### 2. 配置服务器环境
-> Apache
+#### Apache
 
 添加以下内容到 ```.htacess``` 文件中.
 
@@ -36,7 +37,7 @@ TwimiSNS是一个基于BunnyPHP开发的SNS引擎.
 ```
 
 
-> Nginx
+#### Nginx
 
 ```nginx
 location / {
