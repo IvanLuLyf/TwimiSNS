@@ -7,7 +7,7 @@ TwimiSNS is a SNS Engine Powered By BunnyPHP.
 ![GitHub release](https://img.shields.io/github/release/ivanlulyf/twimisns.svg?color=brightgreen&style=flat-square)
 ![Code Size](https://img.shields.io/github/languages/code-size/ivanlulyf/mineblog.svg?color=orange&style=flat-square)
 ![GitHub](https://img.shields.io/github/license/ivanlulyf/twimisns.svg?color=blue&style=flat-square)
-![PHP](https://img.shields.io/badge/PHP->%3D7.0.0-777bb3.svg?style=flat-square&logo=php)
+![PHP](https://img.shields.io/badge/PHP->%3D7.4.0-777bb3.svg?style=flat-square&logo=php)
 
 [![Deploy to Heroku](https://img.shields.io/badge/-Deploy%20to%20Heroku-%237056BF?logo=heroku&style=flat-square&labelColor=%237056BF&logoColor=white)](https://heroku.com/deploy?template=https://github.com/IvanLuLyf/TwimiSNS)
 
