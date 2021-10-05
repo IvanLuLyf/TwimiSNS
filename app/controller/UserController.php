@@ -286,12 +286,13 @@ class UserController extends Controller
         $this->assignAll(['ret' => 0, 'status' => 'ok', 'code' => $code])->render();
     }
 
-    public function ac_detail(array $path, UserService $userService)
+    /**
+     * @param UserService $userService
+     * @param string $username path(0)
+     * @param string $tab path(1,post)
+     */
+    public function ac_detail(UserService $userService, string $username = '', string $tab = '')
     {
-        if (count($path) == 0) $path = ['', ''];
-        $username = $_GET['username'] ?? $path[0];
-        $tab = $_GET['tab'] ?? ($path[1] ?? 'post');
-
         $tp_user = $userService->getLoginUser();
         if ($username == '') {
             if ($tp_user == null) {
