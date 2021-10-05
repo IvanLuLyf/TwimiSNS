@@ -5,7 +5,7 @@
 TwimiSNS是一个基于BunnyPHP开发的SNS引擎.
 
 ![GitHub release](https://img.shields.io/github/release/ivanlulyf/twimisns.svg?color=brightgreen&style=flat-square)
-![Code Size](https://img.shields.io/github/languages/code-size/ivanlulyf/mineblog.svg?color=orange&style=flat-square)
+![Code Size](https://img.shields.io/github/languages/code-size/ivanlulyf/twimisns.svg?color=orange&style=flat-square)
 ![GitHub](https://img.shields.io/github/license/ivanlulyf/twimisns.svg?color=blue&style=flat-square)
 ![PHP](https://img.shields.io/badge/PHP->%3D7.4.0-777bb3.svg?style=flat-square&logo=php)
 
