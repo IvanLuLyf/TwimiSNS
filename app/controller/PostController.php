@@ -52,7 +52,7 @@ class PostController extends Controller
 
     /**
      * @param UserService $userService
-     * @param int $tid path(0,0)
+     * @param int $tid path(0)
      */
     public function ac_view(UserService $userService, int $tid = 0)
     {
@@ -96,7 +96,7 @@ class PostController extends Controller
 
     /**
      * @param UserService $userService
-     * @param int $page path(0,1)
+     * @param int $page path(0)
      */
     function ac_list(UserService $userService, int $page = 1)
     {
@@ -130,7 +130,7 @@ class PostController extends Controller
 
     /**
      * @filter auth canFeed
-     * @param int $tid path(0,0)
+     * @param int $tid path(0)
      */
     function ac_comment(int $tid = 0)
     {
@@ -165,7 +165,7 @@ class PostController extends Controller
     /**
      * @filter csrf
      * @filter auth
-     * @param int $tid path(0,0)
+     * @param int $tid path(0)
      */
     function ac_buy_get(int $tid = 0)
     {
@@ -191,7 +191,7 @@ class PostController extends Controller
     /**
      * @filter csrf check
      * @filter auth canPay
-     * @param int $tid path(0,0)
+     * @param int $tid path(0)
      */
     function ac_buy_post(int $tid = 0)
     {
