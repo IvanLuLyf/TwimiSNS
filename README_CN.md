@@ -10,7 +10,8 @@ TwimiSNS是一个基于BunnyPHP开发的SNS引擎.
 ![PHP](https://img.shields.io/badge/PHP->%3D7.4.0-777bb3.svg?style=flat-square&logo=php)
 
 [![Deploy to Heroku](https://img.shields.io/badge/-Deploy%20to%20Heroku-%237056BF?logo=heroku&style=flat-square&labelColor=%237056BF&logoColor=white)](https://heroku.com/deploy?template=https://github.com/IvanLuLyf/TwimiSNS)
-[![Run on Repl.it](https://img.shields.io/badge/-Run%20on%20Repl.it-%235C6970?logo=repl.it&style=flat-square&logoColor=white)](https://repl.it/github/ivanlulyf/twimisns)
+[![Run on Repl.it](https://img.shields.io/badge/-Run%20on%20Repl.it-%235C6970?logo=replit&style=flat-square&logoColor=white)](https://repl.it/github/ivanlulyf/twimisns)
+[![Deploy with Vercel](https://img.shields.io/badge/-Deploy%20with%20Vercel-%231374EF?logo=vercel&style=flat-square&labelColor=%231374EF&logoColor=white)](https://vercel.com/new/git/external?repository-url=https://github.com/IvanLuLyf/TwimiSNS&project-name=twimi-sns&repository-name=twimi-sns)
 
 [English](README.md) | 中文
 
