@@ -1,0 +1,2 @@
+language = "php"
+run = "(curl -sS https://getcomposer.org/installer | php) && php composer.phar install && php -S 0.0.0.0:8000"
