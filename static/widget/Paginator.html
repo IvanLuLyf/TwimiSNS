@@ -20,6 +20,12 @@
                 if (prev !== +page) that.$emit('change', {page: that.current});
             });
         },
+        setTotal: function (total) {
+            this.total = total || 0;
+            this.current = 1;
+            this.maxPage = Math.ceil(this.total / this.limit);
+            this.$render();
+        },
         setPage: function (page) {
             var p = +page;
             if (page === 'last') p = this.maxPage;
@@ -42,17 +48,21 @@
             }
         },
         $render: function () {
-            var html = '<li class="page-item" data-page="first""><a class="page-link">首页</a></li>';
-            html += '<li class="page-item" data-page="prev"><a aria-label="Previous" class="page-link"><span aria-hidden="true">&laquo;</span><span class="sr-only">上一页</span></a></li>'
-            var b = Math.min(this.current, this.maxPage - 3);
-            this.startPos = b > 4 ? (b - 3) : 1;
-            this.endPos = Math.min(this.startPos + 6, this.maxPage);
-            for (var i = this.startPos; i <= this.endPos; i++) {
-                html += '<li class="page-item' + (this.current === i ? ' active' : '') + '" data-page="' + i + '"><a class="page-link">' + i + '</a></li>'
+            if (this.total > 0) {
+                var html = '<li class="page-item" data-page="first""><a class="page-link">首页</a></li>';
+                html += '<li class="page-item" data-page="prev"><a aria-label="Previous" class="page-link"><span aria-hidden="true">&laquo;</span><span class="sr-only">上一页</span></a></li>'
+                var b = Math.min(this.current, this.maxPage - 3);
+                this.startPos = b > 4 ? (b - 3) : 1;
+                this.endPos = Math.min(this.startPos + 6, this.maxPage);
+                for (var i = this.startPos; i <= this.endPos; i++) {
+                    html += '<li class="page-item' + (this.current === i ? ' active' : '') + '" data-page="' + i + '"><a class="page-link">' + i + '</a></li>'
+                }
+                html += '<li class="page-item" data-page="next"><a aria-label="Next" class="page-link"><span aria-hidden="true">&raquo;</span><span class="sr-only">下一页</span></a></li>'
+                html += '<li class="page-item" data-page="last"><a class="page-link">尾页</a></li>';
+                this.$container.html(html).show();
+            } else {
+                this.$container.hide();
             }
-            html += '<li class="page-item" data-page="next"><a aria-label="Next" class="page-link"><span aria-hidden="true">&raquo;</span><span class="sr-only">下一页</span></a></li>'
-            html += '<li class="page-item" data-page="last"><a class="page-link">尾页</a></li>';
-            this.$container.html(html);
         },
     })
 </script>
