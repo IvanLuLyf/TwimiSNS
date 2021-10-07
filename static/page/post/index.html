@@ -1,0 +1,73 @@
+<template>
+    <div class="row">
+        <div class="col-lg-9">
+            <div id="post_list" auto-widget="ListView">
+                <div class="card neo_card mt-4">
+                    <div class="card-body">
+                        <div class="media">
+                            <div class="media-body small">
+                                <h5>
+                                    <a class="link-dark" href="#/post/view?id={{this.tid}}">{{this.title}}</a>
+                                </h5>
+                                <div>
+                                    <img class="rounded-circle" src="/user/avatar?username={{this.username}}"
+                                         width="24px" alt="avatar"/>
+                                    <span class="username">
+									<a class="text-muted font-weight-bold">{{this.nickname}}</a>
+								</span>
+                                    <span class="text-grey ml-2">{{:this.timestamp|time}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="markdown-body">
+                            {{:this.content|markdown}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav id="pager" class="mt-4" aria-label="" auto-widget="Paginator"></nav>
+        </div>
+        <div class="col-lg-3">
+            <?php if (isset($tp_user)): ?>
+            <div class="card neo_card mt-4">
+                <div class="card-body">
+                    <a href="/post/create" class="btn btn-dark btn-block text-white badge-pill">发贴</a>
+                </div>
+            </div>
+            <div class="card neo_card mt-4">
+                <div class="card-body text-center">
+                    <img src="/user/avatar/<?= $tp_user['uid'] ?>"
+                         class="rounded-circle center-block" width="72px"/>
+                    <h4 class="card-title"><?= $tp_user['nickname'] ?></h4>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</template>
+<script use-widget="Paginator,ListView">
+    (function () {
+        var pager = Elaina.widget('#pager');
+        var converter = new showdown.Converter();
+        pager.$on('change', function (data) {
+            loadPosts(data.page);
+        });
+        var postList = Elaina.widget('#post_list');
+        postList.addTextFunc('markdown', function (data) {
+            return converter.makeHtml(data)
+        });
+        postList.addTextFunc('time', function (data) {
+            return new Date(data * 1000).toLocaleString();
+        });
+
+        function loadPosts(page) {
+            Utils.apiPost('post/list', {page: page}).then(function (res) {
+                pager.setTotal(res.total);
+                postList.setList(res.posts);
+            })
+        }
+
+        loadPosts(1)
+    })();
+</script>
