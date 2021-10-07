@@ -1,0 +1,166 @@
+<template>
+    <div class="elaina-list-view">
+        <slot></slot>
+    </div>
+</template>
+<script>
+    (function () {
+        var ELAINA_TEXT = {};
+
+        function Template(html, extra) {
+            var extraCxt = $.map(extra, function (c) {
+                return '$' + c;
+            });
+            var re = /\{\{\s*(.*?)\s*\}\}/g;
+            var reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g;
+            var result = '__elaina_' + ((new Date()).getTime() % 1000) + '__';
+            var code = '"use strict";\n' + ('var ' + result + '="";\n');
+            var cursor = 0, match;
+            html = html.replace(/(&gt;)|(&lt;)|(&amp;)/g, function (str, $1, $2, $3) {
+                switch (str) {
+                    case $1:
+                        return '>';
+                    case $2:
+                        return '<';
+                    case $3:
+                        return '&';
+                }
+            });
+            var makeVal = function (val) {
+                if (val[0] === ':') {
+                    var s = $.trim(val.replace(':', ''));
+                    var sa = s.split('|'), r = sa[0];
+                    for (var i = 1; i < sa.length; i++) {
+                        var f = $.trim(sa[i]);
+                        if (f) r = '$elainaText.' + f + '(' + r + ')';
+                    }
+                    return r;
+                }
+                return val;
+            };
+            var add = function (line, js) {
+                js ? (code += line.match(reExp) ? line + '\n' : (result + ('+=(') + makeVal($.trim(line)) + ');\n')) :
+                    (code += line !== '' ? (result + ('+=("') + line.replace(/"/g, '\\"').replace(/\s+/g, ' ') + '");\n') : '');
+                return add;
+            };
+            while ((match = re.exec(html))) {
+                add(html.slice(cursor, match.index))(match[1], true);
+                cursor = match.index + match[0].length;
+            }
+            add(html.substr(cursor, html.length - cursor));
+            code += 'return ' + result + ';';
+            code = code.replace(/[\r\t\n]/g, '');
+            var func = new Function('$elainaText', extraCxt.join(','), code);
+            return {
+                render: function (data, context) {
+                    var param = [ELAINA_TEXT];
+                    if (!extra) param.push(data);
+                    return func.apply(data, param.concat(context || []));
+                }
+            };
+        }
+
+        Elaina.defineWidget({
+            init: function ($elem, conf) {
+                this.$container = $elem.find('.elaina-list-view');
+                this.listItem = this.$container.html();
+                this.$render = Template(this.listItem);
+                this.$container.empty();
+                this.emptyContent = conf.empty;
+                if (conf.listClass) {
+                    this.$container.addClass(conf.listClass);
+                }
+                this.itemClass = conf.itemClass;
+                this.setList(conf.data);
+            },
+            addTextFunc: function (name, func) {
+                if (typeof func === 'function' && !ELAINA_TEXT[name]) ELAINA_TEXT[name] = func;
+            },
+            createItem: function (item, front) {
+                if (!item) return;
+                var that = this;
+                var piece = $('<div></div>');
+                if (this.itemClass) piece.addClass(this.itemClass);
+                piece.html(this.$render.render(item));
+                if (front) {
+                    this.$container.prepend(piece);
+                } else {
+                    this.$container.append(piece);
+                }
+                Elaina.piece(piece, item);
+                var pieceHandler = {
+                    remove: function () {
+                        that.remove(piece.index());
+                        piece = null;
+                    },
+                    update: function (newItem) {
+                        that.update(piece.index(), newItem);
+                    }
+                };
+                piece.on('click', '[item-click]', function (e) {
+                    that.$emit($(this).attr('item-click'), {
+                        e: e,
+                        data: item,
+                        index: piece.index(),
+                        handler: pieceHandler,
+                    });
+                });
+                piece.on('dblclick', '[item-dblclick]', function (e) {
+                    that.$emit($(this).attr('item-dblclick'), {
+                        e: e,
+                        data: item,
+                        index: piece.index(),
+                        handler: pieceHandler,
+                    });
+                });
+            },
+            clear: function () {
+                this.dataList = [];
+                Elaina.dispose(this.$container);
+                this.$container.empty().html(this.emptyContent);
+            },
+            setList: function (dataList) {
+                if (!$.isArray(dataList)) {
+                    dataList = []
+                }
+                this.dataList = dataList;
+                Elaina.dispose(this.$container);
+                this.$container.empty();
+                if (dataList.length === 0) {
+                    this.$container.html(this.emptyContent);
+                }
+                for (var i = 0; i < dataList.length; i++) {
+                    this.createItem(dataList[i]);
+                }
+            },
+            remove: function (index) {
+                if (this.dataList[index] !== undefined) {
+                    this.dataList.splice(index, 1);
+                    var piece = this.$container.children(":eq(" + index + ")");
+                    Elaina.dispose(piece);
+                    piece.remove();
+                    piece = null;
+                }
+                if (this.dataList.length === 0) {
+                    this.$container.html(this.emptyContent);
+                }
+            },
+            append: function (item) {
+                if (!item) return;
+                if (this.dataList.length === 0) {
+                    this.$container.empty();
+                }
+                this.dataList.push(item);
+                this.createItem(item);
+            },
+            prepend: function (item) {
+                if (!item) return;
+                if (this.dataList.length === 0) {
+                    this.$container.empty();
+                }
+                this.dataList.unshift(item);
+                this.createItem(item, true);
+            },
+        });
+    })();
+</script>
