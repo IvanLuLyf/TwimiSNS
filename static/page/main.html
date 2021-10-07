@@ -1,0 +1,25 @@
+<template>
+    <nav id="nav_bar" class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top"></nav>
+    <div id="router_container" class="container"></div>
+    <footer>
+        <div class="container mt-4">
+            <div class="center-block">
+                <p class="text-center">
+                    <a href="https://github.com/IvanLuLyf/TwimiSNS">TwimiSNS</a>
+                    - Powered By
+                    <a href="https://github.com/IvanLuLyf/BunnyPHP">BunnyPHP</a>
+                    &
+                    <a href="https://github.com/IvanLuLyf/Elaina">Elaina</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</template>
+<script use-widget="NavBar">
+    (function () {
+        var navBar = Elaina.widget($('#nav_bar'), 'NavBar', {
+            siteName: Elaina.data('siteName'),
+        });
+        Elaina.render($('#router_container'), Elaina.router().path);
+    })();
+</script>
