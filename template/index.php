@@ -9,8 +9,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/showdown/1.8.6/showdown.min.js"></script>
     <link href="/static/css/common.css?v=20211007" rel="stylesheet">
+    <link href="/static/css/article.css?v=20211007" rel="stylesheet">
     <script src="/static/js/elaina.js"></script>
+    <script src="/static/js/util.js"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -19,6 +22,7 @@
         var prevPath = '', isMain = false;
         Elaina.data({
             siteName: '<?=TP_SITE_NAME?>',
+            apiUrl: '/api/',
         });
         Elaina.configure({
             pages: '/static/page',
