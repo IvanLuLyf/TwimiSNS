@@ -5,39 +5,38 @@ use BunnyPHP\Config;
 use BunnyPHP\Controller;
 
 /**
- * User: IvanLu
- * Date: 2018/10/13
- * Time: 1:29
+ * @author IvanLu
+ * @time 2018/10/13 1:29
+ * @filter auth
  */
 class SettingController extends Controller
 {
+    private $user;
+
+    public function __construct()
+    {
+        $this->user = BunnyPHP::app()->get('tp_user');
+    }
+
     public function ac_index()
     {
         $this->redirect('setting', 'avatar');
     }
 
-    /**
-     * @filter auth
-     */
     public function ac_avatar()
     {
         $this->assign('cur_st', 'avatar')->render('setting/avatar.php');
     }
 
-    /**
-     * @filter auth
-     */
-    public function ac_gravatar()
+    public function ac_gravatar(AvatarModel $avatarModel)
     {
-        $tp_user = BunnyPHP::app()->get('tp_user');
-        if (!empty($tp_user['uid'])) {
-            (new AvatarModel())->upload($tp_user['uid'], 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($tp_user['email']))));
+        if (!empty($this->user['uid'])) {
+            $avatarModel->upload($this->user['uid'], 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->user['email']))));
         }
         $this->redirect('setting', 'avatar');
     }
 
     /**
-     * @filter auth
      * @param string $type path(0)
      */
     public function ac_oauth(string $type = '')
@@ -45,8 +44,7 @@ class SettingController extends Controller
         if (Config::check('oauth')) {
             $oauth_enabled = Config::load('oauth')->get('enabled', []);
             $type = $type == '' ? $oauth_enabled[0][0] : $type;
-            $tp_user = BunnyPHP::app()->get('tp_user');
-            $bind = (new BindModel())->where(['uid=:u and type=:t'], ['u' => $tp_user['uid'], 't' => $type])->fetch();
+            $bind = (new BindModel())->where(['uid=:u and type=:t'], ['u' => $this->user['uid'], 't' => $type])->fetch();
             if ($bind != null) {
                 $this->assign('tp_bind', $bind);
                 $image = (new OauthService($this))->avatar($type, $bind['bind'], $bind['token']);
@@ -69,14 +67,12 @@ class SettingController extends Controller
     }
 
     /**
-     * @filter auth
      * @param string $type path(0)
      */
-    public function ac_oauth_avatar(string $type = '')
+    public function ac_oauth_avatar(AvatarModel $avatarModel, string $type = '')
     {
-        $tp_user = BunnyPHP::app()->get('tp_user');
-        if (!empty($tp_user['uid'])) {
-            (new AvatarModel())->upload($tp_user['uid'], $_REQUEST['avatar']);
+        if (!empty($this->user['uid'])) {
+            $avatarModel->upload($this->user['uid'], $_REQUEST['avatar']);
         }
         $this->redirect('setting', 'oauth', ['type' => $type]);
     }
