@@ -5,17 +5,17 @@ use BunnyPHP\Config;
 use BunnyPHP\Controller;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/7/30
- * Time: 16:27
+ * @author IvanLu
+ * @time 2018/7/30 16:27
  */
 class OauthController extends Controller
 {
-    function ac_connect(array $path, $referer)
+    /**
+     * @param string $type path(0)
+     * @param string $referer
+     */
+    function ac_connect(string $type = '', string $referer = '')
     {
-        if (count($path) < 1) $path = [''];
-        list($type) = $path;
         switch ($type) {
             case 'qq':
                 $oauth = Config::load('oauth')->get('qq');
@@ -40,10 +40,12 @@ class OauthController extends Controller
         $this->redirect($url);
     }
 
-    function ac_callback(array $path, UserService $userService)
+    /**
+     * @param UserService $userService
+     * @param string $type path(0)
+     */
+    function ac_callback(UserService $userService, string $type = '')
     {
-        if (count($path) < 1) $path = [''];
-        list($type) = $path;
         $bind_model = new BindModel();
         if (isset($_GET['code'])) {
             $bind = (new OauthService($this))->oauth($type);
@@ -95,11 +97,11 @@ class OauthController extends Controller
         }
     }
 
-    function ac_bind(array $path)
+    /**
+     * @param string $type path(0)
+     */
+    function ac_bind(string $type = '', string $bind_type = 'login')
     {
-        if (count($path) < 1) $path = [''];
-        list($type) = $path;
-        $bind_type = $_REQUEST['type'];
         if ($bind_type == 'reg' && Config::load('config')->get('allow_reg')) {
             $result = (new UserModel())->register($_POST['username'], $_POST['password'], $_POST['email'], $_POST['nickname']);
         } else {
