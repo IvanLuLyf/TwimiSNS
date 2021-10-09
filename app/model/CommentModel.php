@@ -3,14 +3,12 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/10/25
- * Time: 0:52
+ * @author IvanLu
+ * @time 2018/10/25 0:52
  */
 class CommentModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'cid' => ['integer', 'not null'],
         'tid' => ['integer', 'not null'],
         'aid' => ['integer', 'not null'],
@@ -19,8 +17,8 @@ class CommentModel extends Model
         'content' => ['text', 'not null'],
         'timestamp' => ['text'],
     ];
-    protected $_pk = ['cid'];
-    protected $_ai = 'cid';
+    protected array $_pk = ['cid'];
+    protected string $_ai = 'cid';
 
     public function listComment($tid, $aid, $page = 1, $uid = 0)
     {
