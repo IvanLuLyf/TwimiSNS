@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1c7b92c5072ae3f6d3b113ddff05c518",
+    "content-hash": "2592f118c346b2e528dadc5986fa50fe",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -141,6 +141,46 @@
                 "source": "https://github.com/bunniescc/BunnyPHP-AliOSS/tree/1.2"
             },
             "time": "2021-10-09T15:14:22+00:00"
+        },
+        {
+            "name": "ivanlulyf/bunnyphp-mailer",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bunniescc/BunnyPHP-Mailer.git",
+                "reference": "1e9033b868012f272348f5e54e11a5800157f615"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bunniescc/BunnyPHP-Mailer/zipball/1e9033b868012f272348f5e54e11a5800157f615",
+                "reference": "1e9033b868012f272348f5e54e11a5800157f615",
+                "shasum": ""
+            },
+            "require": {
+                "ivanlulyf/bunnyphp": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ivan Lu",
+                    "email": "me@ivanlu.cn"
+                }
+            ],
+            "description": "Mailer for BunnyPHP",
+            "support": {
+                "issues": "https://github.com/bunniescc/BunnyPHP-Mailer/issues",
+                "source": "https://github.com/bunniescc/BunnyPHP-Mailer/tree/1.0.0"
+            },
+            "time": "2021-10-09T15:58:28+00:00"
         }
     ],
     "packages-dev": [],

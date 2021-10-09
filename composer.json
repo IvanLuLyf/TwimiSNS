@@ -12,6 +12,7 @@
   "require": {
     "ivanlulyf/bunnyphp": "^3.0",
     "ivanlulyf/bunnyphp-alioss": "1.*",
+    "ivanlulyf/bunnyphp-mailer": "1.*",
     "ext-json": "*",
     "ext-pdo": "*",
     "ext-pdo_pgsql": "*",
