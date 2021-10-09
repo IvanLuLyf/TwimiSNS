@@ -5,9 +5,8 @@ use BunnyPHP\Config;
 use BunnyPHP\Controller;
 
 /**
- * User: IvanLu
- * Date: 2018/7/29
- * Time: 3:24
+ * @author  IvanLu
+ * @time  2018/7/29 3:24
  */
 class PostController extends Controller
 {
@@ -136,7 +135,7 @@ class PostController extends Controller
     {
         $post = $this->postModel->getPostById($tid);
         if ($post != null) {
-            (new CommentModel())->sendComment($tid, 1, BunnyPHP::app()->get('tp_user'), $_POST['content']);
+            (new CommentModel())->sendComment($tid, ConstUtil::MOD_FORUM, BunnyPHP::app()->get('tp_user'), $_POST['content']);
             if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
                 $this->redirect('post', 'view', ['tid' => $tid]);
             } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
