@@ -3,14 +3,12 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/1/1
- * Time: 20:59
+ * @author IvanLu
+ * @time 2018/1/1 20:59
  */
 class FeedModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'tid' => ['integer', 'not null'],
         'uid' => ['integer', 'not null'],
         'username' => ['varchar(16)', 'not null'],
@@ -23,15 +21,15 @@ class FeedModel extends Model
         'like_num' => ['integer', 'default 0'],
         'image' => ['integer'],
     ];
-    protected $_pk = ['tid'];
-    protected $_ai = 'tid';
+    protected array $_pk = ['tid'];
+    protected string $_ai = 'tid';
 
     public function listFeed($uid, $page = 1)
     {
         $tb = $this->_table;
         $ft = FriendModel::name();
         return $this->join(FriendModel::class, ['username', 'uid' => $uid, 'state' => 2], ['notename'])
-            ->join(LikeModel::class, ['tid', 'aid' => 3, 'uid' => $uid], [["state", "(%s is not null) as islike"]])
+            ->join(LikeModel::class, ['tid', 'aid' => ConstUtil::MOD_FEED, 'uid' => $uid], [['state', '(%s is not null) as islike']])
             ->where(["{$ft}.uid = :u or {$tb}.uid= :um"], ['u' => $uid, 'um' => $uid])
             ->order(["tid desc"])
             ->limit(20, ($page - 1) * 20)
@@ -40,7 +38,7 @@ class FeedModel extends Model
 
     public function userFeed($username, $page = 1)
     {
-        return $this->where('username=:u', ['u' => $username])->order(["tid desc"])->limit(20, ($page - 1) * 20)->fetchAll();
+        return $this->where('username=:u', ['u' => $username])->order(['tid desc'])->limit(20, ($page - 1) * 20)->fetchAll();
     }
 
     public function sendFeed($user, $content, $source, $image = 0)
@@ -62,13 +60,13 @@ class FeedModel extends Model
 
     public function getFeed($tid)
     {
-        return $this->where(["tid = ?"], [$tid])->fetch();
+        return $this->where(['tid = ?'], [$tid])->fetch();
     }
 
-    public function likeFeed($tid)
+    public function likeFeed($tid): int
     {
-        $this->where(["tid = :t"], ['t' => $tid])->update([], 'like_num=like_num+1');
-        $row = $this->where(["tid = :t"], ['t' => $tid])->fetch();
+        $this->where(['tid = :t'], ['t' => $tid])->update([], 'like_num=like_num+1');
+        $row = $this->where(['tid = :t'], ['t' => $tid])->fetch();
         return intval($row['like_num']);
     }
 }
