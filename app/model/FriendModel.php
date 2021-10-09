@@ -3,14 +3,16 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/1/2
- * Time: 1:56
+ * @author IvanLu
+ * @time 2018/1/2 1:56
  */
 class FriendModel extends Model
 {
-    protected $_column = [
+    const STATE_REQUEST = 0;
+    const STATE_PENDING = 1;
+    const STATE_FRIEND = 2;
+
+    protected array $_column = [
         'id' => ['integer', 'not null'],
         'uid' => ['integer', 'not null'],
         'fuid' => ['integer', 'not null'],
@@ -18,15 +20,15 @@ class FriendModel extends Model
         'notename' => ['text', 'not null'],
         'state' => ['integer']
     ];
-    protected $_pk = ['id'];
-    protected $_ai = 'id';
+    protected array $_pk = ['id'];
+    protected string $_ai = 'id';
 
-    public function listFriend($uid, $state = 2)
+    public function listFriend($uid, $state = self::STATE_FRIEND)
     {
-        $friends = $this->where(["uid = ? and state = ?"], [$uid, $state])->fetchAll();
+        $friends = $this->where(['uid = ? and state = ?'], [$uid, $state])->fetchAll();
         $names = [];
         foreach ($friends as $friend) {
-            $names[] = iconv("UTF-8", "GB2312//IGNORE", $friend['notename']);
+            $names[] = iconv('UTF-8', 'GB2312//IGNORE', $friend['notename']);
         }
         array_multisort($names, SORT_ASC, SORT_LOCALE_STRING, $friends);
         return $friends;
@@ -34,7 +36,7 @@ class FriendModel extends Model
 
     public function getNoteName($uid, $friend_uid)
     {
-        if ($friend = $this->where(["uid = ? and fuid = ?"], [$uid, $friend_uid])->fetch(['notename'])) {
+        if ($friend = $this->where(['uid = ? and fuid = ?'], [$uid, $friend_uid])->fetch(['notename'])) {
             return $friend['notename'];
         }
         return null;
@@ -42,53 +44,48 @@ class FriendModel extends Model
 
     public function getNoteNameByUsername($uid, $friend_username)
     {
-        if ($friend = $this->where(["uid = ? and username = ?"], [$uid, $friend_username])->fetch(['notename'])) {
+        if ($friend = $this->where(['uid = ? and username = ?'], [$uid, $friend_username])->fetch(['notename'])) {
             return $friend['notename'];
         }
         return null;
     }
 
-    public function noteFriend($uid, $username, $notename)
+    public function noteFriend($uid, $username, $notename): array
     {
-        if ($friend = $this->where(["uid = ? and username = ? and state = 2"], [$uid, $username])->fetch()) {
+        if ($this->where(['uid = ? and username = ? and state = ?'], [$uid, $username, self::STATE_FRIEND])->fetch()) {
             $updates = ['notename' => $notename];
-            if ($this->where(["uid = :u and username = :un"], ['u' => $uid, 'un' => $username])->update($updates)) {
-                $response = ['ret' => 0, 'status' => 'ok'];
+            if ($this->where(['uid = :u and username = :un'], ['u' => $uid, 'un' => $username])->update($updates)) {
+                return ['ret' => 0, 'status' => 'ok'];
             } else {
-                $response = ['ret' => -6, 'status' => "database error"];
+                return ['ret' => -6, 'status' => 'database error'];
             }
         } else {
-            $response = ['ret' => 4001, 'status' => "user is not a friend"];
+            return ['ret' => 4001, 'status' => 'user is not a friend'];
         }
-        return $response;
     }
 
-    public function addFriend($uid, $fuid, $username, $fusername, $nickname, $fnickname)
+    public function addFriend($uid, $fuid, $username, $fusername, $nickname, $fnickname): array
     {
-        if ($username != $fusername) {
-            if ($this->where(["uid = :u and username = :un"], ['u' => $uid, 'un' => $fusername])->fetch()) {
-                $response = ['ret' => 4002, 'status' => "user is already a friend"];
-            } else {
-                $this->add(['uid' => $uid, 'fuid' => $fuid, 'username' => $fusername, 'notename' => $fnickname, 'state' => 0]);
-                $this->add(['uid' => $fuid, 'fuid' => $uid, 'username' => $username, 'notename' => $nickname, 'state' => 1]);
-                $response = ['ret' => 0, 'status' => "ok"];
-            }
-        } else {
-            $response = ['ret' => 1004, 'status' => "invalid username"];
+        if ($username == $fusername) {
+            return ['ret' => 1004, 'status' => 'invalid username'];
         }
-        return $response;
+        if ($this->where(['uid = :u and username = :un'], ['u' => $uid, 'un' => $fusername])->fetch()) {
+            return ['ret' => 4002, 'status' => 'user is already a friend'];
+        }
+        $this->add(['uid' => $uid, 'fuid' => $fuid, 'username' => $fusername, 'notename' => $fnickname, 'state' => self::STATE_REQUEST]);
+        $this->add(['uid' => $fuid, 'fuid' => $uid, 'username' => $username, 'notename' => $nickname, 'state' => self::STATE_PENDING]);
+        return ['ret' => 0, 'status' => 'ok'];
     }
 
-    public function acceptFriend($uid, $fuid, $username, $fusername)
+    public function acceptFriend($uid, $fuid, $username, $fusername): array
     {
-        if ($row = $this->where(["uid = :u and username = :un and state = 1"], ['u' => $uid, 'un' => $fusername])->fetch()) {
-            $updates = ['state' => 2];
+        if ($this->where(['uid = :u and username = :un and state = 1'], ['u' => $uid, 'un' => $fusername])->fetch()) {
+            $updates = ['state' => self::STATE_FRIEND];
             $this->where(["uid = :u and username= :un"], ['u' => $uid, 'un' => $fusername])->update($updates);
             $this->where(["uid = :u and username= :un"], ['u' => $fuid, 'un' => $username])->update($updates);
-            $response = ['ret' => 0, 'status' => "ok"];
+            return ['ret' => 0, 'status' => 'ok'];
         } else {
-            $response = ['ret' => 1004, 'status' => "invalid username"];
+            return ['ret' => 1004, 'status' => 'invalid username'];
         }
-        return $response;
     }
 }
