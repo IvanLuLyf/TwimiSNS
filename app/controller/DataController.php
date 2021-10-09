@@ -4,16 +4,13 @@ use BunnyPHP\BunnyPHP;
 use BunnyPHP\Controller;
 
 /**
- * User: IvanLu
- * Date: 2019/3/15
- * Time: 16:42
+ * @author IvanLu
+ * @time 2019/3/15 16:42
+ * @filter auth canGetInfo
  */
 class DataController extends Controller
 {
-    /**
-     * @filter auth canGetInfo
-     */
-    public function ac_get(DataModel $dataModel)
+    public function ac_get(DataModel $dataModel): array
     {
         $tp_api = BunnyPHP::app()->get('tp_api');
         $tp_user = BunnyPHP::app()->get('tp_user');
@@ -22,10 +19,7 @@ class DataController extends Controller
         return ['ret' => 0, 'status' => 'ok', 'content' => $content];
     }
 
-    /**
-     * @filter auth canGetInfo
-     */
-    public function ac_set(DataModel $dataModel)
+    public function ac_set(DataModel $dataModel): array
     {
         $tp_api = BunnyPHP::app()->get('tp_api');
         $tp_user = BunnyPHP::app()->get('tp_user');
