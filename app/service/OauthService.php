@@ -5,21 +5,19 @@ use BunnyPHP\Controller;
 use BunnyPHP\Service;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/2/26
- * Time: 17:31
+ * @author IvanLu
+ * @time 2019/2/26 17:31
  */
 class OauthService extends Service
 {
-    private $controller;
+    private Controller $controller;
 
-    function __construct(Controller $controller)
+    public function __construct(Controller $controller)
     {
         $this->controller = $controller;
     }
 
-    function oauth($type)
+    public function oauth($type): array
     {
         switch ($type) {
             case 'qq':
@@ -37,33 +35,28 @@ class OauthService extends Service
         }
     }
 
-    function avatar($type, $bind_id, $token = '')
+    public function avatar($type, $bind_id, $token = ''): string
     {
         switch ($type) {
             case 'qq':
                 $oauth = Config::load('oauth')->get('qq');
-                $imgUrl = $this->qq_avatar($oauth, $bind_id);
-                break;
+                return $this->qq_avatar($oauth, $bind_id);
             case 'wb':
-                $imgUrl = $this->wb_avatar($bind_id, $token);
-                break;
+                return $this->wb_avatar($bind_id, $token);
             case 'gh':
-                $imgUrl = "https://avatars.githubusercontent.com/u/$bind_id";
-                break;
+                return "https://avatars.githubusercontent.com/u/$bind_id";
             default:
                 $oauth = Config::load('oauth')->get($type);
-                $imgUrl = "{$oauth['url']}/user/avatar/$bind_id";
-                break;
+                return "{$oauth['url']}/user/avatar/$bind_id";
         }
-        return $imgUrl;
     }
 
     private function tm_oauth($oauth, $code): array
     {
-        $strInfo = $this->do_post_request("{$oauth['url']}/api/oauth/token", "client_id=" . $oauth['key'] . "&client_secret=" . $oauth['secret'] . "&code=" . $code);
+        $strInfo = $this->do_post_request("{$oauth['url']}/api/oauth/token", "client_id={$oauth['key']}&client_secret={$oauth['secret']}&code=$code");
         $oauth_data = json_decode($strInfo, true);
         $oauthToken = $oauth_data['token'];
-        $strUserInfo = $this->do_post_request("{$oauth['url']}/api/user/info", "client_id=" . $oauth['key'] . "&token=$oauthToken");
+        $strUserInfo = $this->do_post_request("{$oauth['url']}/api/user/info", "client_id={$oauth['key']}&token=$oauthToken");
         $user_info = json_decode($strUserInfo, true);
         return ['uid' => $user_info['uid'], 'nickname' => $user_info['nickname'], 'token' => $oauthToken, 'expire' => $oauth_data['expire']];
     }
@@ -136,7 +129,13 @@ class OauthService extends Service
 
     private function do_post_request($url, $data, $optional_headers = null)
     {
-        $params = ['http' => ['method' => 'POST', 'header' => ['User-Agent: MineBlog'], 'content' => $data]];
+        $params = [
+            'http' => [
+                'method' => 'POST',
+                'header' => ['User-Agent: BunnyPHP', 'Content-Type: application/x-www-form-urlencoded'],
+                'content' => $data
+            ]
+        ];
         if ($optional_headers !== null) $params['http']['header'] = $optional_headers;
         $ctx = stream_context_create($params);
         $fp = @fopen($url, 'rb', false, $ctx);
