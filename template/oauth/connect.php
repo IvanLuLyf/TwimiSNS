@@ -8,7 +8,7 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-3">
-            <?php include APP_PATH . 'template/setting/nav.html'; ?>
+            <?php include APP_PATH . 'template/setting/nav.php'; ?>
         </div>
         <div class="col-lg-9">
             <div class="card neo_card mt-4">
