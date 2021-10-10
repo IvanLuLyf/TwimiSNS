@@ -3,75 +3,94 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/1/1
- * Time: 17:07
+ * @author IvanLu
+ * @time 2018/1/1 17:07
  */
 class OauthTokenModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'id' => ['integer', 'not null'],
         'uid' => ['integer', 'not null'],
         'client_id' => ['text', 'not null'],
-        'token' => ['text', 'not null'],
+        'access_token' => ['text', 'not null'],
+        'scope' => ['text'],
         'expire' => ['text']
     ];
-    protected $_pk = ['id'];
-    protected $_ai = 'id';
+    protected array $_pk = ['id'];
+    protected string $_ai = 'id';
 
     public function check($clientId, $accessToken)
     {
-        if ($row = $this->where(["client_id = ? and token = ? and expire > ?"], [$clientId, $accessToken, time()])->fetch()) {
-            return $row['uid'];
+        if ($tokenInfo = $this->where(['client_id=? and access_token=? and expire>?'], [$clientId, $accessToken, time()])->fetch(['uid', 'scope'])) {
+            $tokenInfo['scope'] = explode('|', $tokenInfo['scope']);
+            return $tokenInfo;
         } else {
             return 0;
         }
     }
 
-    public function get($uid, $clientId, $appType): array
+    public function generate($uid, $clientId, $appType, $scope = []): array
     {
         $timestamp = time();
-        if (intval($appType) == 1 || intval($appType) == 2) {
+        sort($scope, SORT_STRING);
+        $scopeStr = implode('|', $scope);
+        if (intval($appType) == ConstUtil::APP_SYSTEM || intval($appType) == ConstUtil::APP_NORMAL) {
             $seconds = 1296000;
         } else {
             $seconds = 172800;
         }
-        if ($tokenRow = $this->where(["client_id = :ak and uid = :u"], ['ak' => $clientId, 'u' => $uid])->fetch()) {
+        if ($tokenRow = $this->where(['client_id=:ak and uid=:u'], ['ak' => $clientId, 'u' => $uid])->fetch()) {
+            $tokenId = $tokenRow['id'];
+            $updates = [];
             if ($timestamp < intval($tokenRow['expire'])) {
-                $token = $tokenRow['token'];
+                $accessToken = $tokenRow['access_token'];
                 $expire = $tokenRow['expire'];
             } else {
-                $token_id = $tokenRow['id'];
-                $token = md5($uid + $clientId + $timestamp);
+                $accessToken = $this->createToken($uid, $clientId, $timestamp);
                 $expire = $timestamp + $seconds;
-                $this->where(["id = :id"], ['id' => $token_id])->update(['token' => $token, 'expire' => $expire]);
+                $updates = ['access_token' => $accessToken, 'expire' => $expire];
             }
-            $rowId = $tokenRow['id'];
+            if ($tokenRow['scope'] != $scopeStr) {
+                $updates['scope'] = $scopeStr;
+            }
+            if ($updates) $this->where(['id = :id'], ['id' => $tokenId])->update($updates);
         } else {
-            $token = md5($uid + $clientId + $timestamp);
+            $accessToken = $this->createToken($uid, $clientId, $timestamp);
             $expire = $timestamp + $seconds;
-            $rowId = $this->add(['uid' => $uid, 'client_id' => $clientId, 'token' => $token, 'expire' => $expire]);
+            $tokenId = $this->add(['uid' => $uid, 'client_id' => $clientId, 'access_token' => $accessToken, 'expire' => $expire, 'scope' => $scopeStr]);
         }
-        $response = ['token' => $token, 'expire' => $expire];
-        if (intval($appType) == 1) {
-            $response['refresh_token'] = md5(md5($rowId) . $token . md5($clientId));
+        $response = ['token' => $accessToken, 'access_token' => $accessToken, 'expire' => $expire];
+        if ($scopeStr) {
+            $response['scope'] = $scope;
+        }
+        if (intval($appType) == ConstUtil::APP_SYSTEM) {
+            $response['refresh_token'] = $this->createRefreshToken($tokenId, $clientId, $accessToken);
         }
         return $response;
     }
 
     public function refresh($accessToken, $clientId, $refreshToken): ?array
     {
-        $tokenRow = $this->where(["client_id = ? and token = ?"], [$clientId, $accessToken])->fetch();
-        $token_id = $tokenRow['id'];
-        if (md5(md5($token_id) . $accessToken . md5($clientId)) == $refreshToken) {
+        $tokenRow = $this->where(['client_id=? and access_token=?'], [$clientId, $accessToken])->fetch();
+        $tokenId = $tokenRow['id'];
+        if ($this->createRefreshToken($tokenId, $clientId, $accessToken) === $refreshToken) {
             $timestamp = time();
-            $token = md5($tokenRow['uid'] + $clientId + $timestamp);
+            $newToken = $this->createToken($tokenRow['uid'], $clientId, $timestamp);
             $expire = $timestamp + 1296000;
-            $this->where(["id = :id"], ['id' => $token_id])->update(['token' => $token, 'expire' => $expire]);
-            return ['token' => $token, 'expire' => $expire, 'refresh_token' => md5(md5($token_id) . $token . md5($clientId))];
+            $this->where(["id=:id"], ['id' => $tokenId])->update(['access_token' => $newToken, 'expire' => $expire]);
+            return ['token' => $newToken, 'access_token' => $newToken, 'expire' => $expire, 'refresh_token' => $this->createRefreshToken($tokenId, $clientId, $newToken)];
         } else {
             return null;
         }
+    }
+
+    private function createToken($uid, $clientId, $timestamp): string
+    {
+        return md5($uid . $clientId . $timestamp);
+    }
+
+    private function createRefreshToken($tokenId, $clientId, $accessToken): string
+    {
+        return md5(md5($tokenId) . $accessToken . md5($clientId));
     }
 }
