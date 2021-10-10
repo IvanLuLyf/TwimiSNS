@@ -4,10 +4,8 @@ use BunnyPHP\BunnyPHP;
 use BunnyPHP\Filter;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/1/1
- * Time: 23:26
+ * @author IvanLu
+ * @time 2018/1/1 23:26
  */
 class ApiFilter extends Filter
 {
@@ -18,7 +16,7 @@ class ApiFilter extends Filter
                 $appKey = $_POST['client_id'];
                 $appSecret = $_POST['client_secret'];
                 if (($apiInfo = (new ApiModel())->validate($appKey, $appSecret)) != null) {
-                    if ($apiInfo['type'] == 1 || ($param[0] != '' and $apiInfo[$param[0]] == true)) {
+                    if ($apiInfo['type'] == ConstUtil::APP_SYSTEM || ($param[0] != '' && in_array($param[0], $apiInfo['scope']))) {
                         BunnyPHP::app()->set('tp_api', $apiInfo);
                         return self::NEXT;
                     } else {

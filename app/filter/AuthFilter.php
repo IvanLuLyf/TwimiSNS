@@ -4,10 +4,8 @@ use BunnyPHP\BunnyPHP;
 use BunnyPHP\Filter;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/11/12
- * Time: 1:22
+ * @author IvanLu
+ * @time 2018/11/12 1:22
  */
 class AuthFilter extends Filter
 {
@@ -33,7 +31,7 @@ class AuthFilter extends Filter
                 $appKey = $_POST['client_id'];
                 $appToken = $_POST['token'];
                 if ($apiInfo = (new ApiModel())->check($appKey)) {
-                    if ($apiInfo['type'] == 1 || $param[0] == '' || $apiInfo[$param[0]] == true) {
+                    if ($apiInfo['type'] == ConstUtil::APP_SYSTEM || $param[0] == '' || in_array($param[0], $apiInfo['scope'])) {
                         $userId = (new OauthTokenModel())->check($appKey, $appToken);
                         if ($userId != 0) {
                             $user = (new UserModel)->getUserByUid($userId);
