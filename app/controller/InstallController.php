@@ -1,16 +1,32 @@
 <?php
 
+use BunnyPHP\BunnyPHP;
 use BunnyPHP\Config;
 use BunnyPHP\Controller;
 use BunnyPHP\Model;
 
 /**
- * User: IvanLu
- * Date: 2018/9/28
- * Time: 17:12
+ * @author IvanLu
+ * @time 2018/9/28 17:12
  */
 class InstallController extends Controller
 {
+    public function ac_init()
+    {
+        if (BUNNY_APP_MODE === BunnyPHP::MODE_CLI) {
+            $models = scandir(APP_PATH . 'app/model');
+            /**
+             * @var $modelClass Model
+             */
+            foreach ($models as $model) {
+                if (substr($model, -9) == 'Model.php') {
+                    $modelClass = substr($model, 0, -4);
+                    $modelClass::create();
+                }
+            }
+        }
+    }
+
     public function ac_index()
     {
         if (Config::checkLock('install')) {
