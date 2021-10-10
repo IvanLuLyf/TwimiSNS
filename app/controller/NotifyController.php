@@ -4,15 +4,13 @@ use BunnyPHP\BunnyPHP;
 use BunnyPHP\Controller;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/3/7
- * Time: 17:32
+ * @author IvanLu
+ * @time 2019/3/7 17:32
  */
 class NotifyController extends Controller
 {
     /**
-     * @filter auth canFeed
+     * @filter auth feed
      */
     function ac_view()
     {

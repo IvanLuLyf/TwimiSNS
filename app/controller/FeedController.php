@@ -6,7 +6,7 @@ use BunnyPHP\Controller;
 /**
  * @author IvanLu
  * @time 2018/1/1 22:57
- * @filter auth canFeed
+ * @filter auth feed
  */
 class FeedController extends Controller
 {

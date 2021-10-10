@@ -4,15 +4,13 @@ use BunnyPHP\BunnyPHP;
 use BunnyPHP\Controller;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/3/2
- * Time: 18:25
+ * @author IvanLu
+ * @time 2019/3/2 18:25
  */
 class PayController extends Controller
 {
     /**
-     * @filter auth canPay
+     * @filter auth pay
      */
     public function ac_pay()
     {
@@ -42,7 +40,7 @@ class PayController extends Controller
     }
 
     /**
-     * @filter api canRequestPay
+     * @filter api requestPay
      */
     public function ac_request()
     {
@@ -59,7 +57,7 @@ class PayController extends Controller
     }
 
     /**
-     * @filter auth canPay
+     * @filter auth pay
      */
     public function ac_red_packet()
     {
@@ -90,7 +88,7 @@ class PayController extends Controller
     }
 
     /**
-     * @filter auth canPay
+     * @filter auth pay
      */
     public function ac_pick()
     {
@@ -112,7 +110,7 @@ class PayController extends Controller
     }
 
     /**
-     * @filter api canRequestPay
+     * @filter api requestPay
      */
     public function ac_view()
     {
@@ -124,7 +122,7 @@ class PayController extends Controller
     }
 
     /**
-     * @filter auth canPay
+     * @filter auth pay
      */
     public function ac_balance()
     {
@@ -134,7 +132,7 @@ class PayController extends Controller
     }
 
     /**
-     * @filter auth canPay
+     * @filter auth pay
      * @filter csrf
      */
     public function ac_start_get()
@@ -148,7 +146,7 @@ class PayController extends Controller
     }
 
     /**
-     * @filter auth canPay
+     * @filter auth pay
      * @filter csrf check
      * @param EmailService $service
      */

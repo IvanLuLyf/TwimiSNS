@@ -33,7 +33,7 @@ class PostController extends Controller
 
     /**
      * @filter csrf check
-     * @filter auth canFeed
+     * @filter auth feed
      */
     public function ac_create_post()
     {
@@ -128,7 +128,7 @@ class PostController extends Controller
     }
 
     /**
-     * @filter auth canFeed
+     * @filter auth feed
      * @param int $tid path(0)
      */
     function ac_comment(int $tid = 0)
@@ -189,7 +189,7 @@ class PostController extends Controller
 
     /**
      * @filter csrf check
-     * @filter auth canPay
+     * @filter auth pay
      * @param int $tid path(0)
      */
     function ac_buy_post(int $tid = 0)

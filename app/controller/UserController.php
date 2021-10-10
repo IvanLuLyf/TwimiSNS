@@ -242,7 +242,7 @@ class UserController extends Controller
     }
 
     /**
-     * @filter auth canGetInfo
+     * @filter auth info
      */
     public function ac_info()
     {
@@ -276,7 +276,7 @@ class UserController extends Controller
     }
 
     /**
-     * @filter auth canGetInfo
+     * @filter auth info
      */
     public function ac_code()
     {

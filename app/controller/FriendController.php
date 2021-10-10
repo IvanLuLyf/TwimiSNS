@@ -6,7 +6,7 @@ use BunnyPHP\Controller;
 /**
  * @author IvanLu
  * @time 2019/2/18 2:14
- * @filter auth canGetFriend
+ * @filter auth friend
  */
 class FriendController extends Controller
 {

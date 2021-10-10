@@ -6,7 +6,7 @@ use BunnyPHP\Controller;
 /**
  * @author IvanLu
  * @time 2019/3/15 16:42
- * @filter auth canGetInfo
+ * @filter auth info
  */
 class DataController extends Controller
 {
