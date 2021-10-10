@@ -87,7 +87,7 @@ class OauthController extends Controller
         if ($uid = $model->getUid($bind_uid, $type)) {
             $model->where(['bind=:b and type=:t'], ['b' => $bind_uid, 't' => $type])->update(['token' => $bind_token]);
             $result = (new UserModel())->getUserByUid($uid);
-            $appToken = (new OauthTokenModel())->get($uid, $_POST['client_id'], 1);
+            $appToken = (new OauthTokenModel())->generate($uid, $_POST['client_id'], 1);
             $result['token'] = $appToken['token'];
             $result['expire'] = $appToken['expire'];
             $result['refresh_token'] = $appToken['refresh_token'];
@@ -176,7 +176,12 @@ class OauthController extends Controller
                             else
                                 $this->redirect("$url?code=$code");
                         } else {
-                            $this->assignAll($result)->render('oauth/login.php');
+                            $this->assign('client_id', $_REQUEST['client_id'])
+                                ->assign('app_url', $app['url'])
+                                ->assign('client_name', $app['name'])
+                                ->assign('client_icon', $app['icon'])
+                                ->assign('redirect_uri', $_REQUEST['redirect_uri'])
+                                ->assignAll($result)->render('oauth/login.php');
                         }
                     }
                 }
@@ -195,7 +200,7 @@ class OauthController extends Controller
             $app_id = $app['id'];
             $oauthCodeModel = new OauthCodeModel();
             if (isset($_REQUEST['code']) && $uid = $oauthCodeModel->checkCode($app_id, $_REQUEST['code'])) {
-                $token_row = (new OauthTokenModel())->get($uid, $app_key, $app['type']);
+                $token_row = (new OauthTokenModel())->generate($uid, $app_key, $app['type']);
                 $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($token_row);
                 $oauthCodeModel->deleteCode($app_id, $_REQUEST['code']);
                 $this->render('common/error.php');

@@ -6,9 +6,8 @@ use BunnyPHP\Controller;
 use BunnyPHP\View;
 
 /**
- * User: IvanLu
- * Date: 2018/7/28
- * Time: 18:43
+ * @author IvanLu
+ * @time 2018/7/28 18:43
  */
 class UserController extends Controller
 {
@@ -24,7 +23,7 @@ class UserController extends Controller
         }
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             $oauth = [];
-            if (Config::check("oauth")) {
+            if (Config::check('oauth')) {
                 $oauth = Config::load('oauth')->get('enabled', []);
             }
             $this->assign('oauth', $oauth);
@@ -61,7 +60,7 @@ class UserController extends Controller
         } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             if ($result['ret'] == 0) {
                 $app = BunnyPHP::app()->get('tp_api');
-                $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id'], $app['type']);
+                $appToken = (new OauthTokenModel())->generate($result['uid'], $_POST['client_id'], $app['type']);
                 $result['token'] = $appToken['token'];
                 $result['expire'] = $appToken['expire'];
                 if (isset($appToken['refresh_token'])) {
@@ -104,7 +103,7 @@ class UserController extends Controller
                     $service->sendMail('email/reg.php', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
                     BunnyPHP::getRequest()->setSession('token', $result['token']);
                     $refererUrl = BunnyPHP::getRequest()->delSession('referer');
-                    $refererUrl = $referer ? $referer : $refererUrl;
+                    $refererUrl = $referer ?: $refererUrl;
                     if ($refererUrl) {
                         $this->redirect($refererUrl);
                     } else {
@@ -118,7 +117,7 @@ class UserController extends Controller
                     $service = new EmailService();
                     $service->sendMail('email/reg.php', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
                     $app = BunnyPHP::app()->get('tp_api');
-                    $appToken = (new OauthTokenModel())->get($result['uid'], $_POST['client_id'], $app['type']);
+                    $appToken = (new OauthTokenModel())->generate($result['uid'], $_POST['client_id'], $app['type']);
                     $result['token'] = $appToken['token'];
                     $result['expire'] = $appToken['expire'];
                     if (isset($appToken['refresh_token'])) {
