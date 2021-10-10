@@ -3,14 +3,12 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/1/1
- * Time: 16:45
+ * @author IvanLu
+ * @time 2018/1/1 16:45
  */
 class ApiModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'id' => ['integer', 'not null'],
         'uid' => ['integer', 'not null'],
         'name' => ['text', 'not null'],
@@ -20,48 +18,27 @@ class ApiModel extends Model
         'url' => ['text', 'not null'],
         'icon' => ['text', 'not null'],
         'type' => ['integer'],
-        'auth' => ['integer'],
+        'scope' => ['text'],
     ];
-    protected $_pk = ['id'];
-    protected $_ai = 'id';
+    protected array $_pk = ['id'];
+    protected string $_ai = 'id';
+    protected static array $FIELDS = ['id', 'name', 'type', 'url', 'icon', 'redirect_uri', 'scope'];
 
     public function check($clientId): ?array
     {
-        if ($row = $this->where(["client_id = ?"], [$clientId])->fetch()) {
-            return [
-                'id' => $row['id'],
-                'name' => $row['name'],
-                'type' => $row['type'],
-                'url' => $row['url'],
-                'icon' => $row['icon'],
-                'redirect_uri' => $row['redirect_uri'],
-                'canGetInfo' => (intval($row['auth']) & 1) && true,
-                'canFeed' => (intval($row['auth']) & 2) && true,
-                'canGetFriend' => (intval($row['auth']) & 4) && true,
-                'canRequestPay' => (intval($row['auth']) & 8) && true,
-                'canPay' => (intval($row['auth']) & 16) && true
-            ];
+        if ($api = $this->where(['client_id=?'], [$clientId])->fetch(self::$FIELDS)) {
+            $api['scope'] = explode('|', $api['scope']);
+            return $api;
         } else {
             return null;
         }
     }
 
-    public function validate($clientId, $clientSecret)
+    public function validate($clientId, $clientSecret): ?array
     {
-        if ($row = $this->where(["client_id = ? and client_secret = ?"], [$clientId, $clientSecret])->fetch()) {
-            return [
-                'id' => $row['id'],
-                'name' => $row['name'],
-                'type' => $row['type'],
-                'url' => $row['url'],
-                'icon' => $row['icon'],
-                'redirect_uri' => $row['redirect_uri'],
-                'canGetInfo' => (intval($row['auth']) & 1) && true,
-                'canFeed' => (intval($row['auth']) & 2) && true,
-                'canGetFriend' => (intval($row['auth']) & 4) && true,
-                'canRequestPay' => (intval($row['auth']) & 8) && true,
-                'canPay' => (intval($row['auth']) & 16) && true
-            ];
+        if ($api = $this->where(['client_id=? and client_secret=?'], [$clientId, $clientSecret])->fetch(self::$FIELDS)) {
+            $api['scope'] = explode('|', $api['scope']);
+            return $api;
         } else {
             return null;
         }
@@ -69,7 +46,7 @@ class ApiModel extends Model
 
     public function getAuthorByClientId($clientId)
     {
-        if ($row = $this->where(["client_id = ?"], [$clientId])->fetch()) {
+        if ($row = $this->where(['client_id=?'], [$clientId])->fetch(['uid'])) {
             return $row['uid'];
         } else {
             return null;
@@ -78,7 +55,7 @@ class ApiModel extends Model
 
     public function getAuthorByAppId($aid)
     {
-        if ($row = $this->where(["id = ?"], [$aid])->fetch()) {
+        if ($row = $this->where(['id=?'], [$aid])->fetch(['uid'])) {
             return $row['uid'];
         } else {
             return null;
