@@ -48,7 +48,7 @@ class OauthController extends Controller
     {
         $bind_model = new BindModel();
         if (isset($_GET['code'])) {
-            $bind = (new OauthService($this))->oauth($type);
+            $bind = (new OauthService())->oauth($type);
             if ($uid = $bind_model->getUid($bind['uid'], $type)) {
                 $userToken = (new UserModel())->refresh($uid);
                 BunnyPHP::getRequest()->setSession('token', $userToken);

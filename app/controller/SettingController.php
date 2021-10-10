@@ -47,7 +47,7 @@ class SettingController extends Controller
             $bind = (new BindModel())->where(['uid=:u and type=:t'], ['u' => $this->user['uid'], 't' => $type])->fetch();
             if ($bind != null) {
                 $this->assign('tp_bind', $bind);
-                $image = (new OauthService($this))->avatar($type, $bind['bind'], $bind['token']);
+                $image = (new OauthService())->avatar($type, $bind['bind'], $bind['token']);
                 $this->assign('avatar', $image);
             }
             $name = '';
