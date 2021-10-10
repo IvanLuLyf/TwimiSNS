@@ -34,7 +34,7 @@
                         <div id="selTabContent" class="tab-content">
                             <?php if (isset($allow_reg)): ?>
                                 <div class="tab-pane in active" id="acReg">
-                                    <form action="/oauth/bind/<?= $oauth['type'] ?>?type=reg" method="post">
+                                    <form action="/oauth/bind/<?= $oauth['type'] ?>?bind_type=reg" method="post">
                                         <div class="form-group">
                                             <label for="reg_username">用户名</label>
                                             <input type="text" id="reg_username" name="username"
@@ -63,7 +63,7 @@
                                 </div>
                             <?php endif; ?>
                             <div class="tab-pane <?= isset($allow_reg) ? '' : 'in active' ?>" id="acLogin">
-                                <form action="/oauth/bind/<?= $oauth['type'] ?>?type=login" method="post">
+                                <form action="/oauth/bind/<?= $oauth['type'] ?>?bind_type=login" method="post">
                                     <div class="form-group">
                                         <label for="username">用户名</label>
                                         <input type="text" id="username" name="username" class="form-control"
