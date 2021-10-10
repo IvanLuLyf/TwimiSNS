@@ -36,7 +36,7 @@ class PayController extends Controller
         } else {
             $this->assignAll(['ret' => 5001, 'status' => 'wrong payment password']);
         }
-        $this->render('pay/buy.html');
+        $this->render('pay/buy.php');
     }
 
     /**
@@ -53,7 +53,7 @@ class PayController extends Controller
         } else {
             $this->assignAll(['ret' => 5006, 'status' => 'invalid amount']);
         }
-        $this->render('pay/request.html');
+        $this->render('pay/request.php');
     }
 
     /**
@@ -84,7 +84,7 @@ class PayController extends Controller
         } else {
             $this->assignAll(['ret' => 5006, 'status' => 'invalid amount']);
         }
-        $this->render('pay/red_packet.html');
+        $this->render('pay/red_packet.php');
     }
 
     /**
@@ -106,7 +106,7 @@ class PayController extends Controller
         } else {
             $this->assignAll(['ret' => 5005, 'status' => 'empty red packet']);
         }
-        $this->render('pay/pick.html');
+        $this->render('pay/pick.php');
     }
 
     /**
@@ -118,7 +118,7 @@ class PayController extends Controller
         $payInfo = (new PayOrderModel())->get($payTicket);
         $payInfo['paid'] = ($payInfo['uid'] > 0);
         unset($payInfo['uid']);
-        $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($payInfo)->render('pay/view.html');
+        $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($payInfo)->render('pay/view.php');
     }
 
     /**
@@ -128,7 +128,7 @@ class PayController extends Controller
     {
         $tp_user = BunnyPHP::app()->get('tp_user');
         $credit = new CreditModel();
-        $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => intval($credit->balance($tp_user['uid']))])->render('pay/balance.html');
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => intval($credit->balance($tp_user['uid']))])->render('pay/balance.php');
     }
 
     /**
@@ -139,7 +139,7 @@ class PayController extends Controller
     {
         $tp_user = BunnyPHP::app()->get('tp_user');
         if (intval((new CreditModel())->balance($tp_user['uid'])) == -1) {
-            $this->render('pay/start.html');
+            $this->render('pay/start.php');
         } else {
             $this->redirect('pay', 'balance');
         }
@@ -157,7 +157,7 @@ class PayController extends Controller
             $credit = new CreditModel();
             (new PayPassModel())->setPassword($tp_user['uid'], md5($_POST['pass']));
             $service->sendMail('email/pay_start.html', ['nickname' => $tp_user['nickname'], 'site' => TP_SITE_NAME], $tp_user['email'], '您已开通' . TP_SITE_NAME . "支付服务");
-            $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => $credit->start($tp_user['uid'])])->render('pay/start.html');
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => $credit->start($tp_user['uid'])])->render('pay/start.php');
         } else {
             $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => "必要参数为空"])->error();
         }
