@@ -3,14 +3,12 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/7/29
- * Time: 1:27
+ * @author IvanLu
+ * @time 2018/7/29 1:27
  */
 class UserModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'uid' => ['integer', 'not null'],
         'username' => ['varchar(16)', 'not null'],
         'password' => ['varchar(32)', 'not null'],
@@ -19,8 +17,8 @@ class UserModel extends Model
         'token' => ['text', 'not null'],
         'expire' => ['text']
     ];
-    protected $_pk = ['uid'];
-    protected $_ai = 'uid';
+    protected array $_pk = ['uid'];
+    protected string $_ai = 'uid';
 
     public function getUsers($page = 1)
     {
