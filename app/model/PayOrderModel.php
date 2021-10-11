@@ -3,14 +3,12 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/3/2
- * Time: 15:37
+ * @author IvanLu
+ * @time 2019/3/2 15:37
  */
 class PayOrderModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'id' => ['integer', 'not null'],
         'intro' => ['text', 'not null'],
         'price' => ['double', 'not null'],
@@ -19,10 +17,10 @@ class PayOrderModel extends Model
         'uid' => ['integer', 'default 0'],
         'timestamp' => ['text'],
     ];
-    protected $_pk = ['id'];
-    protected $_ai = 'id';
+    protected array $_pk = ['id'];
+    protected string $_ai = 'id';
 
-    public function ticket($appId, $intro, $price)
+    public function ticket($appId, $intro, $price): string
     {
         $timestamp = time();
         $payTicket = sha1($intro . $appId . $timestamp . rand(1, 100));
