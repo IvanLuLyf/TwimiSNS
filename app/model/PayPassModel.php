@@ -3,18 +3,16 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/3/2
- * Time: 18:19
+ * @author IvanLu
+ * @time 2019/3/2 18:19
  */
 class PayPassModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'uid' => ['integer', 'not null'],
         'password' => ['text', 'not null'],
     ];
-    protected $_pk = ['uid'];
+    protected array $_pk = ['uid'];
 
     public function getPassword($uid)
     {
