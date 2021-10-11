@@ -3,14 +3,12 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/3/28
- * Time: 14:38
+ * @author IvanLu
+ * @time 2019/3/28 14:38
  */
 class RedPacketModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'id' => ['integer', 'not null'],
         'app' => ['integer', 'not null'],
         'uid' => ['integer', 'not null'],
@@ -20,8 +18,8 @@ class RedPacketModel extends Model
         'remain' => ['integer', 'not null'],
         'message' => ['text'],
     ];
-    protected $_pk = ['id'];
-    protected $_ai = 'id';
+    protected array $_pk = ['id'];
+    protected string $_ai = 'id';
 
     public function send($app, $uid, $total, $num, $message)
     {
