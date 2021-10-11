@@ -3,19 +3,17 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/2/28
- * Time: 22:34
+ * @author IvanLu
+ * @time 2019/2/28 22:34
  */
 class PassCodeModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'uid' => ['integer', 'not null'],
         'code' => ['text'],
         'expire' => ['integer']
     ];
-    protected $_pk = ['uid'];
+    protected array $_pk = ['uid'];
 
     function getCode($uid)
     {
