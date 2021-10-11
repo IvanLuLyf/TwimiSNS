@@ -3,22 +3,20 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/3/5
- * Time: 23:47
+ * @author IvanLu
+ * @time 2019/3/5 23:47
  */
 class PostPayModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'id' => ['integer', 'not null'],
         'tid' => ['integer', 'not null'],
         'uid' => ['integer', 'not null'],
     ];
-    protected $_pk = ['id'];
-    protected $_ai = 'id';
+    protected array $_pk = ['id'];
+    protected string $_ai = 'id';
 
-    public function check($uid, $tid)
+    public function check($uid, $tid): bool
     {
         return $this->where("tid=:t and uid=:u", ['u' => $uid, 't' => $tid])->fetch() != null;
     }
