@@ -3,14 +3,12 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/2/13
- * Time: 15:51
+ * @author IvanLu
+ * @time 2019/2/13 15:51
  */
 class PostModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'tid' => ['integer', 'not null'],
         'username' => ['varchar(16)', 'not null'],
         'title' => ['text', 'not null'],
@@ -18,8 +16,8 @@ class PostModel extends Model
         'extra' => ['text'],
         'timestamp' => ['text'],
     ];
-    protected $_pk = ['tid'];
-    protected $_ai = 'tid';
+    protected array $_pk = ['tid'];
+    protected string $_ai = 'tid';
 
     public function getPostByPage($page = 1, $size = 20)
     {
