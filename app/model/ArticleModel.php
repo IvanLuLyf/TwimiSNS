@@ -3,14 +3,12 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/2/13
- * Time: 15:51
+ * @author IvanLu
+ * @time 2019/2/13 Time: 15:51
  */
 class ArticleModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'tid' => ['integer', 'not null'],
         'cid' => ['integer', 'not null'],
         'title' => ['text', 'not null'],
@@ -18,8 +16,8 @@ class ArticleModel extends Model
         'content' => ['text', 'not null'],
         'timestamp' => ['text'],
     ];
-    protected $_pk = ['tid'];
-    protected $_ai = 'tid';
+    protected array $_pk = ['tid'];
+    protected string $_ai = 'tid';
 
     public function getArticlesByPage($page = 1, $size = 5)
     {
