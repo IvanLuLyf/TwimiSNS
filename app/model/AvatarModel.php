@@ -3,23 +3,21 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2018/10/13
- * Time: 17:30
+ * @author IvanLu
+ * @time 2018/10/13 17:30
  */
 class AvatarModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'uid' => ['integer', 'not null'],
         'url' => ['text', 'not null'],
     ];
-    protected $_pk = ['uid'];
+    protected array $_pk = ['uid'];
 
     public function upload($uid, $path)
     {
-        if ($this->where(["uid = ?"], [$uid])->fetch()) {
-            return $this->where(["uid = :uid"], ['uid' => $uid])->update(['url' => $path]);
+        if ($this->where(['uid = ?'], [$uid])->fetch()) {
+            return $this->where(['uid = :uid'], ['uid' => $uid])->update(['url' => $path]);
         } else {
             return $this->add(['uid' => $uid, 'url' => $path]);
         }
@@ -27,7 +25,7 @@ class AvatarModel extends Model
 
     public function getAvatar($uid)
     {
-        if ($row = $this->where(["uid = ?"], [$uid])->fetch()) {
+        if ($row = $this->where(['uid = ?'], [$uid])->fetch()) {
             return $row['url'];
         } else {
             return '/static/img/avatar.png';
