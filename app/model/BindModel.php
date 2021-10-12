@@ -3,14 +3,12 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/3/1
- * Time: 19:08
+ * @author IvanLu
+ * @time 2019/3/1 19:08
  */
 class BindModel extends Model
 {
-    protected $_column = [
+    protected array $_column = [
         'id' => ['integer', 'not null'],
         'uid' => ['integer', 'not null'],
         'type' => ['text'],
@@ -18,8 +16,8 @@ class BindModel extends Model
         'token' => ['text', 'not null'],
         'expire' => ['text']
     ];
-    protected $_pk = ['id'];
-    protected $_ai = 'id';
+    protected array $_pk = ['id'];
+    protected string $_ai = 'id';
 
     public function getUid($bind_uid, $type)
     {
