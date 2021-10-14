@@ -4,10 +4,8 @@ use BunnyPHP\BunnyPHP;
 use BunnyPHP\Filter;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/3/1
- * Time: 15:45
+ * @author IvanLu
+ * @time 2019/3/1 15:45
  */
 class CsrfFilter extends Filter
 {
