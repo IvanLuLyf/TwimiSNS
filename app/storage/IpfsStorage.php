@@ -10,9 +10,9 @@ class IpfsStorage implements Storage
 {
     private $server;
 
-    public function __construct($config)
+    public function __construct($config = [])
     {
-        $this->server = $config['server'] ?: 'https://ipfs.infura.io:5001/api/v0';
+        $this->server = ($config['server'] ?? '') ?: 'https://ipfs.infura.io:5001/api/v0';
     }
 
     public function read($filename)
