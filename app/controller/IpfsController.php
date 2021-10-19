@@ -30,6 +30,6 @@ class IpfsController extends Controller
             }
         }
         header('Content-type: application/octet-stream');
-        echo (new IpfsStorage([]))->read($path);
+        echo (new IpfsStorage(['server' => '']))->read($path);
     }
 }
