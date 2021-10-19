@@ -14,11 +14,11 @@ class RequestUtil
         return self::sendRequest($url, $data, 'POST', ['Content-Type: application/x-www-form-urlencoded']);
     }
 
-    public static function doUpload($url, $filename)
+    public static function doUpload($url, $filename, $file_content = null)
     {
         $MULTIPART_BOUNDARY = '--------------------------' . microtime(true);
         $header = 'Content-Type: multipart/form-data; boundary=' . $MULTIPART_BOUNDARY;
-        $file_contents = file_get_contents($filename);
+        $file_contents = $file_content ?? file_get_contents($filename);
         $content = "--{$MULTIPART_BOUNDARY}\r\n" .
             "Content-Disposition: form-data; name=\"file\"; filename=\"" . basename($filename) . "\"\r\n" .
             "Content-Type: application/octet-stream\r\n\r\n" .
