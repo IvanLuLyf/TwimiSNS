@@ -75,7 +75,6 @@ class PostController extends Controller
                 $this->assign('show_state', $showState);
                 $this->assign('tp_user', $tp_user);
                 $this->assign('cur_ctr', 'post');
-                include APP_PATH . 'library/Parser.php';
                 $parser = new HyperDown\Parser;
                 $html_content = $parser->makeHtml($post['content']);
                 $this->assign("html_content", $html_content);
@@ -115,7 +114,6 @@ class PostController extends Controller
         }
         $endPage = ceil($total / 20);
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
-            include APP_PATH . 'library/Parser.php';
             $parser = new HyperDown\Parser;
             $this->assign('parser', $parser);
             $this->assign('tp_user', $tp_user)

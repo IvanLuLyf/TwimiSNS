@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2592f118c346b2e528dadc5986fa50fe",
+    "content-hash": "b74aaf454418ef1048633e3d7dad4b24",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -181,6 +181,52 @@
                 "source": "https://github.com/bunniescc/BunnyPHP-Mailer/tree/1.0.0"
             },
             "time": "2021-10-09T15:58:28+00:00"
+        },
+        {
+            "name": "joyqi/hyper-down",
+            "version": "2.4.27",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SegmentFault/HyperDown.git",
+                "reference": "a8024055032d2b935b2521fddb1c5564a85b7dac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SegmentFault/HyperDown/zipball/a8024055032d2b935b2521fddb1c5564a85b7dac",
+                "reference": "a8024055032d2b935b2521fddb1c5564a85b7dac",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=7.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "HyperDown\\": "./"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-4-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "joyqi",
+                    "email": "joyqi@segmentfault.com"
+                }
+            ],
+            "description": "A light weight markdown parser library",
+            "keywords": [
+                "hyperdown",
+                "markdown",
+                "segmentfault"
+            ],
+            "support": {
+                "issues": "https://github.com/SegmentFault/HyperDown/issues",
+                "source": "https://github.com/SegmentFault/HyperDown/tree/2.4.27"
+            },
+            "time": "2021-08-08T04:33:34+00:00"
         }
     ],
     "packages-dev": [],
