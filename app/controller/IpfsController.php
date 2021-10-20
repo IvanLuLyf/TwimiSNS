@@ -7,14 +7,14 @@ use BunnyPHP\Controller;
 class IpfsController extends Controller
 {
     /**
+     * @param string $storageName config(storage.name)
      * @param array $hash path()
      */
-    public function other(array $hash = [])
+    public function other(string $storageName, array $hash = [])
     {
         $extra = $hash ? ('/' . implode('/', $hash)) : '';
         $path = BUNNY_ACTION . $extra;
-        $storage = BunnyPHP::getStorage();
-        if ($storage instanceof IpfsStorage) {
+        if ($storageName == 'ipfs') {
             $tag = md5($path);
             $last_modified_time = BunnyPHP::getCache()->get('ipfs://' . $path);
             if (!$last_modified_time) {
@@ -32,7 +32,7 @@ class IpfsController extends Controller
                 }
             }
             header('Content-type: image');
-            echo $storage->read($path);
+            echo (BunnyPHP::getStorage())->read($path);
         } else {
             $this->redirect("https://ipfs.io/ipfs/$path");
         }
