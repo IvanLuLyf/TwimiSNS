@@ -41,7 +41,11 @@ class UserController extends Controller
         $result = (new UserModel())->login($_POST['username'], $_POST['password']);
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             if ($result['ret'] == 0) {
-                BunnyPHP::getRequest()->setSession('token', $result['token']);
+                if ($_ENV['BUNNY_COOKIE_TOKEN']) {
+                    setcookie('bunny_user_token', $result['token'], time() + 86400, '/', '', false, true);
+                } else {
+                    BunnyPHP::getRequest()->setSession('token', $result['token']);
+                }
                 $refererUrl = BunnyPHP::getRequest()->delSession('referer');
                 $refererUrl = $referer ?: $refererUrl;
                 if ($refererUrl) {
@@ -192,7 +196,11 @@ class UserController extends Controller
 
     public function ac_logout()
     {
-        BunnyPHP::getRequest()->delSession('token');
+        if ($_ENV['BUNNY_COOKIE_TOKEN']) {
+            setcookie('bunny_user_token', '', time() - 10);
+        } else {
+            BunnyPHP::getRequest()->delSession('token');
+        }
         $this->redirect('user', 'login');
     }
 

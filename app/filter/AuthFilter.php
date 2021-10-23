@@ -12,7 +12,11 @@ class AuthFilter extends Filter
     public function doFilter($param = []): int
     {
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
-            $token = BunnyPHP::getRequest()->getSession('token');
+            if ($_ENV['BUNNY_COOKIE_TOKEN']) {
+                $token = $_COOKIE['bunny_user_token'];
+            } else {
+                $token = BunnyPHP::getRequest()->getSession('token');
+            }
             if (!$token) $token = BunnyPHP::getRequest()->getHeader('token');
             if ($token) {
                 $user = (new UserModel)->check($token);
