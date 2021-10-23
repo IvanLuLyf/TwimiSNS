@@ -21,7 +21,7 @@
                     <img src="/user/avatar/<?= $user['uid'] ?>" class="rounded-circle center-block" width="72px"
                          alt="avatar"/>
                     <h4 class="card-title"><?= $user['nickname'] ?></h4>
-                    <p class="card-text"><?= htmlspecialchars($user_info['signature']) ?></p>
+                    <p class="card-text"><?= htmlspecialchars($user_info['signature'] ?? '') ?></p>
                 </div>
             </div>
             <?php if (!empty($tab) && $tab == 'post'): ?>
