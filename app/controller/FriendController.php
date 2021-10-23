@@ -25,32 +25,37 @@ class FriendController extends Controller
         return ['ret' => 0, 'status' => 'ok', 'friends' => $friends];
     }
 
-    public function ac_note(): array
+    /**
+     * @param string $username not_empty()
+     * @param string $notename not_empty()
+     * @return array
+     */
+    public function ac_note(string $username, string $notename): array
     {
-        if (StrUtil::emptyText($_POST['username']) || StrUtil::emptyText($_POST['notename'])) {
-            return ['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'];
-        }
-        return $this->friendModel->noteFriend($this->user['uid'], $_POST['username'], $_POST['notename']);
+        return $this->friendModel->noteFriend($this->user['uid'], $username, $notename);
     }
 
-    public function ac_add(UserModel $userModel): array
+    /**
+     * @param UserModel $userModel
+     * @param string $username not_empty()
+     * @return array
+     */
+    public function ac_add(UserModel $userModel, string $username): array
     {
-        if (StrUtil::emptyText($_POST['username'])) {
-            return ['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'];
-        }
         $user = $userModel->getUserByUid($this->user['uid']);
-        $f_user = $userModel->getUserByUsername($_POST['username']);
+        $f_user = $userModel->getUserByUsername($username);
         return $this->friendModel->addFriend($user['uid'], $f_user['uid'], $user['username'], $f_user['username'], $user['nickname'], $f_user['nickname']);
     }
 
-
-    public function ac_accept(UserModel $userModel): array
+    /**
+     * @param UserModel $userModel
+     * @param string $username not_empty()
+     * @return array
+     */
+    public function ac_accept(UserModel $userModel, string $username): array
     {
-        if (StrUtil::emptyText($_POST['username'])) {
-            return ['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'];
-        }
         $user = $userModel->getUserByUid($this->user['uid']);
-        $f_user = $userModel->getUserByUsername($_POST['username']);
+        $f_user = $userModel->getUserByUsername($username);
         return $this->friendModel->acceptFriend($user['uid'], $f_user['uid'], $user['username'], $f_user['username']);
     }
 }
