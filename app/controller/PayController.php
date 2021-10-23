@@ -149,17 +149,14 @@ class PayController extends Controller
      * @filter auth pay
      * @filter csrf check
      * @param EmailService $service
+     * @param string $pass not_empty()
      */
-    public function ac_start_post(EmailService $service)
+    public function ac_start_post(EmailService $service, string $pass)
     {
-        if (isset($_POST['pass'])) {
-            $tp_user = BunnyPHP::app()->get('tp_user');
-            $credit = new CreditModel();
-            (new PayPassModel())->setPassword($tp_user['uid'], md5($_POST['pass']));
-            $service->sendMail('email/pay_start.html', ['nickname' => $tp_user['nickname'], 'site' => TP_SITE_NAME], $tp_user['email'], '您已开通' . TP_SITE_NAME . "支付服务");
-            $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => $credit->start($tp_user['uid'])])->render('pay/start.php');
-        } else {
-            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => "必要参数为空"])->error();
-        }
+        $tp_user = BunnyPHP::app()->get('tp_user');
+        $credit = new CreditModel();
+        (new PayPassModel())->setPassword($tp_user['uid'], md5($pass));
+        $service->sendMail('email/pay_start.html', ['nickname' => $tp_user['nickname'], 'site' => TP_SITE_NAME], $tp_user['email'], '您已开通' . TP_SITE_NAME . "支付服务");
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => $credit->start($tp_user['uid'])])->render('pay/start.php');
     }
 }
