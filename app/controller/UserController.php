@@ -3,6 +3,7 @@
 use BunnyPHP\BunnyPHP;
 use BunnyPHP\Config;
 use BunnyPHP\Controller;
+use BunnyPHP\Request;
 use BunnyPHP\View;
 
 /**
@@ -18,7 +19,7 @@ class UserController extends Controller
     public function ac_login_get($referer)
     {
         if ($referer) {
-            BunnyPHP::getRequest()->setSession('referer', $referer);
+            Request::session('referer', $referer);
             $this->assign('referer', $referer);
         }
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
@@ -36,18 +37,13 @@ class UserController extends Controller
      * @filter api
      * @param $referer
      */
-    public function ac_login_post($referer)
+    public function ac_login_post($referer, UserService $userService)
     {
         $result = (new UserModel())->login($_POST['username'], $_POST['password']);
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             if ($result['ret'] == 0) {
-                if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
-                    setcookie('bunny_user_token', $result['token'], time() + 86400, '/', '', false, true);
-                } else {
-                    BunnyPHP::getRequest()->setSession('token', $result['token']);
-                }
-                $refererUrl = BunnyPHP::getRequest()->delSession('referer');
-                $refererUrl = $referer ?: $refererUrl;
+                $userService->setLoginUser($result['token']);
+                $refererUrl = $referer ?: Request::session('referer', null);
                 if ($refererUrl) {
                     $this->redirect($refererUrl);
                 } else {
@@ -56,7 +52,7 @@ class UserController extends Controller
             } else {
                 $this->assignAll($result);
                 $oauth = [];
-                if (Config::check("oauth")) {
+                if (Config::check('oauth')) {
                     $oauth = Config::load('oauth')->get('enabled', []);
                 }
                 $this->assign('oauth', $oauth)->render('user/login.php');
@@ -83,10 +79,10 @@ class UserController extends Controller
     {
         if (Config::load('config')->get('allow_reg')) {
             if ($referer) {
-                BunnyPHP::getRequest()->setSession('referer', $referer);
+                Request::session('referer', $referer);
                 $this->assign('referer', $referer);
             }
-            $this->render("user/register.php");
+            $this->render('user/register.php');
         } else {
             $this->assignAll(['ret' => 1005, 'status' => 'registration is not allowed', 'tp_error_msg' => '站点关闭注册'])->error();
         }
@@ -97,17 +93,16 @@ class UserController extends Controller
      * @filter api
      * @param $referer
      */
-    public function ac_register_post($referer)
+    public function ac_register_post($referer, UserService $userService)
     {
         if (Config::load('config')->get('allow_reg')) {
             $result = (new UserModel())->register($_POST['username'], $_POST['password'], $_POST['email'], $_POST['nickname']);
             if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
                 if ($result['ret'] == 0) {
                     $service = new EmailService();
-                    $service->sendMail('email/reg.php', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
-                    BunnyPHP::getRequest()->setSession('token', $result['token']);
-                    $refererUrl = BunnyPHP::getRequest()->delSession('referer');
-                    $refererUrl = $referer ?: $refererUrl;
+                    $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
+                    $userService->setLoginUser($result['token']);
+                    $refererUrl = $referer ?: Request::session('referer', null);
                     if ($refererUrl) {
                         $this->redirect($refererUrl);
                     } else {
@@ -119,7 +114,7 @@ class UserController extends Controller
             } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
                 if ($result['ret'] == 0) {
                     $service = new EmailService();
-                    $service->sendMail('email/reg.php', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
+                    $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
                     $app = BunnyPHP::app()->get('tp_api');
                     $appToken = (new OauthTokenModel())->generate($result['uid'], $_POST['client_id'], $app['type']);
                     $result['token'] = $appToken['token'];
@@ -146,61 +141,49 @@ class UserController extends Controller
     /**
      * @filter csrf check
      * @filter api
+     * @param string $email not_empty()
      */
-    public function ac_forgot_post()
+    public function ac_forgot_post(string $email)
     {
-        if (isset($_POST['email'])) {
-            if ($user = (new UserModel())->where('username = :u or email = :u', ['u' => $_POST['email']])->fetch()) {
-                $service = new EmailService();
-                $code = (new PassCodeModel())->getCode($user['uid']);
-                $service->sendMail('email/forgot.html', ['nickname' => $user['nickname'], 'site' => TP_SITE_NAME, 'url' => TP_SITE_URL, 'code' => $code], $user['email'], '找回密码');
-                $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "邮件已发送"])->render('common/error.php');
-            } else {
-                $this->assignAll(['ret' => 1002, 'status' => "user does not exist", 'tp_error_msg' => '用户名不存在'])->render('user/forgot.php');
-            }
+        if ($user = (new UserModel())->where('username = :u or email = :u', ['u' => $email])->fetch()) {
+            $service = new EmailService();
+            $code = (new PassCodeModel())->getCode($user['uid']);
+            $service->sendMail('email/forgot.html', ['nickname' => $user['nickname'], 'site' => TP_SITE_NAME, 'url' => TP_SITE_URL, 'code' => $code], $user['email'], '找回密码');
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "邮件已发送"])->render('common/error.php');
         } else {
-            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->render('user/forgot.php');
+            $this->assignAll(['ret' => 1002, 'status' => "user does not exist", 'tp_error_msg' => '用户名不存在'])->render('user/forgot.php');
         }
     }
 
     /**
      * @filter csrf
+     * @param string $code not_empty()
      */
-    public function ac_reset_get()
+    public function ac_reset_get(string $code)
     {
-        if (isset($_REQUEST['code'])) {
-            $this->assign('code', $_REQUEST['code'])->render('user/reset.php');
-        } else {
-            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->error();
-        }
+        $this->assign('code', $code)->render('user/reset.php');
     }
 
     /**
      * @filter csrf check
      * @filter api
+     * @param string $code not_empty()
+     * @param string $password not_empty()
      */
-    public function ac_reset_post()
+    public function ac_reset_post(string $code, string $password)
     {
-        if (isset($_POST['code'])) {
-            $uid = (new PassCodeModel())->checkCode($_POST['code']);
-            if ($uid != null) {
-                (new UserModel())->reset($uid, $_POST['password']);
-                $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "密码修改完成"])->render('common/error.php');
-            } else {
-                $this->assignAll(['ret' => 1008, 'status' => 'invalid verification code', 'tp_error_msg' => '验证码已过期'])->error();
-            }
+        $uid = (new PassCodeModel())->checkCode($code);
+        if ($uid != null) {
+            (new UserModel())->reset($uid, $password);
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => '密码修改完成'])->render('common/error.php');
         } else {
-            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '必要参数为空'])->error();
+            $this->assignAll(['ret' => 1008, 'status' => 'invalid verification code', 'tp_error_msg' => '验证码已过期'])->error();
         }
     }
 
-    public function ac_logout()
+    public function ac_logout(UserService $userService)
     {
-        if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
-            setcookie('bunny_user_token', '', time() - 10);
-        } else {
-            BunnyPHP::getRequest()->delSession('token');
-        }
+        $userService->setLoginUser(null);
         $this->redirect('user', 'login');
     }
 
