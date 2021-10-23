@@ -41,7 +41,7 @@ class UserController extends Controller
         $result = (new UserModel())->login($_POST['username'], $_POST['password']);
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             if ($result['ret'] == 0) {
-                if ($_ENV['BUNNY_COOKIE_TOKEN']) {
+                if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
                     setcookie('bunny_user_token', $result['token'], time() + 86400, '/', '', false, true);
                 } else {
                     BunnyPHP::getRequest()->setSession('token', $result['token']);
@@ -196,7 +196,7 @@ class UserController extends Controller
 
     public function ac_logout()
     {
-        if ($_ENV['BUNNY_COOKIE_TOKEN']) {
+        if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
             setcookie('bunny_user_token', '', time() - 10);
         } else {
             BunnyPHP::getRequest()->delSession('token');

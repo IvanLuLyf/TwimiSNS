@@ -11,8 +11,8 @@ class UserService extends Service
 {
     public function getLoginUser()
     {
-        if ($_ENV['BUNNY_COOKIE_TOKEN']) {
-            $token = $_COOKIE['bunny_user_token'];
+        if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
+            $token = $_COOKIE['bunny_user_token'] ?? '';
         } else {
             $token = BunnyPHP::getRequest()->getSession('token');
         }

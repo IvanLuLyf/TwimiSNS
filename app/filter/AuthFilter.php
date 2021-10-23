@@ -12,8 +12,8 @@ class AuthFilter extends Filter
     public function doFilter($param = []): int
     {
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
-            if ($_ENV['BUNNY_COOKIE_TOKEN']) {
-                $token = $_COOKIE['bunny_user_token'];
+            if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
+                $token = $_COOKIE['bunny_user_token'] ?? '';
             } else {
                 $token = BunnyPHP::getRequest()->getSession('token');
             }
