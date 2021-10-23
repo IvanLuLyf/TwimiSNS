@@ -34,18 +34,16 @@ class PostController extends Controller
     /**
      * @filter csrf check
      * @filter auth feed
+     * @param string $title not_empty()
+     * @param string $content not_empty()
      */
-    public function ac_create_post()
+    public function ac_create_post(string $title, string $content)
     {
-        if (isset($_POST['title']) && isset($_POST['content'])) {
-            $tid = $this->postModel->sendPost(BunnyPHP::app()->get('tp_user'), $_POST['title'], $_POST['content']);
-            if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
-                $this->redirect('post', 'view', ['tid' => $tid]);
-            } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
-                $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid])->render();
-            }
-        } else {
-            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => "必要参数为空"])->error();
+        $tid = $this->postModel->sendPost(BunnyPHP::app()->get('tp_user'), $title, $content);
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
+            $this->redirect('post', 'view', ['tid' => $tid]);
+        } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'tid' => $tid])->render();
         }
     }
 
