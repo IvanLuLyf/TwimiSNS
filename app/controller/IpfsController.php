@@ -15,13 +15,14 @@ class IpfsController extends Controller
         $extra = $hash ? ('/' . implode('/', $hash)) : '';
         $path = BUNNY_ACTION . $extra;
         if ($storageName == 'ipfs') {
+            $lm = $_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? gmdate('r', time());
+            header('ETag: "' . md5($path) . '"');
+            header('Last-Modified: ' . $lm);
             header('Cache-Control: public');
             if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
                 header('HTTP/1.1 304 Not Modified');
                 exit();
             }
-            header('ETag: "' . md5($path) . '"');
-            header('Last-Modified: ' . gmdate('r', time()));
             header('Content-type: image');
             echo (BunnyPHP::getStorage())->read($path);
         } else {
