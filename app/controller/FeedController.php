@@ -22,11 +22,12 @@ class FeedController extends Controller
         $this->feedModel = $feedModel;
     }
 
-    public function ac_send(): array
+    /**
+     * @param string $content not_empty()
+     * @return array
+     */
+    public function ac_send(string $content): array
     {
-        if (isset($_POST['content'])) {
-            return ['ret' => -7, 'status' => 'parameter cannot be empty'];
-        }
         $imageCount = 0;
         if (isset($_FILES['images'])) {
             $paths = $_FILES['images']["tmp_name"];
@@ -37,7 +38,7 @@ class FeedController extends Controller
             }
         }
         $tp_api = BunnyPHP::app()->get('tp_api');
-        $feedId = $this->feedModel->sendFeed($this->user, $_POST['content'], $tp_api['name'], $imageCount);
+        $feedId = $this->feedModel->sendFeed($this->user, $content, $tp_api['name'], $imageCount);
         $feedImageModel = new FeedImageModel();
         if ($imageCount > 0) {
             $image_type = ['image/bmp', 'image/gif', 'image/jpeg', 'image/pjpeg', 'image/png', 'application/x-bmp', 'application/x-jpg', 'application/x-png'];
@@ -104,15 +105,13 @@ class FeedController extends Controller
 
     /**
      * @param int $tid path(0)
+     * @param string $content not_empty()
      */
-    public function ac_comment(int $tid = 0): array
+    public function ac_comment(string $content, int $tid = 0): array
     {
-        if (StrUtil::emptyText($_POST['content'])) {
-            return ['ret' => -7, 'status' => 'parameter cannot be empty'];
-        }
         if ($feed = $this->feedModel->getFeed($tid)) {
-            $comment_id = (new CommentModel())->sendComment($tid, ConstUtil::MOD_FEED, $this->user, $_POST['content']);
-            (new NotificationModel())->notify(3, $tid, $feed['uid'], $this->user['uid'], 'comment', $_POST['content']);
+            $comment_id = (new CommentModel())->sendComment($tid, ConstUtil::MOD_FEED, $this->user, $content);
+            (new NotificationModel())->notify(3, $tid, $feed['uid'], $this->user['uid'], 'comment', $content);
             return ['ret' => 0, 'status' => 'ok', 'tid' => $tid, 'cid' => $comment_id];
         } else {
             return ['ret' => 3001, 'status' => 'invalid tid'];
