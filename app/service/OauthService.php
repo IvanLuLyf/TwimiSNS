@@ -9,21 +9,21 @@ use BunnyPHP\Service;
  */
 class OauthService extends Service
 {
-    public function oauth($type): array
+    public function oauth($type, $code): array
     {
         switch ($type) {
             case 'qq':
                 $oauth = Config::load('oauth')->get('qq');
-                return $this->qq_oauth($oauth, $_GET['code']);
+                return $this->qq_oauth($oauth, $code);
             case 'wb':
                 $oauth = Config::load('oauth')->get('wb');
-                return $this->wb_oauth($oauth, $_GET['code']);
+                return $this->wb_oauth($oauth, $code);
             case 'gh':
                 $oauth = Config::load('oauth')->get('gh');
-                return $this->gh_oauth($oauth, $_GET['code']);
+                return $this->gh_oauth($oauth, $code);
             default:
                 $oauth = Config::load('oauth')->get($type);
-                return $this->tm_oauth($oauth, $_GET['code']);
+                return $this->tm_oauth($oauth, $code);
         }
     }
 

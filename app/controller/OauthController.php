@@ -3,6 +3,7 @@
 use BunnyPHP\BunnyPHP;
 use BunnyPHP\Config;
 use BunnyPHP\Controller;
+use BunnyPHP\Request;
 
 /**
  * @author IvanLu
@@ -35,42 +36,42 @@ class OauthController extends Controller
                 break;
         }
         if ($referer) {
-            BunnyPHP::getRequest()->setSession('referer', $referer);
+            Request::session('referer', $referer);
         }
         $this->redirect($url);
     }
 
     /**
      * @param UserService $userService
+     * @param OauthService $oauthService
+     * @param string $code not_empty()
      * @param string $type path(0)
      */
-    function ac_callback(UserService $userService, string $type = '')
+    function ac_callback(UserService $userService, OauthService $oauthService, string $code, string $type = '')
     {
         $bind_model = new BindModel();
-        if (isset($_GET['code'])) {
-            $bind = (new OauthService())->oauth($type);
-            if ($uid = $bind_model->getUid($bind['uid'], $type)) {
-                $userToken = (new UserModel())->refresh($uid);
-                BunnyPHP::getRequest()->setSession('token', $userToken);
-                $bind_model->where(['bind=:b and type=:t'], ['b' => $bind['uid'], 't' => $type])->update(['token' => $bind['token'], 'expire' => $bind['expire']]);
-                $referer = BunnyPHP::getRequest()->delSession('referer');
-                if ($referer) {
-                    $this->redirect($referer);
-                } else {
-                    $this->redirect('index', 'index');
-                }
+        $bind = $oauthService->oauth($type, $code);
+        if ($uid = $bind_model->getUid($bind['uid'], $type)) {
+            $userToken = (new UserModel())->refresh($uid);
+            $userService->setLoginUser($userToken);
+            $bind_model->where(['bind=:b and type=:t'], ['b' => $bind['uid'], 't' => $type])->update(['token' => $bind['token'], 'expire' => $bind['expire']]);
+            $referer = Request::session('referer', null);
+            if ($referer) {
+                $this->redirect($referer);
             } else {
-                if ($user = $userService->getLoginUser()) {
-                    $bind_data = ['uid' => $user['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
-                    $bind_model->add($bind_data);
-                    $this->redirect('setting', 'oauth', ['type' => $type]);
-                } else {
-                    BunnyPHP::getRequest()->setSession('oauth_user', ['type' => $type, 'uid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire'], 'nickname' => $bind['nickname'],]);
-                    if (Config::load('config')->get('allow_reg')) {
-                        $this->assign('allow_reg', true);
-                    }
-                    $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])->render('oauth/connect.php');
+                $this->redirect('index', 'index');
+            }
+        } else {
+            if ($user = $userService->getLoginUser()) {
+                $bind_data = ['uid' => $user['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
+                $bind_model->add($bind_data);
+                $this->redirect('setting', 'oauth', ['type' => $type]);
+            } else {
+                Request::session('oauth_user', ['type' => $type, 'uid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire'], 'nickname' => $bind['nickname'],]);
+                if (Config::load('config')->get('allow_reg')) {
+                    $this->assign('allow_reg', true);
                 }
+                $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])->render('oauth/connect.php');
             }
         }
     }
@@ -108,11 +109,11 @@ class OauthController extends Controller
             $result = (new UserModel())->login($_POST['username'], $_POST['password']);
         }
         if ($result['ret'] == 0) {
-            BunnyPHP::getRequest()->setSession('access_token', $result['token']);
-            $bind = BunnyPHP::getRequest()->getSession('oauth_user');
+            Request::session('access_token', $result['token']);
+            $bind = Request::session('oauth_user');
             $bind_data = ['uid' => $result['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
             (new BindModel())->add($bind_data);
-            $referer = BunnyPHP::getRequest()->delSession('referer');
+            $referer = Request::session('referer', null);
             if ($referer) {
                 $this->redirect($referer);
             } else {
@@ -168,7 +169,7 @@ class OauthController extends Controller
                     if (isset($_POST['username']) && isset($_POST['password'])) {
                         $result = (new UserModel())->login($_POST['username'], $_POST['password']);
                         if ($result['ret'] == 0) {
-                            BunnyPHP::getRequest()->setSession('token', $result['token']);
+                            $userService->setLoginUser($result['token']);
                             $url = $_REQUEST['redirect_uri'];
                             $code = (new OauthCodeModel())->getCode($_REQUEST['client_id'], $app['id'], $result['uid'], time());
                             if (strpos($url, "?"))
