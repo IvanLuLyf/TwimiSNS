@@ -1,6 +1,5 @@
 <?php
 
-use BunnyPHP\BunnyPHP;
 use BunnyPHP\Request;
 use BunnyPHP\Service;
 
