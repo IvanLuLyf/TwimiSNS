@@ -2,6 +2,7 @@
 
 use BunnyPHP\BunnyPHP;
 use BunnyPHP\Filter;
+use BunnyPHP\Request;
 
 /**
  * @author IvanLu
@@ -13,9 +14,9 @@ class AuthFilter extends Filter
     {
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
-                $token = $_COOKIE['bunny_user_token'] ?? '';
+                $token = Request::cookie('bunny_user_token');
             } else {
-                $token = BunnyPHP::getRequest()->getSession('token');
+                $token = Request::session('token');
             }
             if (!$token) $token = BunnyPHP::getRequest()->getHeader('token');
             if ($token) {
@@ -56,7 +57,11 @@ class AuthFilter extends Filter
             }
         } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_AJAX) {
             if (BunnyPHP::app()->get('tp_ajax') === true) {
-                $token = BunnyPHP::getRequest()->getSession('token');
+                if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
+                    $token = Request::cookie('bunny_user_token');
+                } else {
+                    $token = Request::session('token');
+                }
                 if (!$token) $token = BunnyPHP::getRequest()->getHeader('token');
                 if ($token) {
                     $user = (new UserModel)->check($token);
