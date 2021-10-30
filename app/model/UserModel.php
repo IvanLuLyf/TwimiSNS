@@ -14,11 +14,13 @@ class UserModel extends Model
         'password' => ['varchar(32)', 'not null'],
         'nickname' => ['varchar(32)'],
         'email' => ['text', 'not null'],
+        'avatar' => ['text'],
         'token' => ['text', 'not null'],
-        'expire' => ['text']
+        'expire' => ['bigint']
     ];
     protected array $_pk = ['uid'];
     protected string $_ai = 'uid';
+    protected static array $NO_SENSITIVE_FIELD = ['uid', 'username', 'nickname', 'avatar'];
 
     public function getUsers($page = 1)
     {
@@ -27,10 +29,10 @@ class UserModel extends Model
 
     public function refresh($uid)
     {
-        $user = $this->where("uid = :u", ['u' => $uid])->fetch();
+        $user = $this->where('uid = :u', ['u' => $uid])->fetch();
         $timestamp = time();
         if ($user['expire'] == null || $timestamp > intval($user['expire'])) {
-            $token = md5($user['uid'] . $user['username'] . $timestamp);
+            $token = $this->createToken($user['username'], $timestamp);
             $updates = ['token' => $token, 'expire' => $timestamp + 604800];
             $this->where(["uid = :uid"], ['uid' => $uid])->update($updates);
         } else {
@@ -41,7 +43,7 @@ class UserModel extends Model
 
     public function reset($uid, $password)
     {
-        return $this->where("uid = :u", ['u' => $uid])->update(['password' => md5($password)]);
+        return $this->where('uid = :u', ['u' => $uid])->update(['password' => $this->encodePassword($password)]);
     }
 
     public function login(string $username, string $password): array
@@ -104,26 +106,14 @@ class UserModel extends Model
         return $this->where('token = ? and expire> ?', [$token, time()])->fetch();
     }
 
-    public function getUserByUid($uid): array
+    public function getUserByUid($uid, $field = null): array
     {
-        $user = $this->where('uid = ?', [$uid])->fetch();
-        return [
-            'uid' => $uid,
-            'username' => $user['username'],
-            'email' => $user['email'],
-            'nickname' => $user['nickname']
-        ];
+        return $this->where('uid = ?', [$uid])->fetch($field ?: self::$NO_SENSITIVE_FIELD);
     }
 
-    public function getUserByUsername($username): array
+    public function getUserByUsername($username, $field = null): array
     {
-        $user = $this->where('username = ?', [$username])->fetch();
-        return [
-            'uid' => $user['uid'],
-            'username' => $user['username'],
-            'email' => $user['email'],
-            'nickname' => $user['nickname']
-        ];
+        return $this->where('username = ?', [$username])->fetch($field ?: self::$NO_SENSITIVE_FIELD);
     }
 
     public function getTokenByUid($uid)
@@ -132,6 +122,21 @@ class UserModel extends Model
             return $user['token'];
         } else {
             return null;
+        }
+    }
+
+    public function updateAvatar($uid, $url)
+    {
+        return $this->where(['uid = :uid'], ['uid' => $uid])->update(['avatar' => $url]);
+    }
+
+    public function getAvatar($user, $isId = false)
+    {
+        $default = '/static/img/avatar.png';
+        if ($row = $this->where($isId ? 'uid=?' : 'username=?', [$user])->fetch('avatar')) {
+            return $row['avatar'] ?: $default;
+        } else {
+            return $default;
         }
     }
 
