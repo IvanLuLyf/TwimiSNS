@@ -28,10 +28,10 @@ class SettingController extends Controller
         $this->assign('cur_st', 'avatar')->render('setting/avatar.php');
     }
 
-    public function ac_gravatar(AvatarModel $avatarModel)
+    public function ac_gravatar(UserModel $userModel)
     {
         if (!empty($this->user['uid'])) {
-            $avatarModel->upload($this->user['uid'], 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->user['email']))));
+            $userModel->updateAvatar($this->user['uid'], 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->user['email']))));
         }
         $this->redirect('setting', 'avatar');
     }
@@ -69,10 +69,10 @@ class SettingController extends Controller
     /**
      * @param string $type path(0)
      */
-    public function ac_oauth_avatar(AvatarModel $avatarModel, string $type = '')
+    public function ac_oauth_avatar(UserModel $userModel, string $type = '')
     {
         if (!empty($this->user['uid'])) {
-            $avatarModel->upload($this->user['uid'], $_REQUEST['avatar']);
+            $userModel->updateAvatar($this->user['uid'], $_REQUEST['avatar']);
         }
         $this->redirect('setting', 'oauth', ['type' => $type]);
     }

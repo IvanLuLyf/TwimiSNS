@@ -188,18 +188,17 @@ class UserController extends Controller
     }
 
     /**
+     * @param UserModel $userModel
      * @param string $uid path(0,0)
      * @param string $username
      */
-    public function ac_avatar_get(string $uid, string $username = '')
+    public function ac_avatar_get(UserModel $userModel, string $uid, string $username = '')
     {
         $imgUrl = '/static/img/avatar.png';
         if ($username != null) {
-            if ($uid = (new UserModel())->where(["username = :username"], ['username' => $username])->fetch()['uid']) {
-                $imgUrl = (new AvatarModel())->getAvatar($uid);
-            }
+            $imgUrl = $userModel->getAvatar($username);
         } else if ($uid != 0) {
-            $imgUrl = (new AvatarModel())->getAvatar($uid);
+            $imgUrl = $userModel->getAvatar($uid, true);
         }
         $this->redirect($imgUrl);
     }
@@ -209,7 +208,7 @@ class UserController extends Controller
      * @filter api
      * @filter auth
      */
-    public function ac_avatar_post()
+    public function ac_avatar_post(UserModel $userModel)
     {
         $tp_user = BunnyPHP::app()->get('tp_user');
         $this->assign('tp_user', $tp_user);
@@ -218,7 +217,7 @@ class UserController extends Controller
             if (in_array($_FILES["avatar"]["type"], $image_type) && ($_FILES["avatar"]["size"] < 2000000)) {
                 $t = time() % 1000;
                 $url = BunnyPHP::getStorage()->upload("avatar/" . $tp_user['uid'] . '_' . $t . ".jpg", $_FILES["avatar"]["tmp_name"]);
-                (new AvatarModel())->upload($tp_user['uid'], $url);
+                $userModel->updateAvatar($tp_user['uid'], $url);
                 $response = ['ret' => 0, 'status' => 'ok', 'url' => $url];
             } else {
                 $response = ['ret' => 2, 'status' => 'invalid file'];
