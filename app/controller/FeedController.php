@@ -15,10 +15,12 @@ class FeedController extends Controller
      * @var mixed|null
      */
     private $user;
+    private FeedService $feedService;
 
-    public function __construct(FeedModel $feedModel)
+    public function __construct(FeedService $feedService, FeedModel $feedModel)
     {
         $this->user = BunnyPHP::app()->get('tp_user');
+        $this->feedService = $feedService;
         $this->feedModel = $feedModel;
     }
 
@@ -62,19 +64,14 @@ class FeedController extends Controller
     {
         $res = ['ret' => 0, 'status' => 'ok', 'page' => $page];
         if ($tid == 0) {
-            $feeds = $this->feedModel->listFeed($this->user['uid'], $page);
-            foreach ($feeds as &$feed) {
-                if ($feed['image'] != null && $feed['image'] > 0) {
-                    $feed['images'] = (new FeedImageModel())->getFeedImageByTid($feed['tid']);
-                }
-            }
+            $feeds = $this->feedService->timeline($page);
             $note_info = (new NotificationModel())->getUnreadCnt($this->user['uid']);
             $user_info = (new UserInfoModel())->get($this->user['uid']);
             return array_merge($res, ['tid' => $tid, 'note_count' => $note_info[0], 'note_uid' => $note_info[1], 'user_info' => $user_info, 'feeds' => $feeds]);
         } else {
             $feed = $this->feedModel->getFeed($tid);
-            $noteName = (new FriendModel())->getNoteNameByUsername($this->user['uid'], $feed['username']);
-            $feed['notename'] = $noteName;
+            $remark = (new FriendModel())->getRemarkByUsername($this->user['uid'], $feed['username']);
+            $feed['remark'] = $remark;
             if ($feed['image'] != null && $feed['image'] > 0) {
                 $feed['images'] = (new FeedImageModel())->getFeedImageByTid($feed['tid']);
             }
