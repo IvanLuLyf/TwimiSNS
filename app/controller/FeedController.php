@@ -32,7 +32,7 @@ class FeedController extends Controller
     {
         $imageCount = 0;
         if (isset($_FILES['images'])) {
-            $paths = $_FILES['images']["tmp_name"];
+            $paths = $_FILES['images']['tmp_name'];
             if (is_array($paths)) {
                 $imageCount = count($paths);
             } else {
@@ -43,12 +43,11 @@ class FeedController extends Controller
         $feedId = $this->feedModel->sendFeed($this->user, $content, $tp_api['name'], $imageCount);
         $feedImageModel = new FeedImageModel();
         if ($imageCount > 0) {
-            $image_type = ['image/bmp', 'image/gif', 'image/jpeg', 'image/pjpeg', 'image/png', 'application/x-bmp', 'application/x-jpg', 'application/x-png'];
             for ($i = 0; $i < $imageCount; $i++) {
-                if (in_array($_FILES["images"]["type"][$i], $image_type) && ($_FILES["images"]["size"][$i] < 2000000)) {
+                if (in_array($_FILES['images']['type'][$i], ConstUtil::IMAGE_TYPES) && ($_FILES['images']['size'][$i] < ConstUtil::IMAGE_MAX_SIZE)) {
                     $t = time() % 1000;
                     $filename = "feed/$feedId-$i-$t.jpg";
-                    $url = BunnyPHP::getStorage()->upload($filename, $_FILES["images"]["tmp_name"][$i]);
+                    $url = BunnyPHP::getStorage()->upload($filename, $_FILES['images']['tmp_name'][$i]);
                     $feedImageModel->upload($this->user['uid'], $feedId, $url);
                 }
             }

@@ -213,10 +213,9 @@ class UserController extends Controller
         $tp_user = BunnyPHP::app()->get('tp_user');
         $this->assign('tp_user', $tp_user);
         if (isset($_FILES['avatar'])) {
-            $image_type = ['image/bmp', 'image/gif', 'image/jpeg', 'image/pjpeg', 'image/png', 'application/x-bmp', 'application/x-jpg', 'application/x-png'];
-            if (in_array($_FILES["avatar"]["type"], $image_type) && ($_FILES["avatar"]["size"] < 2000000)) {
+            if (in_array($_FILES['avatar']['type'], ConstUtil::IMAGE_TYPES) && ($_FILES['avatar']['size'] < ConstUtil::IMAGE_MAX_SIZE)) {
                 $t = time() % 1000;
-                $url = BunnyPHP::getStorage()->upload("avatar/" . $tp_user['uid'] . '_' . $t . ".jpg", $_FILES["avatar"]["tmp_name"]);
+                $url = BunnyPHP::getStorage()->upload("avatar/{$tp_user['uid']}_$t.jpg", $_FILES['avatar']['tmp_name']);
                 $userModel->updateAvatar($tp_user['uid'], $url);
                 $response = ['ret' => 0, 'status' => 'ok', 'url' => $url];
             } else {
