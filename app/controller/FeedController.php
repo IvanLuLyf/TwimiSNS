@@ -90,12 +90,7 @@ class FeedController extends Controller
         if (!$user['uid']) {
             return ['ret' => 1002, 'status' => "user does not exist"];
         }
-        $feeds = $this->feedModel->userFeed($username, $page);
-        foreach ($feeds as &$feed) {
-            if ($feed['image'] != null && $feed['image'] > 0) {
-                $feed['images'] = (new FeedImageModel())->getFeedImageByTid($feed['tid']);
-            }
-        }
+        $feeds = $this->feedService->userTimeline($username, $page);
         $user_info = (new UserInfoModel())->get($user['uid']);
         return ['ret' => 0, 'status' => 'ok', 'page' => $page, 'user_info' => $user_info, 'feeds' => $feeds];
     }

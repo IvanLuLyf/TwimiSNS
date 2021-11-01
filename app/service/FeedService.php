@@ -36,11 +36,7 @@ class FeedService extends Service
             ->limit(20, ($page - 1) * 20)
             ->fetchAll();
         $tidArr = array_column($feeds, 'tid');
-        $images = $this->feedImageModel->where('tid in (' . implode(',', $tidArr) . ')')->fetchAll(['tid', 'url']);
-        $imageMap = [];
-        foreach ($images as $image) {
-            $imageMap[$image['tid']][] = ['url' => $image['url']];
-        }
+        $imageMap = $this->loadFeedImages($tidArr);
         foreach ($feeds as &$feed) {
             $feed['remark'] = $friendNotes[$feed['uid']] ?? $feed['nickname'];
             if (isset($imageMap[$feed['tid']])) {
@@ -48,5 +44,31 @@ class FeedService extends Service
             }
         }
         return $feeds;
+    }
+
+    public function userTimeline($username, $page = 1): array
+    {
+        $feeds = $this->feedModel->where('username=:u', ['u' => $username])
+            ->order(['tid desc'])
+            ->limit(20, ($page - 1) * 20)
+            ->fetchAll();
+        $tidArr = array_column($feeds, 'tid');
+        $imageMap = $this->loadFeedImages($tidArr);
+        foreach ($feeds as &$feed) {
+            if (isset($imageMap[$feed['tid']])) {
+                $feed['images'] = $imageMap[$feed['tid']];
+            }
+        }
+        return $feeds;
+    }
+
+    public function loadFeedImages(array $feedIds): array
+    {
+        $images = $this->feedImageModel->where('tid in (' . implode(',', $feedIds) . ')')->fetchAll(['tid', 'url']);
+        $imageMap = [];
+        foreach ($images as $image) {
+            $imageMap[$image['tid']][] = ['url' => $image['url']];
+        }
+        return $imageMap;
     }
 }
