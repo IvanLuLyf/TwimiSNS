@@ -37,9 +37,9 @@ class AuthFilter extends Filter
                 $appToken = $_POST['token'];
                 if ($apiInfo = (new ApiModel())->check($appKey)) {
                     if ($apiInfo['type'] == ConstUtil::APP_SYSTEM || $param[0] == '' || in_array($param[0], $apiInfo['scope'])) {
-                        $userId = (new OauthTokenModel())->check($appKey, $appToken);
-                        if ($userId != 0) {
-                            $user = (new UserModel)->getUserByUid($userId);
+                        $authInfo = (new OauthTokenModel())->check($appKey, $appToken);
+                        if ($authInfo != 0) {
+                            $user = (new UserModel)->getUserByUid($authInfo['uid'], '*');
                             BunnyPHP::app()->set('tp_user', $user);
                             BunnyPHP::app()->set('tp_api', $apiInfo);
                             return self::NEXT;
