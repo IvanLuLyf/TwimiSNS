@@ -27,14 +27,14 @@ class NotificationModel extends Model
     public function getUnreadCnt($uid)
     {
         $note_count = $this->where(["uid = ? and is_read=0"], [$uid])->fetch("count(*) as note_count")['note_count'];
-        $note_uid = $this->where(["uid = ? and is_read=0"], [$uid])->order("timestamp desc")->fetch("from_uid")['from_uid'];
+        $note_uid = $this->where(["uid = ? and is_read=0"], [$uid])->order("timestamp desc")->fetch("from_uid")['from_uid'] ?? 0;
         return [$note_count, $note_uid];
     }
 
     public function getNotice($uid)
     {
         $tb = $this->_table;
-        $notices = $this->join(FriendModel::class, [['fuid', 'from_uid'], 'uid' => $uid, 'state' => 2], ['notename'])
+        $notices = $this->join(FriendModel::class, [['friend', 'from_uid'], 'uid' => $uid, 'state' => 2], ['remark'])
             ->where(["{$tb}.uid=:u AND {$tb}.uid!={$tb}.from_uid AND {$tb}.is_read=0"], ['u' => $uid])
             ->order(["nid desc"])
             ->fetchAll();
