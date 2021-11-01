@@ -14,7 +14,7 @@ class OauthTokenModel extends Model
         'client_id' => ['text', 'not null'],
         'access_token' => ['text', 'not null'],
         'scope' => ['text'],
-        'expire' => ['text']
+        'expire' => ['bigint']
     ];
     protected array $_pk = ['id'];
     protected string $_ai = 'id';
