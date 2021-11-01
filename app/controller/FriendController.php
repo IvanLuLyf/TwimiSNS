@@ -27,12 +27,12 @@ class FriendController extends Controller
 
     /**
      * @param string $username not_empty()
-     * @param string $notename not_empty()
+     * @param string $remark not_empty()
      * @return array
      */
-    public function ac_note(string $username, string $notename): array
+    public function ac_remark(string $username, string $remark): array
     {
-        return $this->friendModel->noteFriend($this->user['uid'], $username, $notename);
+        return $this->friendModel->remarkFriend($this->user['uid'], $username, $remark);
     }
 
     /**
