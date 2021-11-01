@@ -15,7 +15,7 @@ class FeedModel extends Model
         'nickname' => ['varchar(32)'],
         'source' => ['text'],
         'content' => ['text', 'not null'],
-        'timestamp' => ['text'],
+        'timestamp' => ['bigint'],
         'share_num' => ['integer', 'default 0'],
         'comment_num' => ['integer', 'default 0'],
         'like_num' => ['integer', 'default 0'],
@@ -28,7 +28,7 @@ class FeedModel extends Model
     {
         $tb = $this->_table;
         $ft = FriendModel::name();
-        return $this->join(FriendModel::class, ['username', 'uid' => $uid, 'state' => 2], ['notename'])
+        return $this->join(FriendModel::class, ['username', 'uid' => $uid, 'state' => 2], ['remark'])
             ->join(LikeModel::class, ['tid', 'aid' => ConstUtil::MOD_FEED, 'uid' => $uid], [['state', '(%s is not null) as islike']])
             ->where(["{$ft}.uid = :u or {$tb}.uid= :um"], ['u' => $uid, 'um' => $uid])
             ->order(["tid desc"])
