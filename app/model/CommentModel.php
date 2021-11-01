@@ -15,7 +15,7 @@ class CommentModel extends Model
         'username' => ['varchar(16)', 'not null'],
         'nickname' => ['varchar(32)'],
         'content' => ['text', 'not null'],
-        'timestamp' => ['text'],
+        'timestamp' => ['bigint'],
     ];
     protected array $_pk = ['cid'];
     protected string $_ai = 'cid';
@@ -26,7 +26,7 @@ class CommentModel extends Model
             return $this->where('tid = :t and aid = :a', ['t' => $tid, 'a' => $aid])->limit(20, ($page - 1) * 20)->fetchAll();
         } else {
             return $this
-                ->join(FriendModel::class, ['username', 'uid' => $uid, 'state' => 2], ['notename'])
+                ->join(FriendModel::class, ['username', 'uid' => $uid, 'state' => 2], ['remark'])
                 ->where('tid = :t and aid = :a', ['t' => $tid, 'a' => $aid])->limit(20, ($page - 1) * 20)
                 ->fetchAll();
         }
