@@ -53,16 +53,16 @@
         },
         {
             "name": "ivanlulyf/bunnyphp",
-            "version": "3.0.9",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IvanLuLyf/BunnyPHP.git",
-                "reference": "a16d9fde52f602806354cc84be68ff592e8fed4e"
+                "reference": "079758fe84c4b4493d57d392b0f85d80dbe6f6c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IvanLuLyf/BunnyPHP/zipball/a16d9fde52f602806354cc84be68ff592e8fed4e",
-                "reference": "a16d9fde52f602806354cc84be68ff592e8fed4e",
+                "url": "https://api.github.com/repos/IvanLuLyf/BunnyPHP/zipball/079758fe84c4b4493d57d392b0f85d80dbe6f6c0",
+                "reference": "079758fe84c4b4493d57d392b0f85d80dbe6f6c0",
                 "shasum": ""
             },
             "require": {
@@ -99,7 +99,7 @@
                 "issues": "https://github.com/IvanLuLyf/BunnyPHP/issues",
                 "source": "https://github.com/IvanLuLyf/BunnyPHP"
             },
-            "time": "2021-11-01T15:41:58+00:00"
+            "time": "2021-11-04T15:38:02+00:00"
         },
         {
             "name": "ivanlulyf/bunnyphp-alioss",
