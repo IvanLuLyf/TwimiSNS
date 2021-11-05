@@ -27,6 +27,11 @@ class RequestUtil
         return self::sendRequest($url, $content, 'POST', [$header]);
     }
 
+    public static function isHttps(): bool
+    {
+        return ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'));
+    }
+
     private static function sendRequest($url, $data = '', $method = 'GET', $header = [])
     {
         $params = [
