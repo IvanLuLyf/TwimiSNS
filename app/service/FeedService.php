@@ -64,6 +64,7 @@ class FeedService extends Service
 
     public function loadFeedImages(array $feedIds): array
     {
+        if (!$feedIds) return [];
         $images = $this->feedImageModel->where('tid in (' . implode(',', $feedIds) . ')')->fetchAll(['tid', 'url']);
         $imageMap = [];
         foreach ($images as $image) {
