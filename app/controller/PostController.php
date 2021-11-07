@@ -59,7 +59,12 @@ class PostController extends Controller
         if ($post != null) {
             if ($post['extra'] != '') {
                 $extra = json_decode($post['extra'], true);
-                if ($extra['type'] == 'paid' and $post['username'] != $tp_user['username'] and !(new PostPayModel())->check($tp_user['uid'], $tid)) {
+                if ($extra['type'] == 'paid'
+                    && (
+                        $tp_user == null
+                        ||
+                        ($post['username'] != $tp_user['username'] && !(new PostPayModel())->check($tp_user['uid'], $tid))
+                    )) {
                     $post['content'] = "[付费帖子]";
                     $this->assign('coin', $extra['price']);
                     $showState = 1;
@@ -100,9 +105,14 @@ class PostController extends Controller
         $posts = $this->postModel->getPostByPage($page);
         $total = $this->postModel->getTotal();
         foreach ($posts as &$post) {
-            if ($post['extra'] != '') {
+            if ($post['extra']) {
                 $extra = json_decode($post['extra'], true);
-                if ($extra['type'] == 'paid' and $post['username'] != $tp_user['username'] and !(new PostPayModel())->check($tp_user['uid'], $post['tid'])) {
+                if ($extra['type'] == 'paid'
+                    && (
+                        $tp_user == null
+                        ||
+                        ($post['username'] != $tp_user['username'] && !(new PostPayModel())->check($tp_user['uid'], $post['tid']))
+                    )) {
                     $post['content'] = "[付费帖子]";
                     $post['coin'] = $extra['price'];
                 } elseif ($extra['type'] == 'login' and $tp_user == null) {
