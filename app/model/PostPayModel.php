@@ -16,9 +16,14 @@ class PostPayModel extends Model
     protected array $_pk = ['id'];
     protected string $_ai = 'id';
 
-    public function check($uid, $tid): bool
+    public function check($uid, $tid)
     {
-        return $this->where("tid=:t and uid=:u", ['u' => $uid, 't' => $tid])->fetch() != null;
+        if (is_array($tid)) {
+            $rows = $this->where('uid=? and tid in(' . StrUtil::sqlIn($tid) . ')', array_merge([$uid], $tid))->fetchAll('tid');
+            return array_map('tid', $rows);
+        } else {
+            return $this->where('tid=:t and uid=:u', ['u' => $uid, 't' => $tid])->fetch() != null;
+        }
     }
 
     public function pay($uid, $tid)
