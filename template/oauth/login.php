@@ -30,7 +30,6 @@
                         <input type="password" id="password" name="password" class="form-control" placeholder="密码"
                                required>
                     </div>
-                    <input type="hidden" id="referer" name="referer" value="<?= $referer ?>">
                     <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>"/>
                     <input type="submit" class="btn btn-success btn-block" value="登录">
                     <div class="float-right"><a
