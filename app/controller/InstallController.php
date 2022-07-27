@@ -19,12 +19,19 @@ class InstallController extends Controller
             /**
              * @var $modelClass Model
              */
+            $errClasses = [];
             foreach ($models as $model) {
                 if (substr($model, -9) == 'Model.php') {
                     $modelClass = substr($model, 0, -4);
-                    $modelClass::create();
+                    try {
+                        $modelClass::create();
+                    } catch (Exception $exception) {
+                        $errClasses[] = $modelClass;
+                    }
                 }
             }
+            $this->assign('err_msg', '未加载的模型:[' . implode(',', $errClasses) . ']');
+            $this->render('install/error.php');
         } else {
             $this->assign('err_msg', '请先将环境变量BUNNY_INSTALL_LOCK设为unlock后安装本程序');
             $this->render('install/error.php');
