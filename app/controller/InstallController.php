@@ -13,7 +13,8 @@ class InstallController extends Controller
 {
     public function ac_init()
     {
-        if (BUNNY_APP_MODE === BunnyPHP::MODE_CLI) {
+        $unlock = ($_ENV['BUNNY_INSTALL_LOCK'] ?? 'lock') === 'unlock';
+        if (BUNNY_APP_MODE === BunnyPHP::MODE_CLI || (BUNNY_APP_MODE === BunnyPHP::MODE_NORMAL && $unlock)) {
             $models = scandir(APP_PATH . 'app/model');
             /**
              * @var $modelClass Model
@@ -24,6 +25,9 @@ class InstallController extends Controller
                     $modelClass::create();
                 }
             }
+        } else {
+            $this->assign('err_msg', '请先将环境变量BUNNY_INSTALL_LOCK设为unlock后安装本程序');
+            $this->render('install/error.php');
         }
     }
 
