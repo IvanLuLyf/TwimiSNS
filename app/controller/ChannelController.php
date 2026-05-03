@@ -3,10 +3,8 @@
 use BunnyPHP\Controller;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/5/1
- * Time: 19:33
+ * @author IvanLu
+ * @time 2026/5/3 16:17
  */
 class ChannelController extends Controller
 {
@@ -17,6 +15,6 @@ class ChannelController extends Controller
     {
         $channel = (new ChannelModel())->getChannelByName($name);
         $articles = (new ArticleModel())->getArticlesByChannel($channel['cid']);
-        $this->assignAll(['ret' => 0, 'status' => 'ok', 'channel' => $channel, 'articles' => $articles])->render('channel/channel.php');
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'channel' => $channel, 'articles' => $articles])->render('app.php');
     }
 }
