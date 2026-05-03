@@ -1,4 +1,3 @@
-/* design tokens (formerly tokens.css) */
 :root {
     color-scheme: light dark;
     --tw-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
@@ -3025,7 +3024,6 @@ a:hover {
     color: var(--tw-accent-hover);
 }
 
-/* —— BunnyPHP View::error / View::info（嵌入 ts-shell，与 SPA 同栅格）—— */
 .ts-flash-lead-link {
     text-decoration: none;
     color: inherit;

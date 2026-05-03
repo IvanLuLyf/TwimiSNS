@@ -28,7 +28,7 @@ $homeLabel = $shellHtmlLang === 'en' ? 'Home' : '返回首页';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="<?= htmlspecialchars($shellThemeColor, ENT_QUOTES, 'UTF-8') ?>">
     <title><?= $shellSiteName ?></title>
-    <link rel="stylesheet" href="/static/app/styles/app.css?v=55">
+    <link rel="stylesheet" href="/static/app/styles/app.css?v=56">
     <style id="ts-theme-inline">
         :root {
             --tw-accent: <?= htmlspecialchars($shellThemeColor, ENT_QUOTES, 'UTF-8') ?>;

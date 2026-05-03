@@ -1,5 +1,3 @@
-/** 同源 JSON（cookie 会话） */
-
 function enc(data) {
     const p = new URLSearchParams();
     Object.keys(data).forEach((k) => {
@@ -10,6 +8,16 @@ function enc(data) {
 
 export async function jsonGet(path) {
     return (await fetch(path, {credentials: 'include'})).json();
+}
+
+export async function ajaxGet(path) {
+    const p = path.startsWith('/') ? path : `/${path}`;
+    return jsonGet(`/ajax${p}`);
+}
+
+export async function ajaxPost(path, data) {
+    const p = path.startsWith('/') ? path : `/${path}`;
+    return jsonPost(`/ajax${p}`, data);
 }
 
 export async function jsonPost(path, data) {
@@ -23,7 +31,6 @@ export async function jsonPost(path, data) {
     ).json();
 }
 
-/** multipart（不传 Content-Type，由浏览器带 boundary） */
 export async function formPost(path, formData) {
     return (await fetch(path, {method: 'POST', credentials: 'include', body: formData})).json();
 }
