@@ -4,7 +4,7 @@ use BunnyPHP\Model;
 
 /**
  * @author IvanLu
- * @time 2018/7/29 1:27
+ * @time 2026/05/03 15:30
  */
 class UserModel extends Model
 {
@@ -114,6 +114,43 @@ class UserModel extends Model
     public function getUserByUsername($username, $field = null): array
     {
         return $this->where('username = ?', [$username])->fetch($field ?: self::$NO_SENSITIVE_FIELD);
+    }
+
+    public function getPublicByUsernames(array $usernames): array
+    {
+        $usernames = array_values(array_unique(array_filter(array_map('strval', $usernames))));
+        if ($usernames === []) {
+            return [];
+        }
+        $placeholders = implode(',', array_fill(0, count($usernames), '?'));
+        $rows = $this->where("username IN ($placeholders)", $usernames)->fetchAll(self::$NO_SENSITIVE_FIELD);
+        $map = [];
+        foreach ($rows as $r) {
+            if (!empty($r['username'])) {
+                $map[$r['username']] = $r;
+            }
+        }
+
+        return $map;
+    }
+
+    public function searchPublicUsers(string $q, int $limit = 15): array
+    {
+        $q = trim($q);
+        if ($q === '') {
+            return [];
+        }
+        $safe = preg_replace('/[%_\\\\]/', '', $q);
+        $len = function_exists('mb_strlen') ? mb_strlen($safe, 'UTF-8') : strlen($safe);
+        if ($len < 2) {
+            return [];
+        }
+        $like = '%' . $safe . '%';
+
+        return $this->where('username LIKE ? OR nickname LIKE ?', [$like, $like])
+            ->order(['username asc'])
+            ->limit(max(1, min(30, $limit)))
+            ->fetchAll(['uid', 'username', 'nickname', 'avatar']);
     }
 
     public function getTokenByUid($uid)

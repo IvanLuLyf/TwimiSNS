@@ -3,10 +3,8 @@
 use BunnyPHP\Model;
 
 /**
- * Created by PhpStorm.
- * User: IvanLu
- * Date: 2019/3/2
- * Time: 15:07
+ * @author IvanLu
+ * @time 2026/05/03 15:30
  */
 class CreditModel extends Model
 {
@@ -18,22 +16,24 @@ class CreditModel extends Model
 
     public function transfer($from_uid, $to_uid, $credit): bool
     {
+        $credit = doubleval($credit);
+        if ($from_uid === $to_uid) {
+            return true;
+        }
+        if ($this->balance($to_uid) == -1) {
+            $this->start($to_uid);
+        }
         $from_credit = $this->where(["uid = :u"], ['u' => $from_uid])->fetch();
         $to_credit = $this->where(["uid = :u"], ['u' => $to_uid])->fetch();
         if ($from_credit != null && $to_credit != null) {
             $balance = doubleval($from_credit['credit']);
-            if ($balance >= $credit && $from_uid != $to_uid) {
+            if ($balance >= $credit) {
                 $flag = ($this->where(['uid=:u'], ['u' => $from_uid])->update(['c' => $credit], 'credit=credit-:c') > 0);
                 $flag &= ($this->where(['uid=:u'], ['u' => $to_uid])->update(['c' => $credit], 'credit=credit+:c') > 0);
                 return $flag;
-            } else if ($from_uid == $to_uid) {
-                return true;
-            } else {
-                return false;
             }
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function cut($uid, $credit): bool

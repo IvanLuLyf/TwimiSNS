@@ -4,7 +4,7 @@ use BunnyPHP\Model;
 
 /**
  * @author IvanLu
- * @time 2019/2/13 15:51
+ * @time 2026/05/03 15:30
  */
 class PostModel extends Model
 {
@@ -44,8 +44,10 @@ class PostModel extends Model
 
     public function getPostById($id)
     {
-        return $this->join(UserModel::class, ['username'], ['nickname'])
+        $row = $this->join(UserModel::class, ['username'], ['nickname'])
             ->where("tid=:tid", ['tid' => $id])->fetch();
+
+        return is_array($row) ? $row : null;
     }
 
     public function getPostByUsername($username)
@@ -53,13 +55,18 @@ class PostModel extends Model
         return $this->where('username=:un', ['un' => $username])->order(['tid desc'])->fetchAll();
     }
 
-    public function sendPost($user, $title, $content)
+    public function sendPost($user, $title, $content, string $extra = '')
     {
         if ($user != null && $title != null && $content != null) {
-            $post = ['username' => $user['username'], 'title' => $title, 'content' => $content, 'timestamp' => time()];
+            $post = [
+                'username' => $user['username'],
+                'title' => $title,
+                'content' => $content,
+                'timestamp' => time(),
+                'extra' => $extra,
+            ];
             return $this->add($post);
-        } else {
-            return -1;
         }
+        return -1;
     }
 }
