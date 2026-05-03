@@ -484,52 +484,66 @@ function sideNavLink(path, label, navigateFn, iconName = null) {
     return a;
 }
 
-function appendPoweredByNodes(host) {
-    const prefix = t('poweredByPrefix');
-    const spaced = prefix.endsWith(' ') ? prefix : `${prefix} `;
-    host.appendChild(document.createTextNode(spaced));
-    const a = document.createElement('a');
-    a.href = POWERED_BY_URL;
-    a.rel = 'noopener noreferrer';
-    a.target = '_blank';
-    a.textContent = POWERED_BY_NAME;
-    host.appendChild(a);
-}
-
 function appendSiteLegalContent(parent) {
     const copy = (bootstrap.copyright || '').trim();
     const icp = (bootstrap.icp || '').trim();
 
+    const line = document.createElement('div');
+    line.className = 'ts-site-footer-oneline';
+
+    const segments = [];
+
     if (copy) {
-        const p = document.createElement('div');
-        p.className = 'ts-site-footer-line';
-        p.textContent = copy;
-        parent.appendChild(p);
+        const s = document.createElement('span');
+        s.className = 'ts-site-footer-segment';
+        s.textContent = copy;
+        segments.push(s);
     }
 
     if (icp) {
-        const p = document.createElement('div');
-        p.className = 'ts-site-footer-line';
+        const s = document.createElement('span');
+        s.className = 'ts-site-footer-segment';
         const a = document.createElement('a');
         a.href = ICP_BEIAN_URL;
         a.rel = 'noopener noreferrer';
         a.target = '_blank';
         a.textContent = icp;
-        p.appendChild(a);
-        parent.appendChild(p);
+        s.appendChild(a);
+        segments.push(s);
     }
 
-    const powered = document.createElement('div');
-    powered.className = 'ts-site-footer-line ts-site-footer-line--muted';
-    appendPoweredByNodes(powered);
-    parent.appendChild(powered);
+    const powered = document.createElement('span');
+    powered.className = 'ts-site-footer-segment ts-site-footer-segment--muted';
+    const prefix = t('poweredByPrefix');
+    const spaced = prefix.endsWith(' ') ? prefix : `${prefix} `;
+    powered.appendChild(document.createTextNode(spaced));
+    const gh = document.createElement('a');
+    gh.href = POWERED_BY_URL;
+    gh.rel = 'noopener noreferrer';
+    gh.target = '_blank';
+    gh.textContent = POWERED_BY_NAME;
+    powered.appendChild(gh);
+    segments.push(powered);
 
     if (!copy && !icp) {
-        const p = document.createElement('div');
-        p.className = 'ts-site-footer-line ts-site-footer-line--muted';
-        p.textContent = bootstrap.siteName || 'TwimiSNS';
-        parent.appendChild(p);
+        const s = document.createElement('span');
+        s.className = 'ts-site-footer-segment';
+        s.textContent = bootstrap.siteName || 'TwimiSNS';
+        segments.unshift(s);
     }
+
+    segments.forEach((node, i) => {
+        if (i > 0) {
+            const sep = document.createElement('span');
+            sep.className = 'ts-site-footer-sep';
+            sep.setAttribute('aria-hidden', 'true');
+            sep.textContent = ' · ';
+            line.appendChild(sep);
+        }
+        line.appendChild(node);
+    });
+
+    parent.appendChild(line);
 }
 
 function drawerMenuLink(path, label, navigateFn, iconName) {
@@ -2905,7 +2919,6 @@ function buildSettingsAvatarPanel() {
     const pendingHint = document.createElement('p');
     pendingHint.className = 'ts-meta';
     pendingHint.hidden = true;
-    pendingHint.style.marginTop = '0.35rem';
     pendingHint.textContent = t('settingsPendingCropHint');
 
     const row = document.createElement('div');
@@ -3015,11 +3028,17 @@ function buildSettingsAvatarPanel() {
     grav.textContent = t('settingsUseGravatar');
 
     const note = document.createElement('p');
-    note.className = 'ts-meta';
-    note.style.marginTop = '0.65rem';
+    note.className = 'ts-meta ts-settings-avatar-note';
     note.textContent = t('settingsAvatarCropNote');
 
-    wrap.append(h, preview, err, inp, row, pendingHint, grav, note);
+    const avatarLayout = document.createElement('div');
+    avatarLayout.className = 'ts-settings-avatar-layout';
+    const avatarSide = document.createElement('div');
+    avatarSide.className = 'ts-settings-avatar-side';
+    avatarSide.append(row, pendingHint, grav);
+    avatarLayout.append(preview, avatarSide);
+
+    wrap.append(h, err, avatarLayout, inp, note);
     return wrap;
 }
 
