@@ -77,6 +77,7 @@ class InstallController extends Controller
                 if ($pdo != null) {
                     session_start();
                     $db_info = [
+                        'dsn' => $dsn,
                         'type' => $db_type,
                         'host' => $db_host,
                         'port' => $db_port,
@@ -106,13 +107,13 @@ class InstallController extends Controller
         } else {
             session_start();
             $db_info = $_SESSION['db_info'];
-            define('DB_TYPE', $db_info['type']);
-            define('DB_HOST', $db_info['host']);
-            define('DB_PORT', $db_info['port']);
-            define('DB_NAME', $db_info['database']);
-            define('DB_USER', $db_info['username']);
-            define('DB_PASS', $db_info['password']);
-            define('DB_PREFIX', $db_info['prefix']);
+            if (!defined('DB_TYPE')) define('DB_TYPE', $db_info['type']);
+            if (!defined('DB_HOST')) define('DB_HOST', $db_info['host']);
+            if (!defined('DB_PORT')) define('DB_PORT', $db_info['port']);
+            if (!defined('DB_NAME')) define('DB_NAME', $db_info['database']);
+            if (!defined('DB_USER')) define('DB_USER', $db_info['username']);
+            if (!defined('DB_PASS')) define('DB_PASS', $db_info['password']);
+            if (!defined('DB_PREFIX')) define('DB_PREFIX', $db_info['prefix']);
 
             $nickname = ($nickname != '') ? $nickname : $username;
 
@@ -134,6 +135,7 @@ class InstallController extends Controller
                 'site_url' => $site_url,
                 'controller' => 'Index',
                 'allow_reg' => isset($_POST['allow_reg']),
+                'theme_color' => '#1996ff',
             ]);
             fwrite($config_file, $config);
             fclose($config_file);
