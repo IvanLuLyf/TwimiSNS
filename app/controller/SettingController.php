@@ -20,12 +20,57 @@ class SettingController extends Controller
 
     public function ac_index()
     {
-        $this->redirect('setting', 'avatar');
+        $this->render('app.php');
+    }
+
+    public function ac_json_binds_get(): void
+    {
+        $uid = (int) ($this->user['uid'] ?? 0);
+        if ($uid <= 0) {
+            $this->assignAll(['ret' => 2002, 'status' => 'login required', 'binds' => []])->render('app.php');
+            return;
+        }
+        $rows = (new BindModel())->where(['uid = ?'], [$uid])->fetchAll(['type', 'bind']);
+        $nameByType = [];
+        if (Config::check('oauth')) {
+            foreach (Config::load('oauth')->get('enabled', []) as $o) {
+                if (!empty($o[0])) {
+                    $nameByType[$o[0]] = $o[1] ?? $o[0];
+                }
+            }
+        }
+        $binds = [];
+        foreach ($rows as $r) {
+            $type = (string) ($r['type'] ?? '');
+            $bind = (string) ($r['bind'] ?? '');
+            $binds[] = [
+                'type' => $type,
+                'name' => $nameByType[$type] ?? $type,
+                'masked' => self::maskBindId($bind),
+            ];
+        }
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'binds' => $binds])->render('app.php');
+    }
+
+    private static function maskBindId(string $bind): string
+    {
+        $s = trim($bind);
+        if ($s === '') {
+            return '';
+        }
+        $len = function_exists('mb_strlen') ? mb_strlen($s, 'UTF-8') : strlen($s);
+        if ($len <= 4) {
+            return '****';
+        }
+        $prefix = function_exists('mb_substr') ? mb_substr($s, 0, 3, 'UTF-8') : substr($s, 0, 3);
+        $suffix = function_exists('mb_substr') ? mb_substr($s, -2, null, 'UTF-8') : substr($s, -2);
+
+        return $prefix . '…' . $suffix;
     }
 
     public function ac_avatar()
     {
-        $this->assign('cur_st', 'avatar')->render('setting/avatar.php');
+        $this->assign('cur_st', 'avatar')->render('app.php');
     }
 
     public function ac_gravatar(UserModel $userModel)
@@ -60,7 +105,7 @@ class SettingController extends Controller
             $this->assign("oauth_list", $oauth_enabled);
             $this->assign('cur_st', "oauth")
                 ->assign('oauth', ['type' => $type, 'name' => $name])
-                ->render('setting/oauth.php');
+                ->render('app.php');
         } else {
             $this->assignAll(['ret' => 1007, 'status' => 'oauth is not enabled', 'tp_error_msg' => '站点未开启OAuth'])->error();
         }
