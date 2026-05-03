@@ -50,13 +50,7 @@ class IndexController extends Controller
             'user' => $user ? UserController::slicePublic((new UserModel())->getUserByUid($user['uid'])) : null,
             'wallet' => $wallet,
             'copyright' => trim((string)$cfg->get('copyright', '')),
-            'icpBeian' => trim((string)$cfg->get('icp_beian', '')),
-            'icpBeianUrl' => trim((string)$cfg->get('icp_beian_url', 'https://beian.miit.gov.cn/')),
-            'poweredByUrl' => trim((string)$cfg->get('powered_by_url', '')),
-            'poweredByName' => trim((string)$cfg->get('powered_by_name', 'TwimiSNS')),
-            'poweredByPrefix' => trim((string)$cfg->get('powered_by_prefix', '')),
-            'poweredByPlain' => trim((string)$cfg->get('powered_by_plain', '')),
-            'legalFooterOneLine' => (bool)$cfg->get('legal_footer_one_line', false),
+            'icp' => trim((string)$cfg->get('icp', '')),
         ];
     }
 

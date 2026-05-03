@@ -32,13 +32,7 @@ $bootstrap = [
     'user' => null,
     'oauth' => $oauthKeys,
     'copyright' => trim((string)$cfg->get('copyright', '')),
-    'icpBeian' => trim((string)$cfg->get('icp_beian', '')),
-    'icpBeianUrl' => trim((string)$cfg->get('icp_beian_url', 'https://beian.miit.gov.cn/')),
-    'poweredByUrl' => trim((string)$cfg->get('powered_by_url', '')),
-    'poweredByName' => trim((string)$cfg->get('powered_by_name', 'TwimiSNS')),
-    'poweredByPrefix' => trim((string)$cfg->get('powered_by_prefix', '')),
-    'poweredByPlain' => trim((string)$cfg->get('powered_by_plain', '')),
-    'legalFooterOneLine' => (bool)$cfg->get('legal_footer_one_line', false),
+    'icp' => trim((string)$cfg->get('icp', '')),
 ];
 $bootstrap['wallet'] = null;
 if ($tp_user) {
@@ -72,7 +66,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QU
     <link rel="stylesheet" href="/static/app/styles/app.css?v=56">
     <style id="ts-theme-inline">
         :root {
-            --tw-accent: <?= htmlspecialchars($themeColor, ENT_QUOTES, 'UTF-8') ?>;
+            --ts-accent: <?= htmlspecialchars($themeColor, ENT_QUOTES, 'UTF-8') ?>;
         }
     </style>
     <script type="application/json" id="ts-bootstrap"><?= json_encode($bootstrap, $jsonFlags) ?></script>

@@ -28,7 +28,7 @@ $infoLead = $shellHtmlLang === 'en' ? 'Notice' : '提示';
     <link rel="stylesheet" href="/static/app/styles/app.css?v=56">
     <style id="ts-theme-inline">
         :root {
-            --tw-accent: <?= htmlspecialchars($shellThemeColor, ENT_QUOTES, 'UTF-8') ?>;
+            --ts-accent: <?= htmlspecialchars($shellThemeColor, ENT_QUOTES, 'UTF-8') ?>;
         }
     </style>
 </head>

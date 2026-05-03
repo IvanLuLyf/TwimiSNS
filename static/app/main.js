@@ -3,6 +3,11 @@ import {createIcon} from './icons.js';
 import {getLocale, initI18n, t, toggleLocale} from './i18n.js';
 import {prepareFeedMarkdownPreview, renderMarkdown, escapeHtml} from './md.js';
 
+/** Fixed MIIT filing query URL (备案信息查询). */
+const ICP_BEIAN_URL = 'https://beian.miit.gov.cn/';
+const POWERED_BY_URL = 'https://github.com/IvanLuLyf/TwimiSNS';
+const POWERED_BY_NAME = 'TwimiSNS';
+
 function readBootstrap() {
     const el = document.getElementById('ts-bootstrap');
     if (!el) return {};
@@ -347,13 +352,13 @@ function applyThemeFromHex(hex) {
         .map((x) => x.toString(16).padStart(2, '0'))
         .join('')}`;
     const root = document.documentElement;
-    root.style.setProperty('--tw-accent', h);
-    root.style.setProperty('--tw-accent-dim', dim);
-    root.style.setProperty('--tw-accent-hover', hover);
-    root.style.setProperty('--tw-accent-glow', `rgba(${r},${g},${b},0.24)`);
-    root.style.setProperty('--tw-brand-social', h);
-    root.style.setProperty('--tw-brand-social-dim', dim);
-    root.style.setProperty('--tw-brand-social-glow', `rgba(${r},${g},${b},0.22)`);
+    root.style.setProperty('--ts-accent', h);
+    root.style.setProperty('--ts-accent-dim', dim);
+    root.style.setProperty('--ts-accent-hover', hover);
+    root.style.setProperty('--ts-accent-glow', `rgba(${r},${g},${b},0.24)`);
+    root.style.setProperty('--ts-brand-social', h);
+    root.style.setProperty('--ts-brand-social-dim', dim);
+    root.style.setProperty('--ts-brand-social-glow', `rgba(${r},${g},${b},0.22)`);
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', h);
 }
@@ -376,12 +381,9 @@ async function refreshBootstrap() {
         setCsrf(j.csrf_token);
         bootstrap.user = j.user;
     }
-    const bootStrKeys = ['copyright', 'icpBeian', 'icpBeianUrl', 'poweredByUrl', 'poweredByName', 'poweredByPrefix', 'poweredByPlain', 'locale'];
+    const bootStrKeys = ['copyright', 'icp', 'locale'];
     for (const k of bootStrKeys) {
         if (typeof j[k] === 'string') bootstrap[k] = j[k];
-    }
-    if (Object.prototype.hasOwnProperty.call(j, 'legalFooterOneLine')) {
-        bootstrap.legalFooterOneLine = !!j.legalFooterOneLine;
     }
     if (Object.prototype.hasOwnProperty.call(j, 'wallet')) bootstrap.wallet = j.wallet;
     if (Object.prototype.hasOwnProperty.call(j, 'allow_reg')) bootstrap.allowReg = !!j.allow_reg;
@@ -433,67 +435,20 @@ function sideNavLink(path, label, navigateFn, iconName = null) {
 }
 
 function appendPoweredByNodes(host) {
-    const url = (bootstrap.poweredByUrl || '').trim();
-    const name = (bootstrap.poweredByName || '').trim() || 'TwimiSNS';
-    const prefixCfg = (bootstrap.poweredByPrefix || '').trim();
-    const plainCfg = (bootstrap.poweredByPlain || '').trim();
-
-    if (url) {
-        const prefix = prefixCfg || t('poweredByPrefix');
-        const spaced = prefix.endsWith(' ') ? prefix : `${prefix} `;
-        host.appendChild(document.createTextNode(spaced));
-        const a = document.createElement('a');
-        a.href = url;
-        a.rel = 'noopener noreferrer';
-        a.target = '_blank';
-        a.textContent = name;
-        host.appendChild(a);
-    } else if (plainCfg) {
-        host.appendChild(document.createTextNode(plainCfg));
-    } else {
-        host.appendChild(document.createTextNode(t('poweredBy')));
-    }
+    const prefix = t('poweredByPrefix');
+    const spaced = prefix.endsWith(' ') ? prefix : `${prefix} `;
+    host.appendChild(document.createTextNode(spaced));
+    const a = document.createElement('a');
+    a.href = POWERED_BY_URL;
+    a.rel = 'noopener noreferrer';
+    a.target = '_blank';
+    a.textContent = POWERED_BY_NAME;
+    host.appendChild(a);
 }
 
 function appendSiteLegalContent(parent) {
     const copy = (bootstrap.copyright || '').trim();
-    const icp = (bootstrap.icpBeian || '').trim();
-    const icpUrl = (bootstrap.icpBeianUrl || '').trim();
-    const oneLine = bootstrap.legalFooterOneLine === true;
-
-    if (oneLine) {
-        const line = document.createElement('div');
-        line.className = 'ts-site-footer-line ts-site-footer-line--muted ts-site-footer--oneline';
-        const frag = document.createDocumentFragment();
-        const chunks = [];
-        if (copy) {
-            chunks.push(() => frag.appendChild(document.createTextNode(copy)));
-        }
-        if (icp) {
-            chunks.push(() => {
-                if (icpUrl) {
-                    const a = document.createElement('a');
-                    a.href = icpUrl;
-                    a.rel = 'noopener noreferrer';
-                    a.target = '_blank';
-                    a.textContent = icp;
-                    frag.appendChild(a);
-                } else {
-                    frag.appendChild(document.createTextNode(icp));
-                }
-            });
-        }
-        chunks.push(() => appendPoweredByNodes(frag));
-        chunks.forEach((fn, i) => {
-            if (i > 0) {
-                frag.appendChild(document.createTextNode(' '));
-            }
-            fn();
-        });
-        line.appendChild(frag);
-        parent.appendChild(line);
-        return;
-    }
+    const icp = (bootstrap.icp || '').trim();
 
     if (copy) {
         const p = document.createElement('div');
@@ -505,16 +460,12 @@ function appendSiteLegalContent(parent) {
     if (icp) {
         const p = document.createElement('div');
         p.className = 'ts-site-footer-line';
-        if (icpUrl) {
-            const a = document.createElement('a');
-            a.href = icpUrl;
-            a.rel = 'noopener noreferrer';
-            a.target = '_blank';
-            a.textContent = icp;
-            p.appendChild(a);
-        } else {
-            p.textContent = icp;
-        }
+        const a = document.createElement('a');
+        a.href = ICP_BEIAN_URL;
+        a.rel = 'noopener noreferrer';
+        a.target = '_blank';
+        a.textContent = icp;
+        p.appendChild(a);
         parent.appendChild(p);
     }
 
