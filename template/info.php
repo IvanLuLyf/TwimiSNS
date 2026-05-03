@@ -41,7 +41,7 @@ if ($shellHtmlLang === 'en') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="<?= htmlspecialchars($shellThemeColor, ENT_QUOTES, 'UTF-8') ?>">
     <title><?= $shellSiteName ?></title>
-    <link rel="stylesheet" href="/static/app/styles/app.css?v=56">
+    <link rel="stylesheet" href="/static/app/styles/app.css?v=57">
     <style id="ts-theme-inline">
         :root {
             --ts-accent: <?= htmlspecialchars($shellThemeColor, ENT_QUOTES, 'UTF-8') ?>;

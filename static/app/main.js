@@ -3119,18 +3119,27 @@ async function renderLogin() {
         lb.className = 'ts-auth-oauth-label';
         lb.textContent = t('authOAuthBar');
         bar.appendChild(lb);
+        const iconsRow = document.createElement('div');
+        iconsRow.className = 'ts-auth-oauth-icons';
         const refPath = `${window.location.pathname}${window.location.search}`;
         oauthKeys.forEach((o) => {
             if (!o || !o[0]) return;
+            const name = o[1] || o[0];
             const a = document.createElement('a');
             a.href = oauthConnectHref(o[0], refPath);
-            a.title = o[1] || o[0];
+            a.className = 'ts-auth-oauth-btn';
+            a.title = name;
+            a.setAttribute('aria-label', name);
+            a.rel = 'noopener noreferrer';
             const img = document.createElement('img');
             img.src = `/static/img/${o[0]}.png`;
-            img.alt = o[1] || o[0];
+            img.alt = '';
+            img.decoding = 'async';
+            img.setAttribute('aria-hidden', 'true');
             a.appendChild(img);
-            bar.appendChild(a);
+            iconsRow.appendChild(a);
         });
+        bar.appendChild(iconsRow);
         card.appendChild(bar);
     }
 
