@@ -1,4 +1,4 @@
-import {formPost, jsonGet, jsonPost} from './api.js';
+import {ajaxGet, ajaxPost, formPost, jsonGet, jsonPost} from './api.js';
 import {createIcon} from './icons.js';
 import {getLocale, initI18n, t, toggleLocale} from './i18n.js';
 import {prepareFeedMarkdownPreview, renderMarkdown, escapeHtml} from './md.js';
@@ -946,7 +946,6 @@ function parseRoute(pathname) {
         if (segs[1] === 'login') return {name: 'login'};
         if (segs[1] === 'register') return {name: 'register'};
         if (segs[1] === 'info') return {name: 'user', username: '', tab: ''};
-        /* 与后端 JSON 路径一致，便于收藏夹直达 */
         if (segs[1] === 'panel') {
             if (!segs[2]) return {name: 'user', username: '', tab: ''};
             if (segs[3] === 'post') {
@@ -1476,7 +1475,7 @@ async function renderPayStart() {
         return;
     }
 
-    const st = await jsonGet('/pay/json_start_state');
+    const st = await ajaxGet('/pay/json_start_state');
     if (st.ret === 2002) {
         window.location.href = buildLoginUrl('/pay/start');
         return;
@@ -1569,7 +1568,7 @@ async function renderWallet() {
 
     async function paint() {
         wrap.innerHTML = '';
-        const j = await jsonGet('/pay/json_wallet');
+        const j = await ajaxGet('/pay/wallet');
         if (j.ret === 2002) {
             window.location.href = buildLoginUrl('/pay/wallet');
             return;
@@ -2239,7 +2238,7 @@ async function renderUser(username, tab) {
     } else if (tab === 'post') {
         path += '?tab=post';
     }
-    const j = await jsonGet(path);
+    const j = await ajaxGet(path);
     const stack = document.createElement('div');
     stack.className = 'ts-main-stack ts-stack-gap';
     if (j.ret !== 0) {
@@ -2328,7 +2327,7 @@ async function renderFriend() {
         return;
     }
 
-    const j = await jsonGet('/friend/json');
+    const j = await ajaxGet('/friend/json');
     const stack = document.createElement('div');
     stack.className = 'ts-main-stack ts-stack-gap';
     if (j.ret !== 0) {
@@ -2383,7 +2382,7 @@ async function renderFriend() {
             return;
         }
         searchHint.hidden = true;
-        const res = await jsonGet(`/user/json_lookup?q=${encodeURIComponent(q)}`);
+        const res = await ajaxGet(`/user/json_lookup?q=${encodeURIComponent(q)}`);
         if (res.ret !== 0) {
             searchErr.textContent = res.tp_error_msg || res.status || t('loadFailed');
             return;
@@ -2576,7 +2575,7 @@ async function renderFriend() {
 }
 
 async function renderNotify() {
-    const j = await jsonGet('/notify/json');
+    const j = await ajaxGet('/notify/view');
     const stack = document.createElement('div');
     stack.className = 'ts-main-stack ts-stack-gap';
     if (j.ret !== 0) {
@@ -2948,7 +2947,7 @@ function buildSettingsAvatarPanel() {
             const fd = new FormData();
             fd.append('avatar', pendingBlob, 'avatar.jpg');
             fd.append('csrf_token', csrfToken);
-            const r = await formPost('/user/json_avatar', fd);
+            const r = await formPost('/ajax/user/json_avatar', fd);
             if (r.ret !== 0) {
                 err.textContent = r.tp_error_msg || r.status || t('actionFailed');
                 saveBtn.disabled = false;
@@ -3021,7 +3020,7 @@ async function buildSettingsOAuthPanel() {
     p.textContent = t('settingsOAuthIntro');
     wrap.append(h, p);
 
-    const res = await jsonGet('/setting/json_binds');
+    const res = await ajaxGet('/setting/json_binds');
     const binds = res.ret === 0 && Array.isArray(res.binds) ? res.binds : [];
     const byType = Object.fromEntries(binds.map((b) => [b.type, b]));
 
@@ -3132,7 +3131,7 @@ async function renderLogin() {
             password: fd.get('password'),
         };
         if (qRef) payload.referer = qRef;
-        const j = await jsonPost('/user/json_login_post', payload);
+        const j = await ajaxPost('/user/json_login_post', payload);
         if (j.ret === 0) {
             await afterAuthSessionRefreshNavigate();
         } else {
@@ -3227,7 +3226,7 @@ async function renderRegister() {
             nickname: fd.get('nickname') || '',
         };
         if (qRef) payload.referer = qRef;
-        const j = await jsonPost('/user/json_register_post', payload);
+        const j = await ajaxPost('/user/json_register_post', payload);
         if (j.ret === 0) {
             await afterAuthSessionRefreshNavigate();
         } else {
