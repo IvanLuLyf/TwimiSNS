@@ -2,3 +2,5 @@
 /upload/
 .idea/
 /vendor/
+/composer.phar
+/sns.sqlite3

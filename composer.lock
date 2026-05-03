@@ -8,24 +8,24 @@
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
-            "version": "v2.4.3",
+            "version": "v2.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aliyun/aliyun-oss-php-sdk.git",
-                "reference": "4ccead614915ee6685bf30016afb01aabd347e46"
+                "reference": "483dd0b8bff5d47f0e4ffc99f6077a295c5ccbb5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aliyun/aliyun-oss-php-sdk/zipball/4ccead614915ee6685bf30016afb01aabd347e46",
-                "reference": "4ccead614915ee6685bf30016afb01aabd347e46",
+                "url": "https://api.github.com/repos/aliyun/aliyun-oss-php-sdk/zipball/483dd0b8bff5d47f0e4ffc99f6077a295c5ccbb5",
+                "reference": "483dd0b8bff5d47f0e4ffc99f6077a295c5ccbb5",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "*",
-                "satooshi/php-coveralls": "*"
+                "php-coveralls/php-coveralls": "*",
+                "phpunit/phpunit": "*"
             },
             "type": "library",
             "autoload": {
@@ -47,22 +47,22 @@
             "homepage": "http://www.aliyun.com/product/oss/",
             "support": {
                 "issues": "https://github.com/aliyun/aliyun-oss-php-sdk/issues",
-                "source": "https://github.com/aliyun/aliyun-oss-php-sdk/tree/v2.4.3"
+                "source": "https://github.com/aliyun/aliyun-oss-php-sdk/tree/v2.7.2"
             },
-            "time": "2021-08-25T13:03:58+00:00"
+            "time": "2024-10-28T10:41:12+00:00"
         },
         {
             "name": "ivanlulyf/bunnyphp",
-            "version": "3.1.1",
+            "version": "3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IvanLuLyf/BunnyPHP.git",
-                "reference": "3d5e5f09abb20de5d0b0fab7e08c6c72f73e7650"
+                "reference": "b732f2a4bb860788a5a91a4635bad8d984a4bf68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IvanLuLyf/BunnyPHP/zipball/3d5e5f09abb20de5d0b0fab7e08c6c72f73e7650",
-                "reference": "3d5e5f09abb20de5d0b0fab7e08c6c72f73e7650",
+                "url": "https://api.github.com/repos/IvanLuLyf/BunnyPHP/zipball/b732f2a4bb860788a5a91a4635bad8d984a4bf68",
+                "reference": "b732f2a4bb860788a5a91a4635bad8d984a4bf68",
                 "shasum": ""
             },
             "require": {
@@ -99,7 +99,7 @@
                 "issues": "https://github.com/IvanLuLyf/BunnyPHP/issues",
                 "source": "https://github.com/IvanLuLyf/BunnyPHP"
             },
-            "time": "2022-07-27T05:36:59+00:00"
+            "time": "2026-05-02T10:27:48+00:00"
         },
         {
             "name": "ivanlulyf/bunnyphp-alioss",
@@ -184,16 +184,16 @@
         },
         {
             "name": "joyqi/hyper-down",
-            "version": "2.4.27",
+            "version": "2.4.29",
             "source": {
                 "type": "git",
-                "url": "https://github.com/SegmentFault/HyperDown.git",
-                "reference": "a8024055032d2b935b2521fddb1c5564a85b7dac"
+                "url": "https://github.com/segmentfault/HyperDown.git",
+                "reference": "e263c77bc5600fe9c5f939fe9081c159c5f8b6d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SegmentFault/HyperDown/zipball/a8024055032d2b935b2521fddb1c5564a85b7dac",
-                "reference": "a8024055032d2b935b2521fddb1c5564a85b7dac",
+                "url": "https://api.github.com/repos/segmentfault/HyperDown/zipball/e263c77bc5600fe9c5f939fe9081c159c5f8b6d3",
+                "reference": "e263c77bc5600fe9c5f939fe9081c159c5f8b6d3",
                 "shasum": ""
             },
             "require": {
@@ -223,16 +223,16 @@
                 "segmentfault"
             ],
             "support": {
-                "issues": "https://github.com/SegmentFault/HyperDown/issues",
-                "source": "https://github.com/SegmentFault/HyperDown/tree/2.4.27"
+                "issues": "https://github.com/segmentfault/HyperDown/issues",
+                "source": "https://github.com/segmentfault/HyperDown/tree/2.4.29"
             },
-            "time": "2021-08-08T04:33:34+00:00"
+            "time": "2021-09-29T16:58:39+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -243,6 +243,6 @@
         "ext-pdo_sqlite": "*",
         "ext-iconv": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }
