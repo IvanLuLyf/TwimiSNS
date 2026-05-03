@@ -8,10 +8,21 @@ use BunnyPHP\View;
 
 /**
  * @author IvanLu
- * @time 2018/7/28 18:43
+ * @time 2026/5/3 16:35
  */
 class UserController extends Controller
 {
+    /** @internal */
+    public static function slicePublic(array $u): array
+    {
+        return [
+            'uid' => (int)($u['uid'] ?? 0),
+            'username' => $u['username'] ?? '',
+            'nickname' => $u['nickname'] ?? '',
+            'avatar' => $u['avatar'] ?? '',
+        ];
+    }
+
     /**
      * @filter csrf
      * @param $referer
@@ -22,14 +33,7 @@ class UserController extends Controller
             Request::session('referer', $referer);
             $this->assign('referer', $referer);
         }
-        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
-            $oauth = [];
-            if (Config::check('oauth')) {
-                $oauth = Config::load('oauth')->get('enabled', []);
-            }
-            $this->assign('oauth', $oauth);
-        }
-        $this->render("user/login.php");
+        $this->render('app.php');
     }
 
     /**
@@ -50,12 +54,7 @@ class UserController extends Controller
                     $this->redirect('index', 'index');
                 }
             } else {
-                $this->assignAll($result);
-                $oauth = [];
-                if (Config::check('oauth')) {
-                    $oauth = Config::load('oauth')->get('enabled', []);
-                }
-                $this->assign('oauth', $oauth)->render('user/login.php');
+                $this->assignAll($result)->render('app.php');
             }
         } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
             if ($result['ret'] == 0) {
@@ -82,7 +81,7 @@ class UserController extends Controller
                 Request::session('referer', $referer);
                 $this->assign('referer', $referer);
             }
-            $this->render('user/register.php');
+            $this->render('app.php');
         } else {
             $this->assignAll(['ret' => 1005, 'status' => 'registration is not allowed', 'tp_error_msg' => '站点关闭注册'])->error();
         }
@@ -109,7 +108,7 @@ class UserController extends Controller
                         $this->redirect('index', 'index');
                     }
                 } else {
-                    $this->assignAll($result)->render('user/register.php');
+                    $this->assignAll($result)->render('app.php');
                 }
             } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_API) {
                 if ($result['ret'] == 0) {
@@ -131,11 +130,67 @@ class UserController extends Controller
     }
 
     /**
+     * @filter csrf check
+     */
+    public function ac_json_login_post(UserService $userService): void
+    {
+        $referer = trim((string)($_POST['referer'] ?? ''));
+        if ($referer !== '') {
+            Request::session('referer', $referer);
+        }
+        $username = trim((string)($_POST['username'] ?? ''));
+        $password = (string)($_POST['password'] ?? '');
+        $result = (new UserModel())->login($username, $password);
+        if ($result['ret'] === 0) {
+            $userService->setLoginUser($result['token']);
+            $this->assignAll(['ret' => 0, 'status' => 'ok'])->render('app.php');
+            return;
+        }
+        $this->assignAll([
+            'ret' => (int)($result['ret'] ?? -1),
+            'status' => $result['status'] ?? 'error',
+            'tp_error_msg' => $result['tp_error_msg'] ?? ($result['status'] ?? '登录失败'),
+        ])->render('app.php');
+    }
+
+    /**
+     * @filter csrf check
+     */
+    public function ac_json_register_post(UserService $userService): void
+    {
+        if (!Config::load('config')->get('allow_reg')) {
+            $this->assignAll(['ret' => 1005, 'status' => 'registration is not allowed', 'tp_error_msg' => '站点关闭注册'])->render('app.php');
+            return;
+        }
+        $referer = trim((string)($_POST['referer'] ?? ''));
+        if ($referer !== '') {
+            Request::session('referer', $referer);
+        }
+        $username = trim((string)($_POST['username'] ?? ''));
+        $password = (string)($_POST['password'] ?? '');
+        $email = trim((string)($_POST['email'] ?? ''));
+        $nickname = trim((string)($_POST['nickname'] ?? ''));
+        $result = (new UserModel())->register($username, $password, $email, $nickname);
+        if ($result['ret'] === 0) {
+            $service = new EmailService();
+            $service->sendMail('email/reg.html', ['nickname' => $result['nickname'], 'site' => TP_SITE_NAME], $result['email'], '欢迎注册' . TP_SITE_NAME);
+            $userService->setLoginUser($result['token']);
+            $this->assignAll(['ret' => 0, 'status' => 'ok'])->render('app.php');
+            return;
+        }
+        $this->assignAll([
+            'ret' => (int)($result['ret'] ?? -1),
+            'status' => $result['status'] ?? 'error',
+            'tp_error_msg' => $result['tp_error_msg'] ?? '注册失败',
+        ])->render('app.php');
+    }
+
+    /**
      * @filter csrf
      */
     public function ac_forgot_get()
     {
-        $this->render('user/forgot.php');
+        $this->render('app.php');
     }
 
     /**
@@ -149,9 +204,9 @@ class UserController extends Controller
             $service = new EmailService();
             $code = (new PassCodeModel())->getCode($user['uid']);
             $service->sendMail('email/forgot.html', ['nickname' => $user['nickname'], 'site' => TP_SITE_NAME, 'url' => TP_SITE_URL, 'code' => $code], $user['email'], '找回密码');
-            $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "邮件已发送"])->render('common/error.php');
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => "邮件已发送"])->render('app.php');
         } else {
-            $this->assignAll(['ret' => 1002, 'status' => "user does not exist", 'tp_error_msg' => '用户名不存在'])->render('user/forgot.php');
+            $this->assignAll(['ret' => 1002, 'status' => "user does not exist", 'tp_error_msg' => '用户名不存在'])->render('app.php');
         }
     }
 
@@ -161,7 +216,7 @@ class UserController extends Controller
      */
     public function ac_reset_get(string $code)
     {
-        $this->assign('code', $code)->render('user/reset.php');
+        $this->assign('code', $code)->render('app.php');
     }
 
     /**
@@ -175,7 +230,7 @@ class UserController extends Controller
         $uid = (new PassCodeModel())->checkCode($code);
         if ($uid != null) {
             (new UserModel())->reset($uid, $password);
-            $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => '密码修改完成'])->render('common/error.php');
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => '密码修改完成'])->render('app.php');
         } else {
             $this->assignAll(['ret' => 1008, 'status' => 'invalid verification code', 'tp_error_msg' => '验证码已过期'])->error();
         }
@@ -184,7 +239,7 @@ class UserController extends Controller
     public function ac_logout(UserService $userService)
     {
         $userService->setLoginUser(null);
-        $this->redirect('user', 'login');
+        $this->redirect('index', 'index');
     }
 
     /**
@@ -226,8 +281,32 @@ class UserController extends Controller
         if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
             $this->redirect('setting', 'avatar');
         } else {
-            $this->render('setting/avatar.php');
+            $this->render('app.php');
         }
+    }
+
+    /**
+     * @filter csrf check
+     * @filter auth
+     */
+    public function ac_json_avatar_post(UserModel $userModel): void
+    {
+        $tp_user = BunnyPHP::app()->get('tp_user');
+        if (!isset($_FILES['avatar'])) {
+            $this->assignAll(['ret' => -7, 'status' => 'no file', 'tp_error_msg' => '请选择图片文件'])->render('app.php');
+            return;
+        }
+        if (
+            !in_array($_FILES['avatar']['type'], ConstUtil::IMAGE_TYPES, true)
+            || $_FILES['avatar']['size'] >= ConstUtil::IMAGE_MAX_SIZE
+        ) {
+            $this->assignAll(['ret' => 2, 'status' => 'invalid file', 'tp_error_msg' => '文件类型或大小不符合要求'])->render('app.php');
+            return;
+        }
+        $t = time() % 1000;
+        $url = BunnyPHP::getStorage()->upload("avatar/{$tp_user['uid']}_$t.jpg", $_FILES['avatar']['tmp_name']);
+        $userModel->updateAvatar($tp_user['uid'], $url);
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'url' => $url])->render('app.php');
     }
 
     /**
@@ -261,7 +340,11 @@ class UserController extends Controller
                 }
             }
         }
-        $this->render('user/info.php');
+        if (BUNNY_APP_MODE == BunnyPHP::MODE_NORMAL) {
+            $this->render('app.php');
+        } else {
+            $this->render();
+        }
     }
 
     /**
@@ -301,6 +384,74 @@ class UserController extends Controller
         $this->assign('tab', $tab);
         $this->assign('user', $user);
         $this->assign('user_info', $user_info);
-        $this->render('user/detail.php');
+        $this->render('app.php');
+    }
+
+    /**
+     * @param UserService $userService
+     * @param string $username path(0)
+     * @param string $tab path(1,post)
+     */
+    public function ac_panel(UserService $userService, string $username = '', string $tab = ''): void
+    {
+        $tabGet = $_GET['tab'] ?? '';
+        if ($username === '' && $tabGet !== '') {
+            $tab = $tabGet;
+        }
+        $tp_user = $userService->getLoginUser();
+        if ($username === '') {
+            if ($tp_user === null) {
+                $this->assignAll(['ret' => 2002, 'status' => 'login required', 'tp_error_msg' => '请先登录'])->render('app.php');
+                return;
+            }
+            $username = $tp_user['username'];
+        }
+        $user = (new UserModel())->where(['username = :username'], ['username' => $username])->fetch(['uid', 'username', 'nickname']);
+        if ($user === null || empty($user['uid'])) {
+            $this->assignAll(['ret' => 1004, 'status' => 'invalid username', 'tp_error_msg' => '用户不存在'])->render('app.php');
+            return;
+        }
+        $user_info = (new UserInfoModel())->get($user['uid']);
+        $posts = [];
+        if ($tab === 'post') {
+            $posts = (new PostModel())->getPostByUsername($username);
+            foreach ($posts as &$p) {
+                PostsUtil::apply($p, $tp_user);
+            }
+            unset($p);
+        }
+        $this->assignAll([
+            'ret' => 0,
+            'status' => 'ok',
+            'tab' => $tab,
+            'user' => $user,
+            'user_info' => $user_info,
+            'posts' => $posts,
+        ])->render('app.php');
+    }
+
+    public function ac_json_lookup_get(UserService $userService, UserModel $userModel): void
+    {
+        $me = $userService->getLoginUser();
+        if ($me === null) {
+            $this->assignAll([
+                'ret' => 2002,
+                'status' => 'login required',
+                'tp_error_msg' => '请先登录',
+                'users' => [],
+            ])->render('app.php');
+            return;
+        }
+        $q = trim((string)($_GET['q'] ?? ''));
+        $rows = $userModel->searchPublicUsers($q, 15);
+        $myUid = (int)$me['uid'];
+        $users = [];
+        foreach ($rows as $r) {
+            if ((int)($r['uid'] ?? 0) === $myUid) {
+                continue;
+            }
+            $users[] = self::slicePublic($r);
+        }
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'users' => $users])->render('app.php');
     }
 }
