@@ -9,6 +9,117 @@ use BunnyPHP\Controller;
  */
 class PayController extends Controller
 {
+    /** @return array<string, mixed>|null */
+    private function payWalletSnapshot(UserService $userService): ?array
+    {
+        $tp_user = $userService->getLoginUser();
+        if ($tp_user === null) {
+            return null;
+        }
+        $uid = (int) $tp_user['uid'];
+        $raw = (new CreditModel())->balance($uid);
+        $stored = (new PayPassModel())->getPassword($uid);
+        $hasPayPass = $stored !== null && $stored !== '';
+        $active = $raw != -1;
+
+        return [
+            'wallet_active' => $active,
+            'credit' => $active ? (float) $raw : null,
+            'has_pay_pass' => $hasPayPass,
+            'need_setup' => $raw == -1,
+            'need_pay_pass' => $active && !$hasPayPass,
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function walletStartApply(UserService $userService, EmailService $service, string $pass): array
+    {
+        $tp_user = $userService->getLoginUser();
+        if ($tp_user === null) {
+            return ['ret' => 2002, 'status' => 'login required', 'tp_error_msg' => '请先登录'];
+        }
+        $credit = new CreditModel();
+        $bal = $credit->balance($tp_user['uid']);
+        $stored = (new PayPassModel())->getPassword($tp_user['uid']);
+        $hasPayPass = $stored !== null && $stored !== '';
+        if ($bal != -1 && $hasPayPass) {
+            return [
+                'ret' => 0,
+                'status' => 'ok',
+                'already_active' => true,
+                'credit' => (float) $bal,
+            ];
+        }
+
+        $pass = trim($pass);
+        $len = function_exists('mb_strlen') ? mb_strlen($pass) : strlen($pass);
+        if ($len < 1 || $len > 6) {
+            return ['ret' => -7, 'status' => 'invalid pass', 'tp_error_msg' => '支付密码为 1～6 位'];
+        }
+        (new PayPassModel())->setPassword($tp_user['uid'], md5($pass));
+
+        if ($bal == -1) {
+            $service->sendMail(
+                'email/pay_start.html',
+                ['nickname' => $tp_user['nickname'], 'site' => TP_SITE_NAME],
+                $tp_user['email'],
+                '您已开通' . TP_SITE_NAME . '支付服务',
+            );
+            $credit->start($tp_user['uid']);
+        }
+
+        return [
+            'ret' => 0,
+            'status' => 'ok',
+            'credit' => (float) $credit->balance($tp_user['uid']),
+        ];
+    }
+
+    /**
+     * @filter auth pay
+     */
+    public function ac_wallet_get(UserService $userService): void
+    {
+        $snap = $this->payWalletSnapshot($userService);
+        if ($snap === null) {
+            $this->assignAll(['ret' => 2002, 'status' => 'login required', 'tp_error_msg' => '请先登录'])->render('app.php');
+            return;
+        }
+        $this->assignAll([
+            'ret' => 0,
+            'status' => 'ok',
+            'wallet_active' => $snap['wallet_active'],
+            'credit' => $snap['credit'],
+            'has_pay_pass' => $snap['has_pay_pass'],
+        ])->render('app.php');
+    }
+
+    public function ac_json_start_state(UserService $userService): void
+    {
+        $snap = $this->payWalletSnapshot($userService);
+        if ($snap === null) {
+            $this->assignAll(['ret' => 2002, 'status' => 'login required', 'tp_error_msg' => '请先登录'])->render('app.php');
+            return;
+        }
+        $this->assignAll([
+            'ret' => 0,
+            'status' => 'ok',
+            'need_setup' => $snap['need_setup'],
+            'need_pay_pass' => $snap['need_pay_pass'],
+            'credit' => $snap['credit'],
+        ])->render('app.php');
+    }
+
+    /**
+     * @filter csrf check
+     * @param EmailService $service
+     * @param string $pass not_empty()
+     */
+    public function ac_json_start_post(UserService $userService, EmailService $service, string $pass): void
+    {
+        $this->assignAll($this->walletStartApply($userService, $service, $pass))->render('app.php');
+    }
+
     /**
      * @filter auth pay
      */
@@ -36,7 +147,7 @@ class PayController extends Controller
         } else {
             $this->assignAll(['ret' => 5001, 'status' => 'wrong payment password']);
         }
-        $this->render('pay/buy.php');
+        $this->render('app.php');
     }
 
     /**
@@ -53,7 +164,7 @@ class PayController extends Controller
         } else {
             $this->assignAll(['ret' => 5006, 'status' => 'invalid amount']);
         }
-        $this->render('pay/request.php');
+        $this->render('app.php');
     }
 
     /**
@@ -84,7 +195,7 @@ class PayController extends Controller
         } else {
             $this->assignAll(['ret' => 5006, 'status' => 'invalid amount']);
         }
-        $this->render('pay/red_packet.php');
+        $this->render('app.php');
     }
 
     /**
@@ -106,7 +217,7 @@ class PayController extends Controller
         } else {
             $this->assignAll(['ret' => 5005, 'status' => 'empty red packet']);
         }
-        $this->render('pay/pick.php');
+        $this->render('app.php');
     }
 
     /**
@@ -118,7 +229,7 @@ class PayController extends Controller
         $payInfo = (new PayOrderModel())->get($payTicket);
         $payInfo['paid'] = ($payInfo['uid'] > 0);
         unset($payInfo['uid']);
-        $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($payInfo)->render('pay/view.php');
+        $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($payInfo)->render('app.php');
     }
 
     /**
@@ -128,21 +239,15 @@ class PayController extends Controller
     {
         $tp_user = BunnyPHP::app()->get('tp_user');
         $credit = new CreditModel();
-        $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => intval($credit->balance($tp_user['uid']))])->render('pay/balance.php');
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => intval($credit->balance($tp_user['uid']))])->render('app.php');
     }
 
     /**
      * @filter auth pay
-     * @filter csrf
      */
-    public function ac_start_get()
+    public function ac_start_get(): void
     {
-        $tp_user = BunnyPHP::app()->get('tp_user');
-        if (intval((new CreditModel())->balance($tp_user['uid'])) == -1) {
-            $this->render('pay/start.php');
-        } else {
-            $this->redirect('pay', 'balance');
-        }
+        $this->render('app.php');
     }
 
     /**
@@ -151,12 +256,8 @@ class PayController extends Controller
      * @param EmailService $service
      * @param string $pass not_empty()
      */
-    public function ac_start_post(EmailService $service, string $pass)
+    public function ac_start_post(UserService $userService, EmailService $service, string $pass): void
     {
-        $tp_user = BunnyPHP::app()->get('tp_user');
-        $credit = new CreditModel();
-        (new PayPassModel())->setPassword($tp_user['uid'], md5($pass));
-        $service->sendMail('email/pay_start.html', ['nickname' => $tp_user['nickname'], 'site' => TP_SITE_NAME], $tp_user['email'], '您已开通' . TP_SITE_NAME . "支付服务");
-        $this->assignAll(['ret' => 0, 'status' => 'ok', 'credit' => $credit->start($tp_user['uid'])])->render('pay/start.php');
+        $this->assignAll($this->walletStartApply($userService, $service, $pass))->render('app.php');
     }
 }

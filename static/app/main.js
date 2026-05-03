@@ -1542,7 +1542,7 @@ async function renderPayStart() {
             err.textContent = t('walletSetupPassRequired');
             return;
         }
-        const r = await jsonPost('/pay/json_start_post', {csrf_token: csrfToken, pass});
+        const r = await ajaxPost('/pay/json_start_post', {csrf_token: csrfToken, pass});
         if (r.ret !== 0) {
             err.textContent = r.tp_error_msg || r.status || t('actionFailed');
             return;
