@@ -68,10 +68,12 @@ class OauthController extends Controller
                 $this->redirect('setting', 'oauth', ['type' => $type]);
             } else {
                 Request::session('oauth_user', ['type' => $type, 'uid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire'], 'nickname' => $bind['nickname'],]);
-                if (Config::load('config')->get('allow_reg')) {
-                    $this->assign('allow_reg', true);
-                }
-                $this->assign('oauth', ['nickname' => $bind['nickname'], 'type' => $type])->render('oauth/connect.php');
+                $allowReg = (bool)Config::load('config')->get('allow_reg');
+                $this->assign('oauthBind', [
+                    'type' => $type,
+                    'nickname' => $bind['nickname'],
+                    'allowReg' => $allowReg,
+                ])->render('app.php');
             }
         }
     }
@@ -99,6 +101,7 @@ class OauthController extends Controller
     }
 
     /**
+     * @filter csrf check
      * @param string $type path(0)
      */
     function ac_bind(string $type = '', string $bind_type = 'login')
@@ -120,9 +123,14 @@ class OauthController extends Controller
                 $this->redirect('index', 'index');
             }
         } else {
-            $this->assignAll($result);
-            $this->assign('oauth', ['type' => $type, 'nickname' => $_POST['nickname'] ?? ''])
-                ->render('oauth/connect.php');
+            $allowReg = (bool)Config::load('config')->get('allow_reg');
+            $this->assign('oauthBind', [
+                'type' => $type,
+                'nickname' => $_POST['nickname'] ?? '',
+                'allowReg' => $allowReg,
+                'errorMsg' => $result['tp_error_msg'] ?? ($result['status'] ?? ''),
+                'bindMode' => $bind_type === 'reg' ? 'reg' : 'login',
+            ])->render('app.php');
         }
     }
 
@@ -134,19 +142,12 @@ class OauthController extends Controller
     {
         if (isset($_REQUEST['client_id']) && $app = (new ApiModel())->check($_REQUEST['client_id'])) {
             if (isset($_REQUEST['redirect_uri']) && strpos($_REQUEST['redirect_uri'], $app['redirect_uri']) === 0) {
-                $tp_user = $userService->getLoginUser();
-                $this->assign('tp_user', $tp_user)
-                    ->assign('client_id', $_REQUEST['client_id'])
-                    ->assign('app_url', $app['url'])
-                    ->assign('client_name', $app['name'])
-                    ->assign('client_icon', $app['icon'])
-                    ->assign('redirect_uri', $_REQUEST['redirect_uri']);
-                $this->render('oauth/login.php');
+                $this->renderOAuthAuthorizeForm($userService, $app, $_REQUEST['client_id'], $_REQUEST['redirect_uri'], null);
             } else {
-                $this->assignAll(['tp_error_msg' => '非法的应用网址', 'tp_hide' => true])->render('oauth/login.php');
+                $this->renderOAuthAuthorizeError('非法的应用网址');
             }
         } else {
-            $this->assignAll(['tp_error_msg' => '非法的Client ID', 'tp_hide' => true])->render('oauth/login.php');
+            $this->renderOAuthAuthorizeError('非法的Client ID');
         }
     }
 
@@ -177,21 +178,58 @@ class OauthController extends Controller
                             else
                                 $this->redirect("$url?code=$code");
                         } else {
-                            $this->assign('client_id', $_REQUEST['client_id'])
-                                ->assign('app_url', $app['url'])
-                                ->assign('client_name', $app['name'])
-                                ->assign('client_icon', $app['icon'])
-                                ->assign('redirect_uri', $_REQUEST['redirect_uri'])
-                                ->assignAll($result)->render('oauth/login.php');
+                            $this->renderOAuthAuthorizeForm(
+                                $userService,
+                                $app,
+                                $_REQUEST['client_id'],
+                                $_REQUEST['redirect_uri'],
+                                $result['tp_error_msg'] ?? null,
+                            );
                         }
+                    } else {
+                        $this->renderOAuthAuthorizeForm($userService, $app, $_REQUEST['client_id'], $_REQUEST['redirect_uri'], null);
                     }
                 }
             } else {
-                $this->assignAll(['tp_error_msg' => '非法的应用网址', 'tp_hide' => true])->render('oauth/login.php');
+                $this->renderOAuthAuthorizeError('非法的应用网址');
             }
         } else {
-            $this->assignAll(['tp_error_msg' => '非法的Client ID', 'tp_hide' => true])->render('oauth/login.php');
+            $this->renderOAuthAuthorizeError('非法的Client ID');
         }
+    }
+
+    private function renderOAuthAuthorizeError(string $msg): void
+    {
+        $this->assign('oauthAuthorize', [
+            'hideForm' => true,
+            'errorMsg' => $msg,
+            'loggedIn' => false,
+            'user' => null,
+            'clientId' => '',
+            'redirectUri' => '',
+            'appUrl' => '',
+            'clientName' => '',
+            'clientIcon' => '',
+        ])->render('app.php');
+    }
+
+    /**
+     * @param array<string,mixed> $app
+     */
+    private function renderOAuthAuthorizeForm(UserService $userService, array $app, string $clientId, string $redirectUri, ?string $errorMsg): void
+    {
+        $tp_user = $userService->getLoginUser();
+        $this->assign('oauthAuthorize', [
+            'hideForm' => false,
+            'errorMsg' => $errorMsg,
+            'loggedIn' => $tp_user !== null,
+            'user' => $tp_user ? UserController::slicePublic($tp_user) : null,
+            'clientId' => $clientId,
+            'redirectUri' => $redirectUri,
+            'appUrl' => $app['url'],
+            'clientName' => $app['name'],
+            'clientIcon' => $app['icon'],
+        ])->render('app.php');
     }
 
     public function ac_token_post()
@@ -204,7 +242,7 @@ class OauthController extends Controller
                 $token_row = (new OauthTokenModel())->generate($uid, $app_key, $app['type']);
                 $this->assignAll(['ret' => 0, 'status' => 'ok'])->assignAll($token_row);
                 $oauthCodeModel->deleteCode($app_id, $_REQUEST['code']);
-                $this->render('common/error.php');
+                $this->render('app.php');
             } else {
                 $this->assignAll(['ret' => 2004, 'status' => 'invalid oauth code'])->error();
             }
