@@ -53,7 +53,8 @@ $regHref = '/user/register';
                 <a class="ts-header-icon-btn" href="<?= htmlspecialchars($panelHref, ENT_QUOTES, 'UTF-8') ?>"
                    aria-label="<?= htmlspecialchars($lblProfile, ENT_QUOTES, 'UTF-8') ?>">
                     <img class="ts-drawer-toggle-avatar" src="<?= htmlspecialchars($avSrc, ENT_QUOTES, 'UTF-8') ?>"
-                         alt="">
+                         alt=""
+                         onerror="this.onerror=null;this.src='/static/img/avatar.png';this.classList.add('ts-avatar--fallback');">
                 </a>
             <?php else: ?>
                 <nav class="ts-nav-links ts-nav-links--compact ts-flash-nav-auth">

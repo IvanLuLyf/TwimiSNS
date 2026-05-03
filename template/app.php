@@ -63,7 +63,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QU
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="<?= htmlspecialchars($themeColor, ENT_QUOTES, 'UTF-8') ?>">
     <title><?= htmlspecialchars(constant('TP_SITE_NAME'), ENT_QUOTES, 'UTF-8') ?></title>
-    <link rel="stylesheet" href="/static/app/styles/app.css?v=57">
+    <link rel="stylesheet" href="/static/app/styles/app.css?v=58">
     <style id="ts-theme-inline">
         :root {
             --ts-accent: <?= htmlspecialchars($themeColor, ENT_QUOTES, 'UTF-8') ?>;
@@ -75,6 +75,6 @@ $jsonFlags = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QU
 <div id="app" class="ts-shell">
     <div class="ts-loading" role="status" aria-live="polite"></div>
 </div>
-<script type="module" src="/static/app/main.js?v=71"></script>
+<script type="module" src="/static/app/main.js?v=72"></script>
 </body>
 </html>

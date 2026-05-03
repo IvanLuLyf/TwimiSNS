@@ -25,12 +25,12 @@ class SettingController extends Controller
 
     public function ac_json_binds_get(): void
     {
-        $uid = (int) ($this->user['uid'] ?? 0);
+        $uid = (int)($this->user['uid'] ?? 0);
         if ($uid <= 0) {
             $this->assignAll(['ret' => 2002, 'status' => 'login required', 'binds' => []])->render('app.php');
             return;
         }
-        $rows = (new BindModel())->where(['uid = ?'], [$uid])->fetchAll(['type', 'bind']);
+        $rows = (new BindModel())->where(['uid = ?'], [$uid])->fetchAll(['type', 'bind', 'token']);
         $nameByType = [];
         if (Config::check('oauth')) {
             foreach (Config::load('oauth')->get('enabled', []) as $o) {
@@ -40,13 +40,23 @@ class SettingController extends Controller
             }
         }
         $binds = [];
+        $oauthSvc = new OauthService();
         foreach ($rows as $r) {
-            $type = (string) ($r['type'] ?? '');
-            $bind = (string) ($r['bind'] ?? '');
+            $type = (string)($r['type'] ?? '');
+            $bind = (string)($r['bind'] ?? '');
+            $avatarUrl = '';
+            if ($type !== '' && $bind !== '') {
+                try {
+                    $avatarUrl = $oauthSvc->avatar($type, $bind, (string)($r['token'] ?? ''));
+                } catch (Throwable $e) {
+                    $avatarUrl = '';
+                }
+            }
             $binds[] = [
                 'type' => $type,
                 'name' => $nameByType[$type] ?? $type,
                 'masked' => self::maskBindId($bind),
+                'avatarUrl' => $avatarUrl,
             ];
         }
         $this->assignAll(['ret' => 0, 'status' => 'ok', 'binds' => $binds])->render('app.php');
@@ -120,5 +130,37 @@ class SettingController extends Controller
             $userModel->updateAvatar($this->user['uid'], $_REQUEST['avatar']);
         }
         $this->redirect('setting', 'oauth', ['type' => $type]);
+    }
+
+    /**
+     * 使用已绑定第三方账号的头像 URL 更新本站头像（URL 由服务端根据绑定记录解析，不信任客户端传图）。
+     *
+     * @filter ajax
+     * @filter csrf check
+     */
+    public function ac_json_oauth_avatar_post(UserModel $userModel): void
+    {
+        $uid = (int)($this->user['uid'] ?? 0);
+        $type = trim((string)($_POST['type'] ?? ''));
+        if ($uid <= 0 || $type === '') {
+            $this->assignAll(['ret' => -7, 'status' => 'parameter cannot be empty', 'tp_error_msg' => '参数不完整'])->render('app.php');
+
+            return;
+        }
+        $row = (new BindModel())->where(['uid=:u and type=:t'], ['u' => $uid, 't' => $type])->fetch();
+        if ($row === null || empty($row['bind'])) {
+            $this->assignAll(['ret' => 1004, 'status' => 'not bound', 'tp_error_msg' => '未绑定该平台账号'])->render('app.php');
+
+            return;
+        }
+        $url = (new OauthService())->avatar($type, (string)$row['bind'], (string)($row['token'] ?? ''));
+        $url = trim($url);
+        if ($url === '') {
+            $this->assignAll(['ret' => 1005, 'status' => 'no avatar', 'tp_error_msg' => '无法获取该平台头像'])->render('app.php');
+
+            return;
+        }
+        $userModel->updateAvatar($uid, $url);
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'url' => $url])->render('app.php');
     }
 }

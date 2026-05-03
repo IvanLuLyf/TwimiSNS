@@ -21,6 +21,39 @@ function readBootstrap() {
 let bootstrap = readBootstrap();
 let csrfToken = bootstrap.csrfToken || '';
 
+const TS_AVATAR_FALLBACK = '/static/img/avatar.png';
+
+/**
+ * @param {HTMLImageElement} img
+ */
+function bindAvatarImgFallback(img) {
+    if (img.dataset.tsAvatarFb === '1') return;
+    img.dataset.tsAvatarFb = '1';
+    img.addEventListener('error', () => {
+        if (String(img.src || '').includes('/static/img/avatar.png')) return;
+        img.classList.add('ts-avatar--fallback');
+        img.removeAttribute('srcset');
+        img.src = TS_AVATAR_FALLBACK;
+    });
+}
+
+/**
+ * @param {HTMLImageElement} img
+ * @param {string} primarySrc
+ */
+function setAvatarImgSrc(img, primarySrc) {
+    bindAvatarImgFallback(img);
+    img.src = primarySrc;
+}
+
+/**
+ * @param {ParentNode} root
+ */
+function wireAvatarImgsIn(root) {
+    if (!root || typeof root.querySelectorAll !== 'function') return;
+    root.querySelectorAll('img[src*="/user/avatar"]').forEach(bindAvatarImgFallback);
+}
+
 function createLocaleSelect(wrapClass) {
     const wrap = document.createElement('div');
     wrap.className = wrapClass || 'ts-locale-select-wrap';
@@ -228,7 +261,7 @@ function buildAccountHeaderDropdown(navigateFn) {
 
     const av = document.createElement('img');
     av.className = 'ts-header-account-avatar';
-    av.src = `/user/avatar?username=${encodeURIComponent(bootstrap.user.username)}`;
+    setAvatarImgSrc(av, `/user/avatar?username=${encodeURIComponent(bootstrap.user.username)}`);
     av.alt = '';
 
     const meta = document.createElement('span');
@@ -558,6 +591,7 @@ function populateSidebars(navigateFn) {
                 <div class="ts-drawer-name">${escapeHtml(bootstrap.user.nickname || u)}</div>
                 <div class="ts-drawer-handle">@${escapeHtml(u)}</div>
             </div>`;
+        wireAvatarImgsIn(profileHead);
         profileHead.addEventListener('click', (e) => {
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
             e.preventDefault();
@@ -773,7 +807,7 @@ function mountShell(inner, shellOpts = {}) {
         menuToggle.setAttribute('aria-label', t('accountMenu'));
         const av = document.createElement('img');
         av.className = 'ts-drawer-toggle-avatar';
-        av.src = `/user/avatar?username=${encodeURIComponent(bootstrap.user.username)}`;
+        setAvatarImgSrc(av, `/user/avatar?username=${encodeURIComponent(bootstrap.user.username)}`);
         av.alt = '';
         menuToggle.appendChild(av);
     } else {
@@ -1156,7 +1190,7 @@ function buildFeedPostCard(post, navigateFn) {
 
     const avatar = document.createElement('img');
     avatar.className = 'ts-feed-avatar';
-    avatar.src = `/user/avatar?username=${encodeURIComponent(post.username)}`;
+    setAvatarImgSrc(avatar, `/user/avatar?username=${encodeURIComponent(post.username)}`);
     avatar.alt = '';
 
     const body = document.createElement('div');
@@ -1272,7 +1306,7 @@ function buildPostDetailAuthor(post, showState, navigateFn) {
 
     const avatar = document.createElement('img');
     avatar.className = 'ts-avatar';
-    avatar.src = `/user/avatar?username=${encodeURIComponent(post.username)}`;
+    setAvatarImgSrc(avatar, `/user/avatar?username=${encodeURIComponent(post.username)}`);
     avatar.alt = '';
 
     const info = document.createElement('div');
@@ -1663,7 +1697,7 @@ function buildComposeForm(compact, onPosted, streamKey) {
     if (bootstrap.user) {
         const av = document.createElement('img');
         av.className = 'ts-compose-avatar';
-        av.src = `/user/avatar?username=${encodeURIComponent(bootstrap.user.username)}`;
+        setAvatarImgSrc(av, `/user/avatar?username=${encodeURIComponent(bootstrap.user.username)}`);
         av.alt = '';
         stream.appendChild(av);
     }
@@ -2058,6 +2092,7 @@ async function renderPost(tid) {
             row.style.marginBottom = '0.75rem';
             const side = document.createElement('div');
             side.innerHTML = `<img class="ts-avatar" src="/user/avatar?username=${encodeURIComponent(c.username)}" alt="">`;
+            wireAvatarImgsIn(side);
             const text = document.createElement('div');
             text.innerHTML = `<div class="ts-meta">${escapeHtml(c.nickname || c.username)} · ${fmtTime(c.timestamp)}</div><div>${escapeHtml(c.content)}</div>`;
             row.appendChild(side);
@@ -2244,6 +2279,7 @@ async function renderUser(username, tab) {
                 <div class="ts-meta">@${escapeHtml(uname)}</div>
             </div>
         </div>`;
+    wireAvatarImgsIn(card);
     stack.appendChild(card);
 
     const tabs = document.createElement('div');
@@ -2378,7 +2414,7 @@ async function renderFriend() {
             row.className = 'ts-friend-search-row';
             const img = document.createElement('img');
             img.className = 'ts-friend-search-row__avatar';
-            img.src = `/user/avatar?username=${encodeURIComponent(u.username)}`;
+            setAvatarImgSrc(img, `/user/avatar?username=${encodeURIComponent(u.username)}`);
             img.alt = '';
             const mid = document.createElement('div');
             mid.className = 'ts-friend-search-row__text';
@@ -2434,7 +2470,7 @@ async function renderFriend() {
             rowEl.className = 'ts-friend-pending-row';
             const avatar = document.createElement('img');
             avatar.className = 'ts-friend-row__avatar';
-            avatar.src = `/user/avatar?username=${encodeURIComponent(row.username)}`;
+            setAvatarImgSrc(avatar, `/user/avatar?username=${encodeURIComponent(row.username)}`);
             avatar.alt = '';
             const info = document.createElement('div');
             info.className = 'ts-friend-row__text';
@@ -2484,7 +2520,7 @@ async function renderFriend() {
             li.className = 'ts-friend-row ts-friend-row--inline';
             const avatar = document.createElement('img');
             avatar.className = 'ts-friend-row__avatar';
-            avatar.src = `/user/avatar?username=${encodeURIComponent(r.username)}`;
+            setAvatarImgSrc(avatar, `/user/avatar?username=${encodeURIComponent(r.username)}`);
             avatar.alt = '';
             const info = document.createElement('div');
             info.className = 'ts-friend-row__text';
@@ -2525,7 +2561,7 @@ async function renderFriend() {
             a.href = `/user/detail/${encodeURIComponent(f.username)}`;
             const img = document.createElement('img');
             img.className = 'ts-friend-row__avatar';
-            img.src = `/user/avatar?username=${encodeURIComponent(f.username)}`;
+            setAvatarImgSrc(img, `/user/avatar?username=${encodeURIComponent(f.username)}`);
             img.alt = '';
             const info = document.createElement('div');
             info.className = 'ts-friend-row__text';
@@ -2855,7 +2891,7 @@ function buildSettingsAvatarPanel() {
     h.textContent = t('settingsAvatar');
     const preview = document.createElement('img');
     preview.className = 'ts-settings-avatar-preview';
-    preview.src = serverAvatarSrc();
+    setAvatarImgSrc(preview, serverAvatarSrc());
     preview.alt = '';
 
     const err = document.createElement('div');
@@ -2901,7 +2937,7 @@ function buildSettingsAvatarPanel() {
         saveBtn.disabled = true;
         discardBtn.hidden = true;
         pendingHint.hidden = true;
-        preview.src = `${serverAvatarSrc()}&t=${Date.now()}`;
+        setAvatarImgSrc(preview, `${serverAvatarSrc()}&t=${Date.now()}`);
     }
 
     function applyPending(blob) {
@@ -2939,7 +2975,7 @@ function buildSettingsAvatarPanel() {
             pendingBlob = null;
             discardBtn.hidden = true;
             pendingHint.hidden = true;
-            preview.src = `${serverAvatarSrc()}&t=${Date.now()}`;
+            setAvatarImgSrc(preview, `${serverAvatarSrc()}&t=${Date.now()}`);
         } finally {
             pick.disabled = false;
             discardBtn.disabled = false;
@@ -2998,6 +3034,11 @@ async function buildSettingsOAuthPanel() {
     p.textContent = t('settingsOAuthIntro');
     wrap.append(h, p);
 
+    const panelErr = document.createElement('div');
+    panelErr.className = 'ts-error';
+    panelErr.style.display = 'none';
+    panelErr.style.marginTop = '0.65rem';
+
     const res = await ajaxGet('/setting/json_binds');
     const binds = res.ret === 0 && Array.isArray(res.binds) ? res.binds : [];
     const byType = Object.fromEntries(binds.map((b) => [b.type, b]));
@@ -3007,6 +3048,16 @@ async function buildSettingsOAuthPanel() {
         const row = document.createElement('div');
         row.className = 'ts-settings-oauth-row';
 
+        const thumb = document.createElement('div');
+        thumb.className = 'ts-settings-oauth-thumb';
+        const b = byType[type];
+        if (b && b.avatarUrl) {
+            const im = document.createElement('img');
+            im.alt = '';
+            setAvatarImgSrc(im, b.avatarUrl);
+            thumb.appendChild(im);
+        }
+
         const info = document.createElement('div');
         info.className = 'ts-settings-oauth-info';
         const title = document.createElement('div');
@@ -3014,7 +3065,6 @@ async function buildSettingsOAuthPanel() {
         title.textContent = String(name);
         const sub = document.createElement('div');
         sub.className = 'ts-meta ts-settings-oauth-status';
-        const b = byType[type];
         if (b) {
             sub.textContent = b.masked
                 ? t('settingsOAuthLinkedHint').replace('{id}', b.masked)
@@ -3026,15 +3076,43 @@ async function buildSettingsOAuthPanel() {
 
         const actions = document.createElement('div');
         actions.className = 'ts-settings-oauth-actions';
+        if (b && b.avatarUrl) {
+            const useAv = document.createElement('button');
+            useAv.type = 'button';
+            useAv.className = 'ts-btn ts-btn--ghost';
+            useAv.textContent = t('settingsOAuthUseAvatar');
+            useAv.addEventListener('click', async () => {
+                panelErr.style.display = 'none';
+                useAv.disabled = true;
+                try {
+                    const r = await ajaxPost('/setting/json_oauth_avatar', {
+                        csrf_token: csrfToken,
+                        type,
+                    });
+                    if (r.ret !== 0) {
+                        panelErr.textContent = r.tp_error_msg || r.status || t('actionFailed');
+                        panelErr.style.display = 'block';
+                        return;
+                    }
+                    await refreshBootstrap();
+                    navigate('/setting/oauth');
+                } finally {
+                    useAv.disabled = false;
+                }
+            });
+            actions.appendChild(useAv);
+        }
         const a = document.createElement('a');
         a.href = `/oauth/connect/${encodeURIComponent(type)}?referer=${encodeURIComponent('/setting/oauth')}`;
         a.className = 'ts-btn primary';
         a.textContent = b ? t('settingsOAuthRebind') : t('settingsOAuthBind').replace('{name}', String(name));
         actions.appendChild(a);
 
-        row.append(info, actions);
+        row.append(thumb, info, actions);
         wrap.appendChild(row);
     });
+
+    wrap.appendChild(panelErr);
     return wrap;
 }
 
@@ -3400,6 +3478,36 @@ function renderOauthBind(route) {
     err.textContent = bind.errorMsg || '';
     wrap.appendChild(err);
 
+    if (bind.nickname || bind.avatarUrl) {
+        const hero = document.createElement('div');
+        hero.className = 'ts-oauth-bind-hero ts-surface-soft';
+        if (bind.avatarUrl) {
+            const img = document.createElement('img');
+            img.className = 'ts-oauth-bind-avatar';
+            img.alt = '';
+            setAvatarImgSrc(img, bind.avatarUrl);
+            hero.appendChild(img);
+        } else {
+            const ph = document.createElement('div');
+            ph.className = 'ts-oauth-bind-avatar ts-oauth-bind-avatar--placeholder';
+            const ch = String(bind.nickname || '?').trim();
+            ph.textContent = ch ? ch.charAt(0).toUpperCase() : '?';
+            ph.setAttribute('aria-hidden', 'true');
+            hero.appendChild(ph);
+        }
+        const heroText = document.createElement('div');
+        heroText.className = 'ts-oauth-bind-hero-text';
+        const nickEl = document.createElement('div');
+        nickEl.className = 'ts-oauth-bind-nickname';
+        nickEl.textContent = bind.nickname || '';
+        const lead = document.createElement('p');
+        lead.className = 'ts-meta';
+        lead.textContent = t('authBindLead');
+        heroText.append(nickEl, lead);
+        hero.appendChild(heroText);
+        wrap.appendChild(hero);
+    }
+
     const card = document.createElement('div');
     card.className = 'ts-card ts-auth-card';
 
@@ -3535,7 +3643,7 @@ function renderOauthAuthorize() {
         const preview = document.createElement('div');
         preview.className = 'ts-auth-oauth-preview';
         const uAv = document.createElement('img');
-        uAv.src = `/user/avatar?username=${encodeURIComponent(oa.user.username)}`;
+        setAvatarImgSrc(uAv, `/user/avatar?username=${encodeURIComponent(oa.user.username)}`);
         uAv.alt = '';
         const arrow = document.createElement('span');
         arrow.className = 'ts-auth-oauth-arrow';

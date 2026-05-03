@@ -17,7 +17,7 @@ class OauthController extends Controller
      */
     function ac_connect(string $type = '', string $referer = '')
     {
-        $ref = trim((string) ($_GET['referer'] ?? $referer));
+        $ref = trim((string)($_GET['referer'] ?? $referer));
         $ref = self::normalizeOAuthReturnTarget($ref);
         if ($ref !== '') {
             Request::session('referer', $ref);
@@ -71,7 +71,7 @@ class OauthController extends Controller
                 if (is_string($q) && $q !== '') {
                     parse_str($q, $parts);
                     if (!empty($parts['referer'])) {
-                        return self::normalizeOAuthReturnTarget(rawurldecode((string) $parts['referer']), $depth + 1);
+                        return self::normalizeOAuthReturnTarget(rawurldecode((string)$parts['referer']), $depth + 1);
                     }
                 }
 
@@ -96,7 +96,7 @@ class OauthController extends Controller
             $userToken = (new UserModel())->refresh($uid);
             $userService->setLoginUser($userToken);
             $bind_model->where(['bind=:b and type=:t'], ['b' => $bind['uid'], 't' => $type])->update(['token' => $bind['token'], 'expire' => $bind['expire']]);
-            (new UserModel())->maybeSyncOauthAvatar((int) $uid);
+            (new UserModel())->maybeSyncOauthAvatar((int)$uid);
             $referer = Request::session('referer', null);
             $referer = is_string($referer) ? self::normalizeOAuthReturnTarget($referer) : '';
             Request::session('referer', null);
@@ -109,15 +109,21 @@ class OauthController extends Controller
             if ($user = $userService->getLoginUser()) {
                 $bind_data = ['uid' => $user['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
                 $bind_model->add($bind_data);
-                (new UserModel())->maybeSyncOauthAvatar((int) $user['uid']);
+                (new UserModel())->maybeSyncOauthAvatar((int)$user['uid']);
                 $this->redirect('setting', 'oauth', ['type' => $type]);
             } else {
                 Request::session('oauth_user', ['type' => $type, 'uid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire'], 'nickname' => $bind['nickname'],]);
                 $allowReg = (bool)Config::load('config')->get('allow_reg');
+                try {
+                    $avatarUrl = $oauthService->avatar($type, (string)$bind['uid'], (string)($bind['token'] ?? ''));
+                } catch (Throwable $e) {
+                    $avatarUrl = '';
+                }
                 $this->assign('oauthBind', [
                     'type' => $type,
                     'nickname' => $bind['nickname'],
                     'allowReg' => $allowReg,
+                    'avatarUrl' => $avatarUrl,
                 ])->render('app.php');
             }
         }
@@ -161,7 +167,7 @@ class OauthController extends Controller
             $bind = Request::session('oauth_user');
             $bind_data = ['uid' => $result['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
             (new BindModel())->add($bind_data);
-            (new UserModel())->maybeSyncOauthAvatar((int) $result['uid']);
+            (new UserModel())->maybeSyncOauthAvatar((int)$result['uid']);
             $referer = Request::session('referer', null);
             $referer = is_string($referer) ? self::normalizeOAuthReturnTarget($referer) : '';
             Request::session('referer', null);
