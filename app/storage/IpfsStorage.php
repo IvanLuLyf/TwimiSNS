@@ -10,9 +10,13 @@ class IpfsStorage implements Storage
 {
     private $server;
 
+    /** @var string Public gateway base URL, no trailing slash */
+    private $gateway;
+
     public function __construct($config = [])
     {
         $this->server = ($config['server'] ?? '') ?: 'https://ipfs.infura.io:5001/api/v0';
+        $this->gateway = rtrim((string)($config['gateway'] ?? 'https://ipfs.io'), '/');
     }
 
     public function read($filename)
@@ -35,5 +39,19 @@ class IpfsStorage implements Storage
     public function remove($filename)
     {
 
+    }
+
+    public function toPublicUrl(string $reference): string
+    {
+        if ($reference === '') {
+            return $this->gateway;
+        }
+        if (strpos($reference, 'ipfs://') === 0) {
+            return $this->gateway . '/ipfs/' . ltrim(substr($reference, 7), '/');
+        }
+        if (strpos($reference, '/ipfs/') === 0) {
+            return $this->gateway . $reference;
+        }
+        return $this->gateway . '/ipfs/' . ltrim($reference, '/');
     }
 }

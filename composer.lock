@@ -53,16 +53,16 @@
         },
         {
             "name": "ivanlulyf/bunnyphp",
-            "version": "3.3.1",
+            "version": "3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IvanLuLyf/BunnyPHP.git",
-                "reference": "b732f2a4bb860788a5a91a4635bad8d984a4bf68"
+                "reference": "fee872d16ea829ccf25292ed9ad89e1ce07ea2b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IvanLuLyf/BunnyPHP/zipball/b732f2a4bb860788a5a91a4635bad8d984a4bf68",
-                "reference": "b732f2a4bb860788a5a91a4635bad8d984a4bf68",
+                "url": "https://api.github.com/repos/IvanLuLyf/BunnyPHP/zipball/fee872d16ea829ccf25292ed9ad89e1ce07ea2b7",
+                "reference": "fee872d16ea829ccf25292ed9ad89e1ce07ea2b7",
                 "shasum": ""
             },
             "require": {
@@ -99,20 +99,20 @@
                 "issues": "https://github.com/IvanLuLyf/BunnyPHP/issues",
                 "source": "https://github.com/IvanLuLyf/BunnyPHP"
             },
-            "time": "2026-05-02T10:27:48+00:00"
+            "time": "2026-05-03T12:36:01+00:00"
         },
         {
             "name": "ivanlulyf/bunnyphp-alioss",
-            "version": "1.2",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bunniescc/BunnyPHP-AliOSS.git",
-                "reference": "39d64434b61ed0c05bc60230ad531d0ed631990c"
+                "reference": "50d96fd85e2558c93c3a23f1b13ae3ea172b4905"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bunniescc/BunnyPHP-AliOSS/zipball/39d64434b61ed0c05bc60230ad531d0ed631990c",
-                "reference": "39d64434b61ed0c05bc60230ad531d0ed631990c",
+                "url": "https://api.github.com/repos/bunniescc/BunnyPHP-AliOSS/zipball/50d96fd85e2558c93c3a23f1b13ae3ea172b4905",
+                "reference": "50d96fd85e2558c93c3a23f1b13ae3ea172b4905",
                 "shasum": ""
             },
             "require": {
@@ -138,9 +138,9 @@
             "description": "Aliyun OSS Storage for BunnyPHP",
             "support": {
                 "issues": "https://github.com/bunniescc/BunnyPHP-AliOSS/issues",
-                "source": "https://github.com/bunniescc/BunnyPHP-AliOSS/tree/1.2"
+                "source": "https://github.com/bunniescc/BunnyPHP-AliOSS/tree/1.3.0"
             },
-            "time": "2021-10-09T15:14:22+00:00"
+            "time": "2026-05-03T12:42:11+00:00"
         },
         {
             "name": "ivanlulyf/bunnyphp-mailer",
