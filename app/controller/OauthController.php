@@ -17,6 +17,13 @@ class OauthController extends Controller
      */
     function ac_connect(string $type = '', string $referer = '')
     {
+        $ref = trim((string) ($_GET['referer'] ?? $referer));
+        $ref = self::normalizeOAuthReturnTarget($ref);
+        if ($ref !== '') {
+            Request::session('referer', $ref);
+        } else {
+            Request::session('referer', null);
+        }
         switch ($type) {
             case 'qq':
                 $oauth = Config::load('oauth')->get('qq');
@@ -35,10 +42,44 @@ class OauthController extends Controller
                 $url = $oauth['url'] . '/oauth/authorize?client_id=' . $oauth['key'] . '&redirect_uri=' . urlencode($oauth['callback']);
                 break;
         }
-        if ($referer) {
-            Request::session('referer', $referer);
-        }
         $this->redirect($url);
+    }
+
+    /**
+     * 仅允许站内路径；禁止回到登录/注册/忘记密码页；支持从 `/user/login?referer=/foo` 解析真实去向。
+     *
+     * @return non-empty-string|''
+     */
+    private static function normalizeOAuthReturnTarget(string $raw, int $depth = 0): string
+    {
+        if ($depth > 3) {
+            return '';
+        }
+        $raw = trim($raw);
+        if ($raw === '' || ($raw[0] ?? '') !== '/') {
+            return '';
+        }
+        $path = parse_url($raw, PHP_URL_PATH);
+        if ($path === false || $path === null) {
+            return '';
+        }
+        $path = $path === '' ? '/' : $path;
+        $blockedPrefixes = ['/user/login', '/user/register', '/user/forgot'];
+        foreach ($blockedPrefixes as $p) {
+            if ($path === $p || strpos($path, $p . '/') === 0) {
+                $q = parse_url($raw, PHP_URL_QUERY);
+                if (is_string($q) && $q !== '') {
+                    parse_str($q, $parts);
+                    if (!empty($parts['referer'])) {
+                        return self::normalizeOAuthReturnTarget(rawurldecode((string) $parts['referer']), $depth + 1);
+                    }
+                }
+
+                return '';
+            }
+        }
+
+        return $raw;
     }
 
     /**
@@ -57,7 +98,9 @@ class OauthController extends Controller
             $bind_model->where(['bind=:b and type=:t'], ['b' => $bind['uid'], 't' => $type])->update(['token' => $bind['token'], 'expire' => $bind['expire']]);
             (new UserModel())->maybeSyncOauthAvatar((int) $uid);
             $referer = Request::session('referer', null);
-            if ($referer) {
+            $referer = is_string($referer) ? self::normalizeOAuthReturnTarget($referer) : '';
+            Request::session('referer', null);
+            if ($referer !== '') {
                 $this->redirect($referer);
             } else {
                 $this->redirect('index', 'index');
@@ -120,7 +163,9 @@ class OauthController extends Controller
             (new BindModel())->add($bind_data);
             (new UserModel())->maybeSyncOauthAvatar((int) $result['uid']);
             $referer = Request::session('referer', null);
-            if ($referer) {
+            $referer = is_string($referer) ? self::normalizeOAuthReturnTarget($referer) : '';
+            Request::session('referer', null);
+            if ($referer !== '') {
                 $this->redirect($referer);
             } else {
                 $this->redirect('index', 'index');

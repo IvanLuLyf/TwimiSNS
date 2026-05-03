@@ -1072,6 +1072,20 @@ function oauthConnectHref(type, refererPath) {
     return `/oauth/connect/${encodeURIComponent(type)}${q}`;
 }
 
+/** OAuth 回调回来时要回的页面：不要用 `/user/login` 本身当作 referer（否则成功后仍会回到登录页）。 */
+function oauthReturnRefererPath() {
+    const params = new URLSearchParams(window.location.search);
+    const nested = safeRefererPath(params.get('referer'));
+    if (nested) {
+        return nested;
+    }
+    const path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
+    if (path === '/user/login' || path === '/user/register' || path === '/user/forgot') {
+        return '/';
+    }
+    return `${window.location.pathname}${window.location.search}`;
+}
+
 async function afterAuthSessionRefreshNavigate() {
     await refreshBootstrap();
     const ref = safeRefererPath(new URLSearchParams(window.location.search).get('referer'));
@@ -3121,7 +3135,7 @@ async function renderLogin() {
         bar.appendChild(lb);
         const iconsRow = document.createElement('div');
         iconsRow.className = 'ts-auth-oauth-icons';
-        const refPath = `${window.location.pathname}${window.location.search}`;
+        const refPath = oauthReturnRefererPath();
         oauthKeys.forEach((o) => {
             if (!o || !o[0]) return;
             const name = o[1] || o[0];
