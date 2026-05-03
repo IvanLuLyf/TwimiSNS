@@ -10,13 +10,29 @@ require APP_PATH . 'template/common/flash_bootstrap.php';
 
 $rawBody = (string)($tp_info_msg ?? $bunny_info ?? '');
 if (trim($rawBody) === '') {
-    $rawBody = $shellHtmlLang === 'en' ? 'Done.' : '已完成。';
+    if ($shellHtmlLang === 'en') {
+        $rawBody = 'Done.';
+    } elseif ($shellHtmlLang === 'ja') {
+        $rawBody = '完了しました。';
+    } else {
+        $rawBody = '已完成。';
+    }
 }
 $raw = htmlspecialchars($rawBody, ENT_QUOTES, 'UTF-8');
 
-$shellNavTitle = $shellHtmlLang === 'en' ? 'Notice' : '提示';
-$homeLabel = $shellHtmlLang === 'en' ? 'Home' : '返回首页';
-$infoLead = $shellHtmlLang === 'en' ? 'Notice' : '提示';
+if ($shellHtmlLang === 'en') {
+    $shellNavTitle = 'Notice';
+    $homeLabel = 'Home';
+    $infoLead = 'Notice';
+} elseif ($shellHtmlLang === 'ja') {
+    $shellNavTitle = 'お知らせ';
+    $homeLabel = 'ホームへ';
+    $infoLead = 'お知らせ';
+} else {
+    $shellNavTitle = '提示';
+    $homeLabel = '返回首页';
+    $infoLead = '提示';
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($shellHtmlLang, ENT_QUOTES, 'UTF-8') ?>">

@@ -13,13 +13,27 @@ require APP_PATH . 'template/common/flash_bootstrap.php';
 
 $rawMsg = trim($tp_error_msg ?? $bunny_error ?? '');
 if ($rawMsg === '') {
-    $rawMsg = $shellHtmlLang === 'en' ? 'Something went wrong' : '操作失败';
+    if ($shellHtmlLang === 'en') {
+        $rawMsg = 'Something went wrong';
+    } elseif ($shellHtmlLang === 'ja') {
+        $rawMsg = '問題が発生しました';
+    } else {
+        $rawMsg = '操作失败';
+    }
 }
 $msg = htmlspecialchars($rawMsg, ENT_QUOTES, 'UTF-8');
 $showTrace = (defined('APP_DEBUG') && APP_DEBUG === true) && !empty($bunny_error_trace) && is_array($bunny_error_trace);
 
-$shellNavTitle = $shellHtmlLang === 'en' ? 'Error' : '错误';
-$homeLabel = $shellHtmlLang === 'en' ? 'Home' : '返回首页';
+if ($shellHtmlLang === 'en') {
+    $shellNavTitle = 'Error';
+    $homeLabel = 'Home';
+} elseif ($shellHtmlLang === 'ja') {
+    $shellNavTitle = 'エラー';
+    $homeLabel = 'ホームへ';
+} else {
+    $shellNavTitle = '错误';
+    $homeLabel = '返回首页';
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($shellHtmlLang, ENT_QUOTES, 'UTF-8') ?>">
@@ -55,7 +69,7 @@ $homeLabel = $shellHtmlLang === 'en' ? 'Home' : '返回首页';
                             </svg>
                         </div>
                         <div class="ts-flash-hero-body">
-                            <p class="ts-flash-kicker"><?= $shellHtmlLang === 'en' ? 'Something went wrong' : '无法完成操作' ?></p>
+                            <p class="ts-flash-kicker"><?= $shellHtmlLang === 'en' ? 'Something went wrong' : ($shellHtmlLang === 'ja' ? '処理を完了できませんでした' : '无法完成操作') ?></p>
                             <h1 class="ts-flash-title"><?= $msg ?></h1>
                             <?php if (isset($ret) || isset($status)): ?>
                                 <div class="ts-flash-meta-code">
@@ -70,7 +84,7 @@ $homeLabel = $shellHtmlLang === 'en' ? 'Home' : '返回首页';
                         </div>
                     </div>
                     <?php if ($showTrace): ?>
-                        <h2 class="ts-flash-trace-title"><?= $shellHtmlLang === 'en' ? 'Stack trace' : '调用栈' ?></h2>
+                        <h2 class="ts-flash-trace-title"><?= $shellHtmlLang === 'en' ? 'Stack trace' : ($shellHtmlLang === 'ja' ? 'スタックトレース' : '调用栈') ?></h2>
                         <div class="ts-flash-trace-wrap">
                             <table class="ts-flash-trace-table">
                                 <thead>

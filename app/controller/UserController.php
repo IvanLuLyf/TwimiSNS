@@ -211,6 +211,35 @@ class UserController extends Controller
     }
 
     /**
+     * @filter csrf check
+     */
+    public function ac_json_forgot_post(): void
+    {
+        $email = trim((string)($_POST['email'] ?? ''));
+        if ($email === '') {
+            $this->assignAll(['ret' => -7, 'status' => 'empty', 'tp_error_msg' => '用户名或邮箱不能为空'])->render('app.php');
+            return;
+        }
+        if ($user = (new UserModel())->where('username = :u or email = :u', ['u' => $email])->fetch()) {
+            $service = new EmailService();
+            $code = (new PassCodeModel())->getCode($user['uid']);
+            $service->sendMail(
+                'email/forgot.html',
+                ['nickname' => $user['nickname'], 'site' => TP_SITE_NAME, 'url' => TP_SITE_URL, 'code' => $code],
+                $user['email'],
+                '找回密码'
+            );
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => '邮件已发送'])->render('app.php');
+        } else {
+            $this->assignAll([
+                'ret' => 1002,
+                'status' => 'user does not exist',
+                'tp_error_msg' => '用户名不存在',
+            ])->render('app.php');
+        }
+    }
+
+    /**
      * @filter csrf
      * @param string $code not_empty()
      */
@@ -233,6 +262,30 @@ class UserController extends Controller
             $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => '密码修改完成'])->render('app.php');
         } else {
             $this->assignAll(['ret' => 1008, 'status' => 'invalid verification code', 'tp_error_msg' => '验证码已过期'])->error();
+        }
+    }
+
+    /**
+     * @filter csrf check
+     */
+    public function ac_json_reset_post(): void
+    {
+        $code = trim((string)($_POST['code'] ?? ''));
+        $password = (string)($_POST['password'] ?? '');
+        if ($code === '' || $password === '') {
+            $this->assignAll(['ret' => -7, 'status' => 'empty', 'tp_error_msg' => '验证码或密码不能为空'])->render('app.php');
+            return;
+        }
+        $uid = (new PassCodeModel())->checkCode($code);
+        if ($uid != null) {
+            (new UserModel())->reset($uid, $password);
+            $this->assignAll(['ret' => 0, 'status' => 'ok', 'tp_error_msg' => '密码修改完成'])->render('app.php');
+        } else {
+            $this->assignAll([
+                'ret' => 1008,
+                'status' => 'invalid verification code',
+                'tp_error_msg' => '验证码已过期',
+            ])->render('app.php');
         }
     }
 

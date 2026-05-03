@@ -8,11 +8,22 @@
  */
 
 $navEsc = htmlspecialchars($shellNavTitle, ENT_QUOTES, 'UTF-8');
-$isEn = ($shellHtmlLang === 'en');
-$lblHome = $isEn ? 'Home' : '首页';
-$lblLogin = $isEn ? 'Log in' : '登录';
-$lblReg = $isEn ? 'Sign up' : '注册';
-$lblProfile = $isEn ? 'Profile' : '我的';
+if ($shellHtmlLang === 'en') {
+    $lblHome = 'Home';
+    $lblLogin = 'Log in';
+    $lblReg = 'Sign up';
+    $lblProfile = 'Profile';
+} elseif ($shellHtmlLang === 'ja') {
+    $lblHome = 'ホーム';
+    $lblLogin = 'ログイン';
+    $lblReg = '登録';
+    $lblProfile = 'マイページ';
+} else {
+    $lblHome = '首页';
+    $lblLogin = '登录';
+    $lblReg = '注册';
+    $lblProfile = '我的';
+}
 $loginHref = '/user/login';
 $regHref = '/user/register';
 ?>

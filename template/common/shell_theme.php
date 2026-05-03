@@ -11,4 +11,10 @@ if (Config::check('config')) {
 }
 $shellCfg = Config::check('config') ? Config::load('config') : null;
 $shellUiLocale = $shellCfg ? trim((string)$shellCfg->get('locale', 'zh-CN')) : 'zh-CN';
-$shellHtmlLang = (stripos($shellUiLocale, 'en') === 0) ? 'en' : 'zh-CN';
+if (stripos($shellUiLocale, 'en') === 0) {
+    $shellHtmlLang = 'en';
+} elseif (stripos($shellUiLocale, 'ja') === 0) {
+    $shellHtmlLang = 'ja';
+} else {
+    $shellHtmlLang = 'zh-CN';
+}

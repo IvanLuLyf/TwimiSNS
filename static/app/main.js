@@ -1,6 +1,6 @@
 import {ajaxGet, ajaxPost, formPost, jsonGet, jsonPost} from './api.js';
 import {createIcon} from './icons.js';
-import {getLocale, initI18n, t, toggleLocale} from './i18n.js';
+import {applyLocaleChange, getLocale, initI18n, LOCALE_OPTIONS, t} from './i18n.js';
 import {prepareFeedMarkdownPreview, renderMarkdown, escapeHtml} from './md.js';
 
 /** Fixed MIIT filing query URL (备案信息查询). */
@@ -21,6 +21,30 @@ function readBootstrap() {
 let bootstrap = readBootstrap();
 initI18n(bootstrap);
 let csrfToken = bootstrap.csrfToken || '';
+
+function createLocaleSelect(wrapClass) {
+    const wrap = document.createElement('div');
+    wrap.className = wrapClass || 'ts-locale-select-wrap';
+    const sel = document.createElement('select');
+    sel.className = 'ts-locale-select';
+    sel.setAttribute('aria-label', t('language'));
+    const cur = getLocale();
+    for (const opt of LOCALE_OPTIONS) {
+        const o = document.createElement('option');
+        o.value = opt.id;
+        o.textContent = opt.label;
+        if (opt.id === cur) o.selected = true;
+        sel.appendChild(o);
+    }
+    sel.addEventListener('change', () => {
+        if (sel.value === cur) return;
+        applyLocaleChange(sel.value);
+    });
+    sel.addEventListener('mousedown', (e) => e.stopPropagation());
+    sel.addEventListener('click', (e) => e.stopPropagation());
+    wrap.appendChild(sel);
+    return wrap;
+}
 
 function closeDrawer() {
     document.getElementById('app')?.classList.remove('ts-drawer-open');
@@ -239,22 +263,16 @@ function buildAccountHeaderDropdown(navigateFn) {
         panel.appendChild(btn);
     });
 
-    const locBtn = document.createElement('button');
-    locBtn.type = 'button';
-    locBtn.className = 'ts-header-menu-item ts-header-menu-item--row';
-    locBtn.setAttribute('role', 'menuitem');
+    const locRow = document.createElement('div');
+    locRow.className = 'ts-header-menu-item ts-header-menu-item--row ts-header-menu-item--locale';
+    locRow.setAttribute('role', 'menuitem');
     const locIc = document.createElement('span');
     locIc.className = 'ts-header-menu-item-icon';
     locIc.appendChild(createIcon('globe', 18));
-    const locTx = document.createElement('span');
-    locTx.className = 'ts-header-menu-item-text';
-    locTx.textContent = getLocale() === 'zh-CN' ? t('switchToEn') : t('switchToZh');
-    locBtn.append(locIc, locTx);
-    locBtn.addEventListener('click', () => {
-        det.removeAttribute('open');
-        toggleLocale();
-    });
-    panel.appendChild(locBtn);
+    const locSel = createLocaleSelect('ts-header-locale-select-wrap');
+    locRow.append(locIc, locSel);
+    locRow.addEventListener('mousedown', (e) => e.stopPropagation());
+    panel.appendChild(locRow);
 
     const outBtn = document.createElement('button');
     outBtn.type = 'button';
@@ -581,17 +599,13 @@ function populateSidebars(navigateFn) {
         drawerMobile.appendChild(menu);
     }
 
-    const langRow = document.createElement('button');
-    langRow.type = 'button';
-    langRow.className = 'ts-drawer-menu-item ts-drawer-menu-item--muted';
+    const langRow = document.createElement('div');
+    langRow.className = 'ts-drawer-menu-item ts-drawer-menu-item--muted ts-drawer-lang-row';
     const langIc = document.createElement('span');
     langIc.className = 'ts-drawer-menu-icon';
     langIc.appendChild(createIcon('globe', 20));
-    const langTx = document.createElement('span');
-    langTx.className = 'ts-drawer-menu-text';
-    langTx.textContent = getLocale() === 'zh-CN' ? t('switchToEn') : t('switchToZh');
-    langRow.append(langIc, langTx);
-    langRow.addEventListener('click', () => toggleLocale());
+    const langSel = createLocaleSelect('ts-drawer-locale-wrap');
+    langRow.append(langIc, langSel);
     drawerMobile.appendChild(langRow);
 
     left.appendChild(drawerMobile);
@@ -617,7 +631,7 @@ function isStandalonePublicPath(pathname) {
 
 /**
  * @param {string | Node} inner
- * @param {{ authMode?: 'login' | 'register' }} shellOpts
+ * @param {{ authMode?: 'login' | 'register' | 'forgot' | 'reset' }} shellOpts
  */
 function mountAuthShell(inner, shellOpts = {}) {
     const app = document.getElementById('app');
@@ -650,14 +664,12 @@ function mountAuthShell(inner, shellOpts = {}) {
         const a = navLink(`/user/login${q}`, t('login'));
         a.classList.add('ts-auth-float-link');
         floatTrailing.appendChild(a);
+    } else if (mode === 'forgot' || mode === 'reset') {
+        const a = navLink(`/user/login${q}`, t('authSwitchLogin'));
+        a.classList.add('ts-auth-float-link');
+        floatTrailing.appendChild(a);
     }
-    const langBtn = document.createElement('button');
-    langBtn.type = 'button';
-    langBtn.className = 'ts-btn ts-btn--ghost ts-auth-float-btn ts-auth-float-lang';
-    langBtn.textContent = getLocale() === 'zh-CN' ? 'EN' : '中文';
-    langBtn.setAttribute('aria-label', getLocale() === 'zh-CN' ? t('switchToEn') : t('switchToZh'));
-    langBtn.addEventListener('click', () => toggleLocale());
-    floatTrailing.appendChild(langBtn);
+    floatTrailing.appendChild(createLocaleSelect('ts-auth-locale-wrap'));
 
     floatbar.append(floatLeading, floatTrailing);
 
@@ -896,6 +908,8 @@ function parseRoute(pathname) {
     if (segs[0] === 'user') {
         if (segs[1] === 'login') return {name: 'login'};
         if (segs[1] === 'register') return {name: 'register'};
+        if (segs[1] === 'forgot') return {name: 'forgot_password'};
+        if (segs[1] === 'reset') return {name: 'reset_password'};
         if (segs[1] === 'info') return {name: 'user', username: '', tab: ''};
         if (segs[1] === 'panel') {
             if (!segs[2]) return {name: 'user', username: '', tab: ''};
@@ -3192,6 +3206,148 @@ async function renderRegister() {
     mountShell(wrap, {shellVariant: 'auth', authMode: 'register'});
 }
 
+async function renderForgotPassword() {
+    document.title = `${t('authForgotTitle')} · ${bootstrap.siteName || 'TwimiSNS'}`;
+    const wrap = document.createElement('div');
+    wrap.className = 'ts-auth-stack';
+
+    wrap.appendChild(buildAuthPageHero('authForgotTitle'));
+
+    const card = document.createElement('div');
+    card.className = 'ts-card ts-auth-card';
+
+    const hint = document.createElement('p');
+    hint.className = 'ts-text-muted';
+    hint.style.marginTop = '0';
+    hint.style.marginBottom = '1rem';
+    hint.textContent = t('authForgotHint');
+
+    const err = document.createElement('div');
+    err.className = 'ts-error';
+    err.style.display = 'none';
+
+    const ok = document.createElement('p');
+    ok.className = 'ts-text-muted';
+    ok.style.display = 'none';
+    ok.style.marginBottom = '0';
+
+    const form = document.createElement('form');
+    form.innerHTML = `<div class="ts-field"><label>${escapeHtml(t('authUsername'))}</label><input name="email" type="text" autocomplete="username" required></div>
+<button class="ts-btn primary" type="submit">${escapeHtml(t('authForgotSubmit'))}</button>`;
+
+    form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        err.style.display = 'none';
+        const fd = new FormData(form);
+        const j = await ajaxPost('/user/json_forgot_post', {
+            csrf_token: csrfToken,
+            email: fd.get('email'),
+        });
+        if (j.ret === 0) {
+            hint.style.display = 'none';
+            form.style.display = 'none';
+            ok.textContent = t('authForgotSent');
+            ok.style.display = 'block';
+        } else {
+            err.textContent = j.tp_error_msg || t('actionFailed');
+            err.style.display = 'block';
+        }
+    });
+
+    const foot = document.createElement('div');
+    foot.className = 'ts-auth-foot';
+    foot.appendChild(navLink('/user/login', t('authSwitchLogin')));
+
+    card.appendChild(hint);
+    card.appendChild(err);
+    card.appendChild(ok);
+    card.appendChild(form);
+    card.appendChild(foot);
+    wrap.appendChild(card);
+
+    mountShell(wrap, {shellVariant: 'auth', authMode: 'forgot'});
+}
+
+async function renderResetPassword() {
+    document.title = `${t('authResetTitle')} · ${bootstrap.siteName || 'TwimiSNS'}`;
+    const code = new URLSearchParams(window.location.search).get('code');
+    const wrap = document.createElement('div');
+    wrap.className = 'ts-auth-stack';
+
+    wrap.appendChild(buildAuthPageHero('authResetTitle'));
+
+    const card = document.createElement('div');
+    card.className = 'ts-card ts-auth-card';
+
+    if (!code) {
+        const p = document.createElement('p');
+        p.className = 'ts-error';
+        p.style.marginBottom = '1rem';
+        p.textContent = t('authResetNoCode');
+        const foot = document.createElement('div');
+        foot.className = 'ts-auth-foot';
+        foot.appendChild(navLink('/user/forgot', t('authResetBackForgot')));
+        foot.appendChild(document.createTextNode(' · '));
+        foot.appendChild(navLink('/user/login', t('authSwitchLogin')));
+        card.appendChild(p);
+        card.appendChild(foot);
+        wrap.appendChild(card);
+        mountShell(wrap, {shellVariant: 'auth', authMode: 'reset'});
+        return;
+    }
+
+    const err = document.createElement('div');
+    err.className = 'ts-error';
+    err.style.display = 'none';
+
+    const form = document.createElement('form');
+    form.innerHTML = `<div class="ts-field"><label>${escapeHtml(t('authPassword'))}</label><input name="password" type="password" autocomplete="new-password" required></div>
+<div class="ts-field"><label>${escapeHtml(t('authPasswordConfirm'))}</label><input name="password_confirm" type="password" autocomplete="new-password" required></div>
+<button class="ts-btn primary" type="submit">${escapeHtml(t('authResetSubmit'))}</button>`;
+
+    form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        err.style.display = 'none';
+        const fd = new FormData(form);
+        const password = String(fd.get('password') || '');
+        const password2 = String(fd.get('password_confirm') || '');
+        if (password !== password2) {
+            err.textContent = t('authResetMismatch');
+            err.style.display = 'block';
+            return;
+        }
+        const j = await ajaxPost('/user/json_reset_post', {
+            csrf_token: csrfToken,
+            code,
+            password,
+        });
+        if (j.ret === 0) {
+            form.style.display = 'none';
+            err.classList.remove('ts-error');
+            err.classList.add('ts-text-muted');
+            err.textContent = t('authResetSuccess');
+            err.style.display = 'block';
+            setTimeout(() => navigate('/user/login'), 900);
+        } else {
+            err.classList.add('ts-error');
+            err.classList.remove('ts-text-muted');
+            err.textContent = j.tp_error_msg || t('actionFailed');
+            err.style.display = 'block';
+        }
+    });
+
+    const foot = document.createElement('div');
+    foot.className = 'ts-auth-foot';
+    foot.appendChild(navLink('/user/forgot', t('authForgotPassword')));
+
+    card.appendChild(err);
+    card.appendChild(form);
+    card.appendChild(foot);
+    wrap.appendChild(card);
+
+    mountShell(wrap, {shellVariant: 'auth', authMode: 'reset'});
+}
+
 function renderOauthBind(route) {
     document.title = `${t('authBindTitle')} · ${bootstrap.siteName || 'TwimiSNS'}`;
     const bind = bootstrap.oauthBind;
@@ -3481,6 +3637,12 @@ async function render() {
             break;
         case 'register':
             await renderRegister();
+            break;
+        case 'forgot_password':
+            await renderForgotPassword();
+            break;
+        case 'reset_password':
+            await renderResetPassword();
             break;
         case 'oauth_bind':
             renderOauthBind(route);

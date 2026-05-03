@@ -251,6 +251,33 @@ a:hover {
     min-width: 0;
 }
 
+.ts-header-menu-item--locale {
+    cursor: default;
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+}
+
+.ts-header-locale-select-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.ts-locale-select {
+    width: 100%;
+    max-width: 11rem;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 580;
+    padding: 0.28rem 0.45rem;
+    border-radius: var(--ts-radius-sm);
+    border: 1px solid var(--ts-border);
+    background: var(--ts-surface);
+    color: var(--ts-text);
+}
+
 .ts-header-menu-item--danger {
     color: var(--ts-danger);
 }
@@ -1332,6 +1359,20 @@ a:hover {
     font-weight: 520;
     color: var(--ts-muted);
     padding-block: 0.48rem;
+}
+
+.ts-drawer-lang-row {
+    cursor: default;
+}
+
+.ts-drawer-locale-wrap {
+    flex: 1;
+    min-width: 0;
+}
+
+.ts-drawer-lang-row .ts-locale-select {
+    width: 100%;
+    max-width: none;
 }
 
 .ts-drawer-menu-item--muted:hover {
@@ -3318,10 +3359,16 @@ a:hover {
     background: color-mix(in srgb, var(--ts-accent) 8%, transparent);
 }
 
-.ts-auth-float-lang {
+.ts-auth-locale-wrap {
+    pointer-events: auto;
+}
+
+.ts-auth-locale-wrap .ts-locale-select {
     font-size: 0.8rem;
     font-weight: 650;
-    min-width: 2.35rem;
+    min-height: 2.35rem;
+    padding: 0.25rem 0.45rem;
+    max-width: 9.5rem;
 }
 
 .ts-auth-float-link {
