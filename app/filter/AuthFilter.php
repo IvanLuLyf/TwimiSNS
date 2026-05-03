@@ -56,26 +56,24 @@ class AuthFilter extends Filter
                 $this->error(['ret' => -7, 'status' => 'parameter cannot be empty']);
             }
         } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_AJAX) {
-            if (BunnyPHP::app()->get('tp_ajax') === true) {
-                if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
-                    $token = Request::cookie('bunny_user_token');
-                } else {
-                    $token = Request::session('token');
-                }
-                if (!$token) $token = BunnyPHP::getRequest()->getHeader('token');
-                if ($token) {
-                    $user = (new UserModel)->check($token);
-                    if ($user != null) {
-                        BunnyPHP::app()->set('tp_user', $user);
-                        return self::NEXT;
-                    } else {
-                        $this->redirect('user', 'login', ['referer' => $_SERVER['REQUEST_URI']]);
-                    }
-                } else {
-                    $this->redirect('user', 'login', ['referer' => $_SERVER['REQUEST_URI']]);
-                }
+            // `/ajax/...` routes set MODE_AJAX (and normally tp_ajax); auth must not depend only on tp_ajax.
+            if ($_ENV['BUNNY_COOKIE_TOKEN'] ?? false) {
+                $token = Request::cookie('bunny_user_token');
             } else {
-                $this->error(['ret' => 2002, 'status' => 'permission denied']);
+                $token = Request::session('token');
+            }
+            if (!$token) {
+                $token = BunnyPHP::getRequest()->getHeader('token');
+            }
+            if ($token) {
+                $user = (new UserModel)->check($token);
+                if ($user != null) {
+                    BunnyPHP::app()->set('tp_user', $user);
+                    return self::NEXT;
+                }
+                $this->redirect('user', 'login', ['referer' => $_SERVER['REQUEST_URI']]);
+            } else {
+                $this->redirect('user', 'login', ['referer' => $_SERVER['REQUEST_URI']]);
             }
         } else {
             $this->error(['ret' => 2002, 'status' => 'permission denied']);

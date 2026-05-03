@@ -29,10 +29,9 @@ class ApiFilter extends Filter
                 $this->error(['ret' => -7, 'status' => 'parameter cannot be empty']);
             }
             return self::STOP;
-        } else if (BUNNY_APP_MODE == BunnyPHP::MODE_AJAX) {
-            if (BunnyPHP::app()->get('tp_ajax') !== true) {
-                return self::STOP;
-            }
+        } elseif (BUNNY_APP_MODE == BunnyPHP::MODE_AJAX) {
+            // Ajax browser routes skip API key validation.
+            return self::NEXT;
         }
         return self::NEXT;
     }

@@ -1,5 +1,6 @@
 <?php
 
+use BunnyPHP\Config;
 use BunnyPHP\Model;
 
 /**
@@ -170,11 +171,101 @@ class UserModel extends Model
     public function getAvatar($user, $isId = false)
     {
         $default = '/static/img/avatar.png';
-        if ($row = $this->where($isId ? 'uid=?' : 'username=?', [$user])->fetch('avatar')) {
-            return $row['avatar'] ?: $default;
-        } else {
+        $row = $this->where($isId ? 'uid=?' : 'username=?', [$user])->fetch(['avatar', 'uid']);
+        if (!$row) {
             return $default;
         }
+        $stored = trim((string) ($row['avatar'] ?? ''));
+        if ($stored !== '' && $stored !== $default) {
+            return $stored;
+        }
+        $uid = (int) ($row['uid'] ?? 0);
+        if ($uid > 0) {
+            $oauthUrl = $this->oauthAvatarUrlForUid($uid);
+            if ($oauthUrl !== '') {
+                return $oauthUrl;
+            }
+        }
+
+        return $stored !== '' ? $stored : $default;
+    }
+
+    /**
+     * When profile avatar is still empty/default, persist provider avatar once bind exists.
+     */
+    public function maybeSyncOauthAvatar(int $uid): void
+    {
+        if ($uid <= 0) {
+            return;
+        }
+        $default = '/static/img/avatar.png';
+        $row = $this->where('uid = ?', [$uid])->fetch(['avatar']);
+        if (!$row) {
+            return;
+        }
+        $cur = trim((string) ($row['avatar'] ?? ''));
+        if ($cur !== '' && $cur !== $default) {
+            return;
+        }
+        $url = $this->oauthAvatarUrlForUid($uid);
+        if ($url !== '') {
+            $this->updateAvatar($uid, $url);
+        }
+    }
+
+    /**
+     * Resolve avatar URL from OAuth binds (GitHub / QQ use stable URLs; Weibo may call remote API).
+     *
+     * @return non-empty-string|''
+     */
+    private function oauthAvatarUrlForUid(int $uid): string
+    {
+        if (!Config::check('oauth')) {
+            return '';
+        }
+        $rows = (new BindModel())->where(['uid = ?'], [$uid])->fetchAll(['id', 'type', 'bind', 'token']);
+        if ($rows === null || $rows === []) {
+            return '';
+        }
+        usort($rows, static function ($a, $b) {
+            $p = static function ($t) {
+                switch ($t) {
+                    case 'gh':
+                        return 0;
+                    case 'qq':
+                        return 1;
+                    case 'wb':
+                        return 10;
+                    default:
+                        return 5;
+                }
+            };
+            $ta = $p((string) ($a['type'] ?? ''));
+            $tb = $p((string) ($b['type'] ?? ''));
+            if ($ta !== $tb) {
+                return $ta <=> $tb;
+            }
+
+            return (int) ($a['id'] ?? 0) <=> (int) ($b['id'] ?? 0);
+        });
+        $svc = new OauthService();
+        foreach ($rows as $r) {
+            $type = (string) ($r['type'] ?? '');
+            $bindId = (string) ($r['bind'] ?? '');
+            if ($type === '' || $bindId === '') {
+                continue;
+            }
+            try {
+                $url = trim($svc->avatar($type, $bindId, (string) ($r['token'] ?? '')));
+                if ($url !== '' && strncmp($url, 'http', 4) === 0) {
+                    return $url;
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        return '';
     }
 
     private function validateUsername($username): bool

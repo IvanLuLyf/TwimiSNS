@@ -55,6 +55,7 @@ class OauthController extends Controller
             $userToken = (new UserModel())->refresh($uid);
             $userService->setLoginUser($userToken);
             $bind_model->where(['bind=:b and type=:t'], ['b' => $bind['uid'], 't' => $type])->update(['token' => $bind['token'], 'expire' => $bind['expire']]);
+            (new UserModel())->maybeSyncOauthAvatar((int) $uid);
             $referer = Request::session('referer', null);
             if ($referer) {
                 $this->redirect($referer);
@@ -65,6 +66,7 @@ class OauthController extends Controller
             if ($user = $userService->getLoginUser()) {
                 $bind_data = ['uid' => $user['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
                 $bind_model->add($bind_data);
+                (new UserModel())->maybeSyncOauthAvatar((int) $user['uid']);
                 $this->redirect('setting', 'oauth', ['type' => $type]);
             } else {
                 Request::session('oauth_user', ['type' => $type, 'uid' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire'], 'nickname' => $bind['nickname'],]);
@@ -116,6 +118,7 @@ class OauthController extends Controller
             $bind = Request::session('oauth_user');
             $bind_data = ['uid' => $result['uid'], 'type' => $type, 'bind' => $bind['uid'], 'token' => $bind['token'], 'expire' => $bind['expire']];
             (new BindModel())->add($bind_data);
+            (new UserModel())->maybeSyncOauthAvatar((int) $result['uid']);
             $referer = Request::session('referer', null);
             if ($referer) {
                 $this->redirect($referer);
