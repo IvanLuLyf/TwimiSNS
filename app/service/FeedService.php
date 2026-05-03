@@ -65,12 +65,10 @@ class FeedService extends Service
     public function loadFeedImages(array $feedIds): array
     {
         if (!$feedIds) return [];
-        $base = (RequestUtil::isHttps() ? 'https://' : 'http://') . TP_SITE_URL;
         $images = $this->feedImageModel->where('tid in (' . implode(',', $feedIds) . ')')->fetchAll(['tid', 'url']);
         $imageMap = [];
         foreach ($images as $image) {
-            $url = $image['url'];
-            if ($url[0] === '/') $url = $base . $url;
+            $url = BunnyPHP::toPublicUrl((string)($image['url'] ?? ''));
             $imageMap[$image['tid']][] = ['url' => $url];
         }
         return $imageMap;

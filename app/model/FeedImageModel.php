@@ -1,5 +1,6 @@
 <?php
 
+use BunnyPHP\BunnyPHP;
 use BunnyPHP\Model;
 
 /**
@@ -27,6 +28,14 @@ class FeedImageModel extends Model
     public function getFeedImageByTid($tid)
     {
         $row = $this->where(["tid = ?"], [$tid])->fetchAll('url');
-        return $row ? $row : null;
+        if (!$row) {
+            return null;
+        }
+        $out = [];
+        foreach ($row as $r) {
+            $u = is_array($r) ? (string)($r['url'] ?? '') : (string)$r;
+            $out[] = ['url' => BunnyPHP::toPublicUrl($u)];
+        }
+        return $out;
     }
 }

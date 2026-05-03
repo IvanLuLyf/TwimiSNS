@@ -1,5 +1,6 @@
 <?php
 
+use BunnyPHP\BunnyPHP;
 use BunnyPHP\Config;
 use BunnyPHP\Model;
 
@@ -22,6 +23,14 @@ class UserModel extends Model
     protected array $_pk = ['uid'];
     protected string $_ai = 'uid';
     protected static array $NO_SENSITIVE_FIELD = ['uid', 'username', 'nickname', 'avatar'];
+
+    public static function withPublicAvatar(array $user): array
+    {
+        if (isset($user['avatar'])) {
+            $user['avatar'] = BunnyPHP::toPublicUrl((string)$user['avatar']);
+        }
+        return $user;
+    }
 
     public function getUsers($page = 1)
     {
@@ -175,19 +184,19 @@ class UserModel extends Model
         if (!$row) {
             return $default;
         }
-        $stored = trim((string) ($row['avatar'] ?? ''));
+        $stored = trim((string)($row['avatar'] ?? ''));
         if ($stored !== '' && $stored !== $default) {
-            return $stored;
+            return BunnyPHP::toPublicUrl($stored);
         }
-        $uid = (int) ($row['uid'] ?? 0);
+        $uid = (int)($row['uid'] ?? 0);
         if ($uid > 0) {
             $oauthUrl = $this->oauthAvatarUrlForUid($uid);
             if ($oauthUrl !== '') {
-                return $oauthUrl;
+                return BunnyPHP::toPublicUrl($oauthUrl);
             }
         }
 
-        return $stored !== '' ? $stored : $default;
+        return BunnyPHP::toPublicUrl($stored !== '' ? $stored : $default);
     }
 
     /**
@@ -203,7 +212,7 @@ class UserModel extends Model
         if (!$row) {
             return;
         }
-        $cur = trim((string) ($row['avatar'] ?? ''));
+        $cur = trim((string)($row['avatar'] ?? ''));
         if ($cur !== '' && $cur !== $default) {
             return;
         }
@@ -240,23 +249,23 @@ class UserModel extends Model
                         return 5;
                 }
             };
-            $ta = $p((string) ($a['type'] ?? ''));
-            $tb = $p((string) ($b['type'] ?? ''));
+            $ta = $p((string)($a['type'] ?? ''));
+            $tb = $p((string)($b['type'] ?? ''));
             if ($ta !== $tb) {
                 return $ta <=> $tb;
             }
 
-            return (int) ($a['id'] ?? 0) <=> (int) ($b['id'] ?? 0);
+            return (int)($a['id'] ?? 0) <=> (int)($b['id'] ?? 0);
         });
         $svc = new OauthService();
         foreach ($rows as $r) {
-            $type = (string) ($r['type'] ?? '');
-            $bindId = (string) ($r['bind'] ?? '');
+            $type = (string)($r['type'] ?? '');
+            $bindId = (string)($r['bind'] ?? '');
             if ($type === '' || $bindId === '') {
                 continue;
             }
             try {
-                $url = trim($svc->avatar($type, $bindId, (string) ($r['token'] ?? '')));
+                $url = trim($svc->avatar($type, $bindId, (string)($r['token'] ?? '')));
                 if ($url !== '' && strncmp($url, 'http', 4) === 0) {
                     return $url;
                 }

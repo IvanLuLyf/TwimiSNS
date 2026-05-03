@@ -22,6 +22,7 @@ class AuthFilter extends Filter
             if ($token) {
                 $user = (new UserModel)->check($token);
                 if ($user != null) {
+                    $user = UserModel::withPublicAvatar($user);
                     BunnyPHP::app()->set('tp_user', $user);
                     $this->assign('tp_user', $user);
                     return self::NEXT;
@@ -39,7 +40,7 @@ class AuthFilter extends Filter
                     if ($apiInfo['type'] == ConstUtil::APP_SYSTEM || $param[0] == '' || in_array($param[0], $apiInfo['scope'])) {
                         $authInfo = (new OauthTokenModel())->check($appKey, $appToken);
                         if ($authInfo != 0) {
-                            $user = (new UserModel)->getUserByUid($authInfo['uid'], '*');
+                            $user = UserModel::withPublicAvatar((new UserModel)->getUserByUid($authInfo['uid'], '*'));
                             BunnyPHP::app()->set('tp_user', $user);
                             BunnyPHP::app()->set('tp_api', $apiInfo);
                             return self::NEXT;
@@ -68,6 +69,7 @@ class AuthFilter extends Filter
             if ($token) {
                 $user = (new UserModel)->check($token);
                 if ($user != null) {
+                    $user = UserModel::withPublicAvatar($user);
                     BunnyPHP::app()->set('tp_user', $user);
                     return self::NEXT;
                 }

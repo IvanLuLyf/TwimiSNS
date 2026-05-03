@@ -17,7 +17,8 @@ class UserService extends Service
             $token = Request::session('token');
         }
         if ($token) {
-            return (new UserModel)->check($token);
+            $u = (new UserModel)->check($token);
+            return $u !== null ? UserModel::withPublicAvatar($u) : null;
         }
         return null;
     }

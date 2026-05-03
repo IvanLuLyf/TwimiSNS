@@ -19,7 +19,7 @@ class UserController extends Controller
             'uid' => (int)($u['uid'] ?? 0),
             'username' => $u['username'] ?? '',
             'nickname' => $u['nickname'] ?? '',
-            'avatar' => $u['avatar'] ?? '',
+            'avatar' => isset($u['avatar']) ? BunnyPHP::toPublicUrl((string)$u['avatar']) : '',
         ];
     }
 
@@ -325,7 +325,7 @@ class UserController extends Controller
                 $t = time() % 1000;
                 $url = BunnyPHP::getStorage()->upload("avatar/{$tp_user['uid']}_$t.jpg", $_FILES['avatar']['tmp_name']);
                 $userModel->updateAvatar($tp_user['uid'], $url);
-                $response = ['ret' => 0, 'status' => 'ok', 'url' => $url];
+                $response = ['ret' => 0, 'status' => 'ok', 'url' => BunnyPHP::toPublicUrl($url)];
             } else {
                 $response = ['ret' => 2, 'status' => 'invalid file'];
             }
@@ -359,7 +359,7 @@ class UserController extends Controller
         $t = time() % 1000;
         $url = BunnyPHP::getStorage()->upload("avatar/{$tp_user['uid']}_$t.jpg", $_FILES['avatar']['tmp_name']);
         $userModel->updateAvatar($tp_user['uid'], $url);
-        $this->assignAll(['ret' => 0, 'status' => 'ok', 'url' => $url])->render('app.php');
+        $this->assignAll(['ret' => 0, 'status' => 'ok', 'url' => BunnyPHP::toPublicUrl($url)])->render('app.php');
     }
 
     /**
@@ -373,18 +373,18 @@ class UserController extends Controller
             if ($username == '' && $id_code == '') {
                 $tp_user = BunnyPHP::app()->get('tp_user');
                 $this->assignAll(['ret' => 0, 'status' => 'ok']);
-                $this->assignAll($tp_user);
+                $this->assignAll(UserModel::withPublicAvatar($tp_user));
             } else if ($id_code != '') {
                 $uid = (new IdCodeModel())->getIdByCode($id_code);
                 if ($uid != 0) {
-                    $response = (new UserModel())->getUserByUid($uid);
+                    $response = UserModel::withPublicAvatar((new UserModel())->getUserByUid($uid));
                     $this->assignAll(['ret' => 0, 'status' => 'ok']);
                     $this->assignAll($response);
                 } else {
                     $this->assignAll(['ret' => 1006, 'status' => 'invalid id code']);
                 }
             } else {
-                $row = (new UserModel())->getUserByUsername($username);
+                $row = UserModel::withPublicAvatar((new UserModel())->getUserByUsername($username));
                 if ($row['uid'] != null) {
                     $this->assignAll(['ret' => 0, 'status' => 'ok']);
                     $this->assignAll($row);
