@@ -19,7 +19,6 @@ function readBootstrap() {
 }
 
 let bootstrap = readBootstrap();
-initI18n(bootstrap);
 let csrfToken = bootstrap.csrfToken || '';
 
 function createLocaleSelect(wrapClass) {
@@ -3655,4 +3654,7 @@ async function render() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => void render());
+document.addEventListener('DOMContentLoaded', async () => {
+    await initI18n(bootstrap);
+    await render();
+});

@@ -75,6 +75,6 @@ $jsonFlags = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QU
 <div id="app" class="ts-shell">
     <div class="ts-loading" role="status" aria-live="polite"></div>
 </div>
-<script type="module" src="/static/app/main.js?v=70"></script>
+<script type="module" src="/static/app/main.js?v=71"></script>
 </body>
 </html>
