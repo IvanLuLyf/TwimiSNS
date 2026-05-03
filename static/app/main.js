@@ -1349,7 +1349,7 @@ async function renderBuy(tidStr) {
     wrap.appendChild(loading);
     mountShell(wrap, {headerTitle: t('pay'), headerActions: null});
 
-    const j = await jsonGet(`/post/pay_preview/${tid}`);
+    const j = await ajaxGet(`/post/pay_preview/${tid}`);
     wrap.innerHTML = '';
 
     if (j.ret === 2002) {
@@ -1454,7 +1454,7 @@ async function renderBuy(tidStr) {
             err.textContent = t('payPassRequired');
             return;
         }
-        const r = await jsonPost(`/post/pay_commit/${tid}`, {csrf_token: csrfToken, pass});
+        const r = await ajaxPost(`/post/pay_commit/${tid}`, {csrf_token: csrfToken, pass});
         if (r.ret !== 0) {
             err.textContent = r.tp_error_msg || r.status || t('payFail');
             return;
@@ -1850,7 +1850,7 @@ function buildComposeForm(compact, onPosted, streamKey) {
         syncVisibility();
         err.textContent = '';
         const fd = new FormData(form);
-        const r = await jsonPost('/post/push', {
+        const r = await ajaxPost('/post/push', {
             csrf_token: csrfToken,
             title: fd.get('title'),
             content: fd.get('content'),
@@ -1922,7 +1922,7 @@ async function renderHome() {
         retryPage = null;
         retryBtn.hidden = true;
         statusLine.textContent = t('loading');
-        const j = await jsonGet(`/post/feed/${nextPage}`);
+        const j = await ajaxGet(`/post/feed/${nextPage}`);
         loading = false;
 
         if (j.ret !== 0) {
@@ -1988,7 +1988,7 @@ async function renderHome() {
 }
 
 async function renderPost(tid) {
-    const j = await jsonGet(`/post/thread/${tid}`);
+    const j = await ajaxGet(`/post/thread/${tid}`);
     const frag = document.createDocumentFragment();
     if (j.ret !== 0) {
         const stack = document.createElement('div');
@@ -2045,7 +2045,7 @@ async function renderPost(tid) {
             err.textContent = '';
             const fd = new FormData(form);
             const content = fd.get('content');
-            const r = await jsonPost(`/post/reply/${tid}`, {
+            const r = await ajaxPost(`/post/reply/${tid}`, {
                 csrf_token: csrfToken,
                 content,
             });
@@ -2159,7 +2159,7 @@ async function renderSearch() {
         retryPage = null;
         retryBtn.hidden = true;
         statusLine.textContent = t('loading');
-        const j = await jsonGet(`/post/find?word=${encodeURIComponent(q)}&page=${nextPage}`);
+        const j = await ajaxGet(`/post/find?word=${encodeURIComponent(q)}&page=${nextPage}`);
         loading = false;
 
         if (j.ret !== 0) {
